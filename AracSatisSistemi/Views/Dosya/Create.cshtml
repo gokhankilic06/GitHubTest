@@ -211,23 +211,23 @@
     <input type="hidden" asp-for="KomisyonUye4" />
 
     <div class="form-section-title">4. Satış Bilgileri</div>
-    <p class="text-muted small">İhaleler her hafta Çarşamba günü yapılır. Satış tarihleri, resmi tatile denk gelmediği sürece otomatik olarak hesaplanır; bu nedenle burada değiştirilemez. İhale gerçekleştikten sonra sonuç, satış bedeli ve alıcı bilgileri "Satışa İlişkin Bilgiler" ekranından girilir.</p>
+    <p class="text-muted small">İhaleler her hafta Çarşamba günü yapılır; satış tarihleri resmi tatile denk gelmediği sürece otomatik önerilir. Gerekirse (ör. ihale ertelenirse) tarihi elle değiştirebilirsiniz. İhale gerçekleştikten sonra sonuç, satış bedeli ve alıcı bilgileri "Satışa İlişkin Bilgiler" ekranından girilir.</p>
     <div class="table-responsive">
-        <table class="table table-bordered align-middle">
+        <table class="table table-bordered align-middle" style="width:auto;">
             <thead class="table-light">
                 <tr>
-                    <th style="width:20%">Satış Türü</th>
+                    <th>Satış Türü</th>
                     <th>Satış Tarihi</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="fw-semibold">1. Satış</td>
-                    <td><input class="form-control" asp-for="Satis1Tarihi" type="date" readonly /></td>
+                    <td><input class="form-control" asp-for="Satis1Tarihi" type="date" style="width:170px;" /></td>
                 </tr>
                 <tr>
                     <td class="fw-semibold">2. Satış</td>
-                    <td><input class="form-control" asp-for="Satis2Tarihi" type="date" readonly /></td>
+                    <td><input class="form-control" asp-for="Satis2Tarihi" type="date" style="width:170px;" /></td>
                 </tr>
             </tbody>
         </table>

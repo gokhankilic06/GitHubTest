@@ -213,6 +213,29 @@
     <input type="hidden" asp-for="KomisyonUye3" />
     <input type="hidden" asp-for="KomisyonUye4" />
 
+    <div class="form-section-title">4. Satış Bilgileri</div>
+    <p class="text-muted small">İhaleler her hafta Çarşamba günü yapılır. Gerekirse (ör. ihale ertelenirse) tarihi elle değiştirebilirsiniz.</p>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle" style="width:auto;">
+            <thead class="table-light">
+                <tr>
+                    <th>Satış Türü</th>
+                    <th>Satış Tarihi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="fw-semibold">1. Satış</td>
+                    <td><input class="form-control" asp-for="Satis1Tarihi" type="date" style="width:170px;" /></td>
+                </tr>
+                <tr>
+                    <td class="fw-semibold">2. Satış</td>
+                    <td><input class="form-control" asp-for="Satis2Tarihi" type="date" style="width:170px;" /></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <div class="mt-4">
         <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
         <a asp-controller="Dosya" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Vazgeç</a>

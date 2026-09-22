@@ -72,10 +72,9 @@ namespace AracSatisSistemi.Controllers
             dosya.KayitTarihi = DateTime.Now;
             dosya.Durum = DosyaDurumu.Kayitli;
 
-            // Planlanan ihale tarihleri güvenilirlik için istemciden gelen değere değil,
-            // sunucuda kayıt anında yeniden hesaplanan değere göre belirlenir.
-            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
-            (dosya.Satis1Tarihi, dosya.Satis2Tarihi) = IhaleTarihHesaplayici.PlanliSatisTarihleriHesapla(dosya.KayitTarihi, resmiTatiller);
+            // Satış tarihleri formda otomatik hesaplanmış öneri olarak gelir; kullanıcı
+            // gerektiğinde (ör. ihale ertelenirse) elle değiştirebildiği için burada
+            // olduğu gibi (dosya.Satis1Tarihi / Satis2Tarihi) kaydedilir.
 
             _db.Dosyalar.Add(dosya);
             await _db.SaveChangesAsync();
@@ -136,6 +135,8 @@ namespace AracSatisSistemi.Controllers
             dosya.KomisyonUye2 = guncel.KomisyonUye2;
             dosya.KomisyonUye3 = guncel.KomisyonUye3;
             dosya.KomisyonUye4 = guncel.KomisyonUye4;
+            dosya.Satis1Tarihi = guncel.Satis1Tarihi;
+            dosya.Satis2Tarihi = guncel.Satis2Tarihi;
 
             await _db.SaveChangesAsync();
             TempData["Basari"] = "Dosya güncellendi.";
