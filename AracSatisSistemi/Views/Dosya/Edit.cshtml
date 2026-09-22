@@ -1,0 +1,308 @@
+@model Dosya
+@{
+    ViewData["Title"] = "Dosya Düzenle";
+    var cinsler = (List<AracCinsi>)ViewBag.Cinsler;
+    var markalar = (List<AracMarkasi>)ViewBag.Markalar;
+    var otoparklar = (List<OtoparkKaydi>)ViewBag.Otoparklar;
+    var sehirler = (List<string>)ViewBag.Sehirler;
+    var ankaraVergiDaireleri = (List<VergiDairesiKaydi>)ViewBag.AnkaraVergiDaireleri;
+    var renkler = (List<AracRengi>)ViewBag.Renkler;
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h3>Dosya Düzenle - @Model.DosyaNo</h3>
+    </div>
+    <div class="d-flex gap-2 no-print">
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-success" onclick="excelOlarakAktar()"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</button>
+    </div>
+</div>
+
+<form asp-controller="Dosya" asp-action="Edit" asp-route-id="@Model.Id" method="post" id="kayitFormu">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="DosyaNo" />
+    <input type="hidden" asp-for="KayitTarihi" />
+    <input type="hidden" asp-for="Durum" />
+
+    <div class="form-section-title">1. İlgili Vergi Dairesi</div>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label" asp-for="VergiDairesiAdi"></label>
+            <select class="form-select" asp-for="VergiDairesiAdi">
+                <option value="">-- Seçiniz --</option>
+                @foreach (var v in ankaraVergiDaireleri)
+                {
+                    <option value="@v.Ad">@v.Ad</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" asp-for="VergiDairesiYaziTarihi"></label>
+            <input class="form-control" asp-for="VergiDairesiYaziTarihi" type="date" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label" asp-for="VergiDairesiYaziSayisi"></label>
+            <input class="form-control" asp-for="VergiDairesiYaziSayisi" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Alacaklı Vergi Dairesi - İl</label>
+            <select class="form-select" id="sehir2">
+                <option value="">-- İl Seçiniz --</option>
+                @foreach (var s in sehirler)
+                {
+                    <option value="@s">@s</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="AlacakliVergiDairesi"></label>
+            <select class="form-select" asp-for="AlacakliVergiDairesi" id="vergiDairesi2" disabled>
+                <option value="">-- Önce il seçiniz --</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="form-section-title">2. Borçlu Mükellef Bilgileri</div>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label" asp-for="VergiKimlikNumarasi"></label>
+            <input class="form-control" asp-for="VergiKimlikNumarasi" maxlength="10" placeholder="10 haneli" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="TCKimlikNumarasi"></label>
+            <input class="form-control" asp-for="TCKimlikNumarasi" maxlength="11" placeholder="11 haneli" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="AdiSoyadiUnvani"></label>
+            <input class="form-control" asp-for="AdiSoyadiUnvani" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="KanuniTemsilci"></label>
+            <input class="form-control" asp-for="KanuniTemsilci" />
+        </div>
+    </div>
+
+    <div class="form-section-title">3. Araç Bilgi Girişi</div>
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label" asp-for="Plaka"></label>
+            <input class="form-control" asp-for="Plaka" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="AracCinsi"></label>
+            <select class="form-select" asp-for="AracCinsi">
+                <option value="">-- Seçiniz --</option>
+                @foreach (var c in cinsler)
+                {
+                    <option value="@c.Ad">@c.Ad</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="AracMarkasi"></label>
+            <select class="form-select" asp-for="AracMarkasi">
+                <option value="">-- Seçiniz --</option>
+                @foreach (var m in markalar)
+                {
+                    <option value="@m.Ad">@m.Ad</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="AracTipi"></label>
+            <input class="form-control" asp-for="AracTipi" placeholder="Manuel giriş" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="ModelYili"></label>
+            <select class="form-select" asp-for="ModelYili">
+                <option value="">-- Seçiniz --</option>
+                @for (var yil = 2035; yil >= 1940; yil--)
+                {
+                    <option value="@yil">@yil</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="Renk"></label>
+            <select class="form-select" asp-for="Renk">
+                <option value="">-- Seçiniz --</option>
+                @foreach (var r in renkler)
+                {
+                    <option value="@r.Ad">@r.Ad</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="RuhsatVar">Ruhsatın Olup Olmadığı</label>
+            <select class="form-select" asp-for="RuhsatVar">
+                <option value="true">VAR</option>
+                <option value="false">YOK</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="AnahtarVar">Anahtarın Bulunup Bulunmadığı</label>
+            <select class="form-select" asp-for="AnahtarVar">
+                <option value="true">VAR</option>
+                <option value="false">YOK</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="CekiciVar">Çekici</label>
+            <select class="form-select" asp-for="CekiciVar">
+                <option value="true">VAR</option>
+                <option value="false">YOK</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="OtoparkAdi">Aracın Bulunduğu Otopark</label>
+            <select class="form-select" asp-for="OtoparkAdi">
+                <option value="">-- Seçiniz --</option>
+                @foreach (var o in otoparklar)
+                {
+                    <option value="@o.Ad">@o.Ad</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="OtoparkaGirisTarihi"></label>
+            <input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label" asp-for="MuhammenBedel"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="MuhammenBedel" id="muhammenBedel" type="number" step="0.01" min="0" />
+                <span class="input-group-text">TL</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Teminat (%5, 10.000 TL üzeri)</label>
+            <div class="input-group">
+                <input class="form-control" id="teminatOnizleme" readonly />
+                <span class="input-group-text">TL</span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="KdvOrani"></label>
+            <select class="form-select" asp-for="KdvOrani">
+                <option value="1">%1</option>
+                <option value="10">%10</option>
+                <option value="20">%20</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Damga Vergisi Tutarı (Binde 5,69)</label>
+            <div class="input-group">
+                <input class="form-control" id="damgaVergisiOnizleme" readonly />
+                <span class="input-group-text">TL</span>
+            </div>
+        </div>
+        <div class="col-7">
+            <label class="form-label" asp-for="HasarDurumu"></label>
+            <textarea class="form-control" asp-for="HasarDurumu" rows="2" placeholder="Haciz tutanağında yapılan tespitler kısa açıklama olarak yazılabilir"></textarea>
+        </div>
+    </div>
+
+    <!-- Komisyon bilgileri "Güncellemeler" ekranındaki ayardan otomatik alınır ve
+         dosyada saklanır (İhale Tutanağı imza alanlarında kullanılır); bu ekranda
+         ayrıca gösterilmez. -->
+    <input type="hidden" asp-for="KomisyonBaskani" />
+    <input type="hidden" asp-for="KomisyonUye1" />
+    <input type="hidden" asp-for="KomisyonUye2" />
+    <input type="hidden" asp-for="KomisyonUye3" />
+    <input type="hidden" asp-for="KomisyonUye4" />
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+        <a asp-controller="Dosya" asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script>
+        // Doldurulmuş formdaki alan/değerleri Excel (.xlsx) olarak indirir.
+        function excelOlarakAktar() {
+            const form = document.getElementById('kayitFormu');
+            const satirlar = [['Alan', 'Değer']];
+            form.querySelectorAll('.form-label').forEach(label => {
+                let el = label.nextElementSibling;
+                while (el && !(el.matches('input, select, textarea') || el.querySelector('input, select, textarea'))) {
+                    el = el.nextElementSibling;
+                }
+                if (!el) return;
+                const control = el.matches('input, select, textarea') ? el : el.querySelector('input, select, textarea');
+                if (!control) return;
+                let deger = '';
+                if (control.tagName === 'SELECT') {
+                    deger = control.options[control.selectedIndex] ? control.options[control.selectedIndex].text : '';
+                } else {
+                    deger = control.value;
+                }
+                satirlar.push([label.textContent.trim(), deger]);
+            });
+            const ws = XLSX.utils.aoa_to_sheet(satirlar);
+            ws['!cols'] = [{ wch: 30 }, { wch: 40 }];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Kayıt Formu');
+            const tarih = new Date().toISOString().slice(0, 10);
+            XLSX.writeFile(wb, `KayitFormu_${tarih}.xlsx`);
+        }
+
+        const vergiDaireleriData = @Html.Raw(ViewBag.VergiDaireleriJson);
+
+        function kademeliVergiDairesiKur(sehirSelectId, vdSelectId) {
+            const sehirSelect = document.getElementById(sehirSelectId);
+            const vdSelect = document.getElementById(vdSelectId);
+            sehirSelect.addEventListener('change', function () {
+                const secilenSehir = this.value;
+                vdSelect.innerHTML = '';
+                if (!secilenSehir) {
+                    vdSelect.disabled = true;
+                    vdSelect.innerHTML = '<option value="">-- Önce il seçiniz --</option>';
+                    return;
+                }
+                vdSelect.disabled = false;
+                const bosOpt = document.createElement('option');
+                bosOpt.value = '';
+                bosOpt.textContent = '-- Vergi Dairesi Seçiniz --';
+                vdSelect.appendChild(bosOpt);
+                vergiDaireleriData
+                    .filter(v => v.Sehir === secilenSehir)
+                    .forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v.Ad;
+                        opt.textContent = v.Ad;
+                        vdSelect.appendChild(opt);
+                    });
+            });
+        }
+        kademeliVergiDairesiKur('sehir2', 'vergiDairesi2');
+
+        // Düzenleme ekranında mevcut "Alacaklı Vergi Dairesi" seçimini önceden doldur.
+        function onSecimYap(sehirSelectId, vdSelectId, mevcutAd) {
+            if (!mevcutAd) return;
+            const kayit = vergiDaireleriData.find(v => v.Ad === mevcutAd);
+            if (!kayit) return;
+            const sehirSelect = document.getElementById(sehirSelectId);
+            sehirSelect.value = kayit.Sehir;
+            sehirSelect.dispatchEvent(new Event('change'));
+            document.getElementById(vdSelectId).value = mevcutAd;
+        }
+        onSecimYap('sehir2', 'vergiDairesi2', @Html.Raw(Json.Serialize(Model.AlacakliVergiDairesi)));
+
+        const bedelInput = document.getElementById('muhammenBedel');
+        const teminatOut = document.getElementById('teminatOnizleme');
+        const damgaOut = document.getElementById('damgaVergisiOnizleme');
+        function hesapla() {
+            const bedel = parseFloat(bedelInput.value) || 0;
+            const teminat = bedel > 10000 ? (bedel * 0.05) : 0;
+            const damgaVergisi = bedel * 5.69 / 1000;
+            teminatOut.value = teminat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            damgaOut.value = damgaVergisi.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        bedelInput.addEventListener('input', hesapla);
+        hesapla();
+    </script>
+}

@@ -1,0 +1,189 @@
+@model Dosya
+@{
+    ViewData["Title"] = "Dosya Detayı";
+    var dosyaNoTemiz = Model.DosyaNo.Replace("/", "_");
+}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h3>Dosya No: @Model.DosyaNo <span class="badge bg-secondary">@Model.DurumGorunenAd</span></h3>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i> Düzenle</a>
+        <a class="btn btn-outline-dark" asp-controller="Satis" asp-action="Create" asp-route-dosyaId="@Model.Id"><i class="bi bi-cash-coin"></i> Satış Bilgisi Gir</a>
+        <a class="btn btn-outline-danger" asp-controller="IptalIade" asp-action="Islem" asp-route-dosyaId="@Model.Id"><i class="bi bi-arrow-return-left"></i> İptal / İade / Kapama</a>
+        <a class="btn btn-outline-dark" asp-action="IhaleTutanagi" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-text"></i> İhale Tutanağı</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-success" asp-action="ExcelIndir" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
+    </div>
+</div>
+
+<div id="yazdirAlani">
+<div class="letterhead mb-3 pb-2 d-flex align-items-start">
+    <div style="width:90px;"></div>
+    <div class="text-center flex-grow-1">
+        <h4 class="mb-0 fw-bold text-nowrap">ANKARA DEFTERDARLIĞI</h4>
+        <div class="text-muted">Satış Detayları</div>
+    </div>
+    <div class="text-end small text-muted" style="width:90px;">@Model.KayitTarihi.ToString("dd.MM.yyyy")</div>
+</div>
+
+<div class="card p-3 mb-3">
+    <div class="d-flex flex-wrap gap-3">
+        <div class="kimlik-kutu">
+            <span class="kimlik-etiket">Dosya No:</span>
+            <span class="kimlik-deger">@Model.DosyaNo</span>
+        </div>
+        <div class="kimlik-kutu">
+            <span class="kimlik-etiket">Durum:</span>
+            <span class="durum-rozet durum-@Model.Durum">@Model.DurumGorunenAd</span>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3 mb-3">
+    <div class="form-section-title">İlgili Vergi Dairesi</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">Vergi Dairesi Adı</td><td>@Model.VergiDairesiAdi</td>
+            <td class="etiket">Alacaklı Vergi Dairesi</td><td>@Model.AlacakliVergiDairesi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Vergi Dairesi Yazısı Tarihi</td><td>@Model.VergiDairesiYaziTarihi?.ToString("dd.MM.yyyy")</td>
+            <td class="etiket">Vergi Dairesi Yazısı Sayısı</td><td>@Model.VergiDairesiYaziSayisi</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card p-3 mb-3">
+    <div class="form-section-title">Borçlu Mükellef</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">Adı Soyadı / Unvanı</td><td>@Model.AdiSoyadiUnvani</td>
+            <td class="etiket">Kanuni Temsilci</td><td>@Model.KanuniTemsilci</td>
+        </tr>
+        <tr>
+            <td class="etiket">T.C. Kimlik No</td><td>@Model.TCKimlikNumarasi</td>
+            <td class="etiket">Vergi Kimlik No</td><td>@Model.VergiKimlikNumarasi</td>
+        </tr>
+    </table>
+</div>
+
+<div class="card p-3 mb-3">
+    <div class="form-section-title">Araç Bilgileri</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">Plaka</td><td>@Model.Plaka</td>
+            <td class="etiket">Markası</td><td>@Model.AracMarkasi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Cinsi</td><td>@Model.AracCinsi</td>
+            <td class="etiket">Tipi</td><td>@Model.AracTipi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Model Yılı</td><td>@Model.ModelYili</td>
+            <td class="etiket">Renk</td><td>@Model.Renk</td>
+        </tr>
+        <tr>
+            <td class="etiket">Ruhsat</td><td>@(Model.RuhsatVar ? "VAR" : "YOK")</td>
+            <td class="etiket">Anahtar</td><td>@(Model.AnahtarVar ? "VAR" : "YOK")</td>
+        </tr>
+        <tr>
+            <td class="etiket">Çekici</td><td>@(Model.CekiciVar ? "VAR" : "YOK")</td>
+            <td class="etiket">Otopark</td><td>@Model.OtoparkAdi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Otoparka Giriş Tarihi</td><td>@Model.OtoparkaGirisTarihi?.ToString("dd.MM.yyyy")</td>
+            <td class="etiket">Hasar Durumu</td><td>@Model.HasarDurumu</td>
+        </tr>
+        <tr>
+            <td class="etiket">Muhammen Bedel</td><td>@Model.MuhammenBedel.ToString("N2") TL</td>
+            <td class="etiket">Teminat (%5)</td><td>@Model.Teminat.ToString("N2") TL</td>
+        </tr>
+        <tr>
+            <td class="etiket">KDV Oranı</td><td>%@Model.KdvOrani</td>
+            <td class="etiket">Damga Vergisi (Binde 5,69)</td><td>@Model.DamgaVergisiTutari.ToString("N2") TL</td>
+        </tr>
+    </table>
+</div>
+
+@if (Model.Satislar.Any())
+{
+    <div class="card p-3 mb-3">
+        <div class="form-section-title">Satış Bilgileri</div>
+        <table class="satis-tablo">
+            <thead>
+                <tr>
+                    <th>Tür</th><th>Tarih</th><th>Sonuç</th><th>Bedel (TL)</th><th>Vade</th><th>Otopark Ücreti (TL)</th><th class="no-print"></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var s in Model.Satislar)
+            {
+                <tr>
+                    <td>@s.SatisTuruGorunen</td>
+                    <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
+                    <td>@s.SonucGorunen</td>
+                    <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
+                    <td>@s.Vade.ToString("dd.MM.yyyy")</td>
+                    <td>@s.OtoparkUcretiToplam.ToString("N2")</td>
+                    <td class="no-print"><a class="btn btn-sm btn-outline-primary" asp-controller="Satis" asp-action="Edit" asp-route-id="@s.Id">Düzenle</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.IptalIade != null)
+{
+    <div class="card p-3 mb-3">
+        <div class="form-section-title">İptal / İade / Kapama</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">Satış İptali</td><td>@(Model.IptalIade.SatisIptaliSecildi ? "Evet" : "Hayır")</td>
+                <td class="etiket">Satış İadesi</td><td>@(Model.IptalIade.SatisIadesiSecildi ? "Evet" : "Hayır")</td>
+                <td class="etiket">Dosya Kapatıldı</td><td>@(Model.IptalIade.DosyaKapatildi ? "Evet" : "Hayır")</td>
+            </tr>
+        </table>
+    </div>
+}
+
+</div>
+
+<a class="btn btn-secondary mt-3 no-print" asp-action="Index">&larr; Listeye Dön</a>
+
+@section Scripts {
+    <script>
+        // Yakalamadan önce ".no-print" öğelerini (ör. Düzenle butonları) geçici gizler,
+        // canvas'ı üretir, sonra öğeleri geri gösterir. Ortak yardımcı fonksiyon.
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('yazdirAlani');
+            const gizlenecekler = alan.querySelectorAll('.no-print');
+            gizlenecekler.forEach(el => el.style.display = 'none');
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                gizlenecekler.forEach(el => el.style.display = '');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const genislik = 210;
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                devamEt(pdf);
+            }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('Dosya_@(dosyaNoTemiz).pdf'));
+        }
+
+        // Tarayıcının "Yazdır" penceresi tarih/saat, sayfa başlığı ve adres gibi kendi
+        // üstbilgi/altbilgisini sayfaya ekler ve bu, sayfa CSS'i ile kapatılamaz. Bunu
+        // tamamen atlamak için önce temiz bir PDF üretilip yeni sekmede açılıyor ve o
+        // PDF'in kendi yazdırma penceresi otomatik tetikleniyor - bu şekilde tarayıcı
+        // üstbilgisi hiç eklenmiyor.
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+    </script>
+}

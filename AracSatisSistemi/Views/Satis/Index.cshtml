@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Satışa İlişkin Bilgiler";
+}
+<h3>Satışa İlişkin Bilgiler</h3>
+<p class="text-muted">Satış bilgisi girmek istediğiniz dosyanın numarasını yazın.</p>
+
+<form asp-action="Bul" method="post" class="row g-2">
+    @Html.AntiForgeryToken()
+    <div class="col-md-4">
+        <input class="form-control" name="dosyaNo" placeholder="Dosya No (ör. 2026/000001)" value="@ViewBag.DosyaNo" required />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit">Dosyayı Getir</button>
+    </div>
+</form>

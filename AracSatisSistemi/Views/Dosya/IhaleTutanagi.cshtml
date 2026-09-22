@@ -1,0 +1,128 @@
+@model Dosya
+@{
+    ViewData["Title"] = "İhale Tutanağı";
+    var satis = Model.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
+}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h3>İhale Tutanağı - Dosya No: @Model.DosyaNo</h3>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@Model.Id"><i class="bi bi-arrow-left"></i> Dosyaya Dön</a>
+    </div>
+</div>
+
+<div id="tutanakAlani">
+    <div class="text-center mb-3 pb-2 border-bottom">
+        <h3 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h3>
+        <h5 class="text-muted mb-0">İhale Tutanağı</h5>
+    </div>
+
+    <div class="card p-3">
+        <div class="row">
+            <div class="col-md-4"><strong>Dosya No:</strong> @Model.DosyaNo</div>
+            <div class="col-md-4"><strong>Tutanak Tarihi:</strong> @DateTime.Now.ToString("dd.MM.yyyy")</div>
+            <div class="col-md-4"><strong>Vergi Dairesi:</strong> @Model.VergiDairesiAdi</div>
+        </div>
+
+        <div class="form-section-title">Borçlu Mükellef</div>
+        <div class="row">
+            <div class="col-md-4"><strong>Adı Soyadı/Unvanı:</strong> @Model.AdiSoyadiUnvani</div>
+            <div class="col-md-4"><strong>TCKN:</strong> @Model.TCKimlikNumarasi</div>
+            <div class="col-md-4"><strong>VKN:</strong> @Model.VergiKimlikNumarasi</div>
+        </div>
+
+        <div class="form-section-title">Satışa Konu Araç</div>
+        <div class="row">
+            <div class="col-md-3"><strong>Plaka:</strong> @Model.Plaka</div>
+            <div class="col-md-3"><strong>Markası:</strong> @Model.AracMarkasi</div>
+            <div class="col-md-3"><strong>Cinsi:</strong> @Model.AracCinsi</div>
+            <div class="col-md-3"><strong>Model Yılı:</strong> @Model.ModelYili</div>
+            <div class="col-md-3"><strong>Renk:</strong> @Model.Renk</div>
+            <div class="col-md-3"><strong>Muhammen Bedel:</strong> @Model.MuhammenBedel.ToString("N2") TL</div>
+        </div>
+
+        <div class="form-section-title">İhale / Satış Sonucu</div>
+        @if (satis != null)
+        {
+            <div class="row">
+                <div class="col-md-3"><strong>Satış Türü:</strong> @satis.SatisTuru</div>
+                <div class="col-md-3"><strong>Satış Tarihi:</strong> @satis.SatisTarihi.ToString("dd.MM.yyyy")</div>
+                <div class="col-md-3"><strong>Sonuç:</strong> @satis.SatisSonucu</div>
+                <div class="col-md-3"><strong>Satış Bedeli:</strong> @(satis.SatisBedeli?.ToString("N2") ?? "-") TL</div>
+                <div class="col-md-4"><strong>Alıcı Adı Soyadı:</strong> @satis.AliciAdiSoyadi</div>
+                <div class="col-md-4"><strong>Alıcı TCKN:</strong> @satis.AliciTCKN</div>
+                <div class="col-md-4"><strong>Alıcı VKN:</strong> @satis.AliciVKN</div>
+                <div class="col-md-6"><strong>Adres:</strong> @satis.Adres</div>
+                <div class="col-md-3"><strong>Vade:</strong> @satis.Vade.ToString("dd.MM.yyyy")</div>
+            </div>
+        }
+        else
+        {
+            <p class="text-muted">Bu dosya için henüz satış kaydı girilmemiştir.</p>
+        }
+
+        <div class="form-section-title">Yukarıda bilgileri yazılı araç, ilgili mevzuat hükümlerine göre açık artırma (ihale) usulüyle satışa çıkarılmış olup, işbu tutanak komisyon üyeleri tarafından tanzim ve imza edilmiştir.</div>
+
+        <div class="row mt-4 text-center">
+            <div class="col-md-4 mt-4">
+                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
+                    @Model.KomisyonBaskani<br /><span class="text-muted small">Komisyon Başkanı</span>
+                </div>
+            </div>
+            <div class="col-md-2 mt-4">
+                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
+                    @Model.KomisyonUye1<br /><span class="text-muted small">Üye</span>
+                </div>
+            </div>
+            <div class="col-md-2 mt-4">
+                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
+                    @Model.KomisyonUye2<br /><span class="text-muted small">Üye</span>
+                </div>
+            </div>
+            <div class="col-md-2 mt-4">
+                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
+                    @Model.KomisyonUye3<br /><span class="text-muted small">Üye</span>
+                </div>
+            </div>
+            <div class="col-md-2 mt-4">
+                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
+                    @Model.KomisyonUye4<br /><span class="text-muted small">Üye</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('tutanakAlani');
+            const gizlenecekler = alan.querySelectorAll('.no-print');
+            gizlenecekler.forEach(el => el.style.display = 'none');
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                gizlenecekler.forEach(el => el.style.display = '');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const genislik = 210;
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                devamEt(pdf);
+            }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('IhaleTutanagi_@(Model.DosyaNo.Replace("/", "_")).pdf'));
+        }
+
+        // Tarayıcının kendi yazdırma üstbilgisini (tarih, başlık, adres) atlamak için
+        // önce temiz bir PDF üretilip yeni sekmede açılıyor ve o PDF'in kendi yazdırma
+        // penceresi otomatik tetikleniyor.
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+    </script>
+}

@@ -1,0 +1,98 @@
+@{
+    ViewData["Title"] = "Yazışmalar ve Listeler";
+    var aracListesi = (List<AracSatisSistemi.Models.Dosya>)ViewBag.AracDurumListesi;
+    var satisListesi = (List<AracSatisSistemi.Models.Satis>)ViewBag.SatisSonucListesi;
+}
+<h3>Yazışmalar ve Listeler</h3>
+
+<form method="get" class="row g-2 mb-4 no-print">
+    <div class="col-md-3">
+        <label class="form-label">Satış Türü</label>
+        <select class="form-select" name="satisTuru">
+            <option value="">Tümü</option>
+            <option value="1" selected="@(ViewBag.SatisTuru?.ToString() == "1")">1. Satış</option>
+            <option value="2" selected="@(ViewBag.SatisTuru?.ToString() == "2")">2. Satış</option>
+            <option value="3" selected="@(ViewBag.SatisTuru?.ToString() == "3")">Pazarlık</option>
+            <option value="4" selected="@(ViewBag.SatisTuru?.ToString() == "4")">6183/86</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Başlangıç Tarihi</label>
+        <input class="form-control" type="date" name="baslangic" value="@ViewBag.Baslangic" />
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Bitiş Tarihi</label>
+        <input class="form-control" type="date" name="bitis" value="@ViewBag.Bitis" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end gap-2">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrele</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer"></i> Yazdır</button>
+        <a class="btn btn-outline-success" id="excelLink" href="#"><i class="bi bi-file-earmark-excel"></i> Excel</a>
+    </div>
+</form>
+
+<script>
+    // Filtre alanlarındaki mevcut değerlerle Excel indirme linkini oluşturur.
+    (function () {
+        const form = document.querySelector('form[method="get"]');
+        const excelLink = document.getElementById('excelLink');
+        function baglantiyiGuncelle() {
+            const params = new URLSearchParams(new FormData(form));
+            excelLink.href = '@Url.Action("ExcelIndir")?' + params.toString();
+        }
+        form.addEventListener('change', baglantiyiGuncelle);
+        baglantiyiGuncelle();
+    })();
+</script>
+
+<h5>Araç Durum Listesi</h5>
+<table class="table table-sm table-bordered bg-white mb-4">
+    <thead><tr><th>Dosya No</th><th>Plaka</th><th>Marka/Cins</th><th>Adı Soyadı</th><th>Durum</th><th>Muhammen Bedel</th></tr></thead>
+    <tbody>
+    @foreach (var d in aracListesi)
+    {
+        <tr>
+            <td>@d.DosyaNo</td>
+            <td>@d.Plaka</td>
+            <td>@d.AracMarkasi / @d.AracCinsi</td>
+            <td>@d.AdiSoyadiUnvani</td>
+            <td>@d.Durum</td>
+            <td>@d.MuhammenBedel.ToString("N2") TL</td>
+        </tr>
+    }
+    @if (!aracListesi.Any())
+    {
+        <tr><td colspan="6" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+    }
+    </tbody>
+</table>
+
+<h5>Satış Sonuç Listesi</h5>
+<table class="table table-sm table-bordered bg-white">
+    <thead><tr><th>Dosya No</th><th>Satış Türü</th><th>Satış Tarihi</th><th>Sonuç</th><th>Satış Bedeli</th><th>Alıcı</th></tr></thead>
+    <tbody>
+    @foreach (var s in satisListesi)
+    {
+        <tr>
+            <td>@s.Dosya?.DosyaNo</td>
+            <td>@s.SatisTuru</td>
+            <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
+            <td>@s.SatisSonucu</td>
+            <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
+            <td>@s.AliciAdiSoyadi</td>
+        </tr>
+    }
+    @if (!satisListesi.Any())
+    {
+        <tr><td colspan="6" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+    }
+    </tbody>
+</table>
+
+<div class="alert alert-info no-print mt-4">
+    <strong>Not:</strong> "İhale Satış Tutanağı", "Araç Satış Kararı" ve "Vergi Dairesi Yazısı" belgeleri elden
+    fiziki olarak teslim edilir. Bir dosyanın belgesini yazdırmak için
+    <a asp-controller="Dosya" asp-action="Index">dosya listesinden</a> ilgili dosyanın detay sayfasını açıp
+    tarayıcınızın yazdırma özelliğini kullanabilirsiniz. Standart belge şablonları (Word/PDF) ihtiyaç
+    halinde ayrıca eklenebilir.
+</div>

@@ -1,0 +1,58 @@
+@model IptalIade
+@{
+    ViewData["Title"] = "İptal / İade / Kapama";
+    var dosya = (Dosya)ViewBag.Dosya;
+}
+<h3>Dosya No: @dosya.DosyaNo</h3>
+<div class="card p-3 mb-3">
+    <div class="row">
+        <div class="col-md-3"><strong>Plaka:</strong> @dosya.Plaka</div>
+        <div class="col-md-3"><strong>Vergi Dairesi:</strong> @dosya.VergiDairesiAdi</div>
+        <div class="col-md-3"><strong>TCKN:</strong> @dosya.TCKimlikNumarasi</div>
+        <div class="col-md-3"><strong>VKN:</strong> @dosya.VergiKimlikNumarasi</div>
+        <div class="col-md-6"><strong>Adı Soyadı/Unvanı:</strong> @dosya.AdiSoyadiUnvani</div>
+    </div>
+</div>
+
+<form asp-action="Islem" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="DosyaId" value="@dosya.Id" />
+
+    <div class="form-section-title">Satış İptali</div>
+    <div class="row g-3">
+        <div class="col-md-3 form-check mt-4">
+            <input class="form-check-input" type="checkbox" asp-for="SatisIptaliSecildi" id="iptalCheck" />
+            <label class="form-check-label" asp-for="SatisIptaliSecildi">Satış İptal Edildi</label>
+        </div>
+        <div class="col-md-3"><label class="form-label" asp-for="IptalYaziTarihi"></label><input class="form-control" asp-for="IptalYaziTarihi" type="date" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="IptalYaziSayisi"></label><input class="form-control" asp-for="IptalYaziSayisi" /></div>
+        <div class="col-md-12"><label class="form-label" asp-for="IptalNedeni"></label><textarea class="form-control" asp-for="IptalNedeni" rows="2"></textarea></div>
+    </div>
+
+    <div class="form-section-title">Satış İadesi</div>
+    <div class="row g-3">
+        <div class="col-md-3 form-check mt-4">
+            <input class="form-check-input" type="checkbox" asp-for="SatisIadesiSecildi" id="iadeCheck" />
+            <label class="form-check-label" asp-for="SatisIadesiSecildi">Satış İade Edildi</label>
+        </div>
+        <div class="col-md-3"><label class="form-label" asp-for="IadeYaziTarihi"></label><input class="form-control" asp-for="IadeYaziTarihi" type="date" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="IadeYaziSayisi"></label><input class="form-control" asp-for="IadeYaziSayisi" /></div>
+        <div class="col-md-12"><label class="form-label" asp-for="IadeNedeni"></label><textarea class="form-control" asp-for="IadeNedeni" rows="2"></textarea></div>
+    </div>
+
+    <div class="form-section-title">Dosya Kapatma</div>
+    <div class="row g-3">
+        <div class="col-md-3 form-check mt-4">
+            <input class="form-check-input" type="checkbox" asp-for="DosyaKapatildi" />
+            <label class="form-check-label" asp-for="DosyaKapatildi">Dosyayı Kapat</label>
+        </div>
+        <div class="col-md-3"><label class="form-label" asp-for="KapatmaVergiDairesiYaziTarihi"></label><input class="form-control" asp-for="KapatmaVergiDairesiYaziTarihi" type="date" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="KapatmaVergiDairesiYaziSayisi"></label><input class="form-control" asp-for="KapatmaVergiDairesiYaziSayisi" /></div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>

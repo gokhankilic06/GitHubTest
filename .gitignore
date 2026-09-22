@@ -1,2 +1,7 @@
-node_modules/
-data/*.db
+bin/
+obj/
+*.db
+*.db-shm
+*.db-wal
+.vs/
+Backups/

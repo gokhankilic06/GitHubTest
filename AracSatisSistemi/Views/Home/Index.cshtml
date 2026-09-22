@@ -1,0 +1,55 @@
+@{
+    ViewData["Title"] = "Açılış Ekranı";
+}
+<div class="text-center mb-4">
+    <h2>Araç Satış Programı</h2>
+    <p class="text-muted">Haczedilen araçların kayıt, satış ve takip süreçlerini yönetin</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+    <div class="col-md-4">
+        <a asp-controller="Dosya" asp-action="Create" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                <h5>KAYIT İŞLEMLERİ</h5>
+                <p class="text-muted mb-0">Yeni dosya, vergi dairesi, borçlu ve araç bilgisi girişi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Satis" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-cash-coin"></i></div>
+                <h5>SATIŞA İLİŞKİN BİLGİLER</h5>
+                <p class="text-muted mb-0">Satış türü, tarihi, sonucu ve alıcı bilgisi girişi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="IptalIade" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-arrow-return-left"></i></div>
+                <h5>İADE KAPAMA İŞLEMLERİ</h5>
+                <p class="text-muted mb-0">Satış iptali, iadesi ve dosya kapatma</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Listeler" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-list-check"></i></div>
+                <h5>YAZIŞMALAR VE LİSTELER</h5>
+                <p class="text-muted mb-0">Araç durum listesi, satış sonuç listesi, yazdır / PDF / Excel</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Ayarlar" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-gear"></i></div>
+                <h5>GÜNCELLEMELER</h5>
+                <p class="text-muted mb-0">Komisyon, tarife, referans listeleri ve veri yedekleme</p>
+            </div>
+        </a>
+    </div>
+</div>

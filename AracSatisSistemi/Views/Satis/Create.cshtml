@@ -1,0 +1,81 @@
+@model Satis
+@{
+    ViewData["Title"] = "Satış Bilgisi Girişi";
+    var dosya = (Dosya)ViewBag.Dosya;
+}
+<h3>Satış Bilgisi Girişi - Dosya No: @dosya.DosyaNo</h3>
+<p class="text-muted">@dosya.Plaka - @dosya.AdiSoyadiUnvani</p>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="DosyaId" />
+
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label class="form-label" asp-for="SatisTuru"></label>
+            <select class="form-select" asp-for="SatisTuru">
+                <option value="1">1. Satış</option>
+                <option value="2">2. Satış</option>
+                <option value="3">Pazarlık</option>
+                <option value="4">6183/86</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="SatisTarihi"></label>
+            <input class="form-control" asp-for="SatisTarihi" type="date" id="satisTarihi" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="SatisSonucu"></label>
+            <select class="form-select" asp-for="SatisSonucu" id="satisSonucu">
+                <option value="1">Satıldı</option>
+                <option value="2">Alıcı Çıkmadı</option>
+            </select>
+        </div>
+        <div class="col-md-3" id="satisBedeliAlani">
+            <label class="form-label" asp-for="SatisBedeli"></label>
+            <input class="form-control" asp-for="SatisBedeli" type="number" step="0.01" />
+        </div>
+
+        <div class="col-md-3"><label class="form-label" asp-for="AliciTCKN"></label><input class="form-control" asp-for="AliciTCKN" maxlength="11" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="AliciVKN"></label><input class="form-control" asp-for="AliciVKN" maxlength="10" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="AliciAdiSoyadi"></label><input class="form-control" asp-for="AliciAdiSoyadi" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="Adres"></label><input class="form-control" asp-for="Adres" /></div>
+
+        <div class="col-md-3">
+            <label class="form-label">Vade (Satış tarihinden itibaren 3 gün)</label>
+            <input class="form-control" id="vadeOnizleme" readonly />
+        </div>
+        <div class="col-md-3"><label class="form-label" asp-for="MTV"></label><input class="form-control" asp-for="MTV" type="number" step="0.01" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi"></label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="GunlukOtoparkUcreti"></label><input class="form-control" asp-for="GunlukOtoparkUcreti" type="number" step="0.01" /></div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary">Kaydet</button>
+        <a asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        const sonucSelect = document.getElementById('satisSonucu');
+        const bedelAlani = document.getElementById('satisBedeliAlani');
+        function bedelAlaniniAyarla() {
+            const satildi = sonucSelect.value === '1';
+            bedelAlani.style.display = satildi ? '' : 'none';
+        }
+        sonucSelect.addEventListener('change', bedelAlaniniAyarla);
+        bedelAlaniniAyarla();
+
+        const tarihInput = document.getElementById('satisTarihi');
+        const vadeOut = document.getElementById('vadeOnizleme');
+        function vadeHesapla() {
+            if (!tarihInput.value) { vadeOut.value = ''; return; }
+            const d = new Date(tarihInput.value);
+            d.setDate(d.getDate() + 3);
+            vadeOut.value = d.toLocaleDateString('tr-TR');
+        }
+        tarihInput.addEventListener('change', vadeHesapla);
+        vadeHesapla();
+    </script>
+}
