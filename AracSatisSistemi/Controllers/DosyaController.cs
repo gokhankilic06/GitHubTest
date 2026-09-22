@@ -42,6 +42,8 @@ namespace AracSatisSistemi.Controllers
         {
             await DoldurListeler();
             var komisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            var (satis1, satis2) = IhaleTarihHesaplayici.PlanliSatisTarihleriHesapla(DateTime.Now, resmiTatiller);
             var dosya = new Dosya
             {
                 ModelYili = DateTime.Now.Year,
@@ -49,17 +51,16 @@ namespace AracSatisSistemi.Controllers
                 KomisyonUye1 = komisyon?.Uye1,
                 KomisyonUye2 = komisyon?.Uye2,
                 KomisyonUye3 = komisyon?.Uye3,
-                KomisyonUye4 = komisyon?.Uye4
+                KomisyonUye4 = komisyon?.Uye4,
+                Satis1Tarihi = satis1,
+                Satis2Tarihi = satis2
             };
             return View(dosya);
         }
 
         // POST: /Dosya/Create
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-            Dosya dosya,
-            DateTime? satis1Tarihi, SatisSonucu? satis1Sonuc, decimal? satis1Bedel, string? satis1Alici,
-            DateTime? satis2Tarihi, SatisSonucu? satis2Sonuc, decimal? satis2Bedel, string? satis2Alici)
+        public async Task<IActionResult> Create(Dosya dosya)
         {
             if (!ModelState.IsValid)
             {
@@ -71,46 +72,10 @@ namespace AracSatisSistemi.Controllers
             dosya.KayitTarihi = DateTime.Now;
             dosya.Durum = DosyaDurumu.Kayitli;
 
-            // Dosyanın satışı daha önce gerçekleşmişse (ör. eski kayıtların girilmesi),
-            // "4. Satış Bilgileri" bölümünde doldurulan satırlar da Satış kaydı olarak eklenir.
-            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
-            var gunlukOtoparkUcreti = genelAyar?.GunlukOtoparkUcreti ?? 0m;
-
-            if (satis1Tarihi.HasValue && satis1Sonuc.HasValue)
-            {
-                dosya.Satislar.Add(new Satis
-                {
-                    SatisTuru = SatisTuru.BirinciSatis,
-                    SatisTarihi = satis1Tarihi.Value,
-                    SatisSonucu = satis1Sonuc.Value,
-                    SatisBedeli = satis1Sonuc == SatisSonucu.Satildi ? satis1Bedel : null,
-                    AliciAdiSoyadi = satis1Alici,
-                    OtoparkaGirisTarihi = dosya.OtoparkaGirisTarihi,
-                    GunlukOtoparkUcreti = gunlukOtoparkUcreti
-                });
-            }
-            if (satis2Tarihi.HasValue && satis2Sonuc.HasValue)
-            {
-                dosya.Satislar.Add(new Satis
-                {
-                    SatisTuru = SatisTuru.IkinciSatis,
-                    SatisTarihi = satis2Tarihi.Value,
-                    SatisSonucu = satis2Sonuc.Value,
-                    SatisBedeli = satis2Sonuc == SatisSonucu.Satildi ? satis2Bedel : null,
-                    AliciAdiSoyadi = satis2Alici,
-                    OtoparkaGirisTarihi = dosya.OtoparkaGirisTarihi,
-                    GunlukOtoparkUcreti = gunlukOtoparkUcreti
-                });
-            }
-
-            if (dosya.Satislar.Any(s => s.SatisSonucu == SatisSonucu.Satildi))
-            {
-                dosya.Durum = DosyaDurumu.Satildi;
-            }
-            else if (dosya.Satislar.Any())
-            {
-                dosya.Durum = DosyaDurumu.SatisaCikti;
-            }
+            // Planlanan ihale tarihleri güvenilirlik için istemciden gelen değere değil,
+            // sunucuda kayıt anında yeniden hesaplanan değere göre belirlenir.
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            (dosya.Satis1Tarihi, dosya.Satis2Tarihi) = IhaleTarihHesaplayici.PlanliSatisTarihleriHesapla(dosya.KayitTarihi, resmiTatiller);
 
             _db.Dosyalar.Add(dosya);
             await _db.SaveChangesAsync();

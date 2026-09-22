@@ -19,6 +19,7 @@ namespace AracSatisSistemi.Data
 
         public DbSet<KomisyonAyari> KomisyonAyarlari => Set<KomisyonAyari>();
         public DbSet<GenelAyar> GenelAyarlar => Set<GenelAyar>();
+        public DbSet<ResmiTatil> ResmiTatiller => Set<ResmiTatil>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

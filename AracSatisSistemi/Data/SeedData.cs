@@ -81,6 +81,34 @@ namespace AracSatisSistemi.Data
                 context.GenelAyarlar.Add(new GenelAyar { GunlukOtoparkUcreti = 0m });
             }
 
+            if (!context.ResmiTatiller.Any())
+            {
+                // Sabit tarihli resmi/milli bayramlar - her yıl aynı gün, otomatik hesaplanır.
+                // Ramazan/Kurban Bayramı gibi dini bayramlar yıldan yıla değiştiğinden burada
+                // yer almaz; Güncellemeler ekranından elle eklenmelidir.
+                var sabitTatilGunleri = new (int Ay, int Gun, string Aciklama)[]
+                {
+                    (1, 1, "Yılbaşı"),
+                    (4, 23, "Ulusal Egemenlik ve Çocuk Bayramı"),
+                    (5, 1, "Emek ve Dayanışma Günü"),
+                    (5, 19, "Atatürk'ü Anma, Gençlik ve Spor Bayramı"),
+                    (7, 15, "Demokrasi ve Milli Birlik Günü"),
+                    (8, 30, "Zafer Bayramı"),
+                    (10, 29, "Cumhuriyet Bayramı"),
+                };
+
+                var tatiller = new List<ResmiTatil>();
+                var buYil = DateTime.Now.Year;
+                for (var yil = buYil; yil <= buYil + 5; yil++)
+                {
+                    foreach (var (ay, gun, aciklama) in sabitTatilGunleri)
+                    {
+                        tatiller.Add(new ResmiTatil { Tarih = new DateTime(yil, ay, gun), Aciklama = aciklama });
+                    }
+                }
+                context.ResmiTatiller.AddRange(tatiller);
+            }
+
             context.SaveChanges();
         }
 

@@ -19,6 +19,7 @@ namespace AracSatisSistemi.Controllers
             ViewBag.VergiDaireleri = await _db.VergiDaireleri.OrderBy(a => a.Sehir).ThenBy(a => a.Ad).ToListAsync();
             ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
+            ViewBag.ResmiTatiller = await _db.ResmiTatiller.OrderBy(t => t.Tarih).ToListAsync();
             return View();
         }
 
@@ -155,6 +156,25 @@ namespace AracSatisSistemi.Controllers
         {
             var kayit = await _db.AracRenkleri.FindAsync(id);
             if (kayit != null) { _db.AracRenkleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResmiTatilEkle(DateTime tarih, string? aciklama)
+        {
+            if (!await _db.ResmiTatiller.AnyAsync(t => t.Tarih == tarih.Date))
+            {
+                _db.ResmiTatiller.Add(new ResmiTatil { Tarih = tarih.Date, Aciklama = aciklama });
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResmiTatilSil(int id)
+        {
+            var kayit = await _db.ResmiTatiller.FindAsync(id);
+            if (kayit != null) { _db.ResmiTatiller.Remove(kayit); await _db.SaveChangesAsync(); }
             return RedirectToAction(nameof(Index));
         }
 

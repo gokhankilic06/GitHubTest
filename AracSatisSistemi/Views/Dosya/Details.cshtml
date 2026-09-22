@@ -105,6 +105,16 @@
     </table>
 </div>
 
+<div class="card p-3 mb-3">
+    <div class="form-section-title">Planlanan İhale Tarihleri</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">1. Satış Tarihi</td><td>@Model.Satis1Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
+            <td class="etiket">2. Satış Tarihi</td><td>@Model.Satis2Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
+        </tr>
+    </table>
+</div>
+
 @if (Model.Satislar.Any())
 {
     <div class="card p-3 mb-3">

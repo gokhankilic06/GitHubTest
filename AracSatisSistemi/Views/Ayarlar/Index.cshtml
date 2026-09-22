@@ -7,6 +7,7 @@
     var vergiDaireleri = (List<AracSatisSistemi.Models.VergiDairesiKaydi>)ViewBag.VergiDaireleri;
     var otoparklar = (List<AracSatisSistemi.Models.OtoparkKaydi>)ViewBag.Otoparklar;
     var renkler = (List<AracSatisSistemi.Models.AracRengi>)ViewBag.Renkler;
+    var resmiTatiller = (List<AracSatisSistemi.Models.ResmiTatil>)ViewBag.ResmiTatiller;
 }
 <h3>Güncellemeler</h3>
 
@@ -163,6 +164,39 @@
                     </li>
                 }
             </ul>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3">
+            <div class="form-section-title">Resmi Tatiller</div>
+            <p class="text-muted small mb-2">
+                Kayıt ekranındaki 1. ve 2. Satış (ihale) tarihleri her Çarşamba olacak şekilde
+                otomatik hesaplanır; burada listelenen günlere denk gelirse bir sonraki Çarşamba'ya
+                ertelenir. Sabit tarihli milli bayramlar otomatik yüklüdür; Ramazan/Kurban Bayramı
+                gibi dini bayramları her yıl için buradan elle ekleyin.
+            </p>
+            <form asp-action="ResmiTatilEkle" method="post" class="row g-2 mb-2">
+                @Html.AntiForgeryToken()
+                <div class="col-5"><input class="form-control" name="tarih" type="date" required /></div>
+                <div class="col-5"><input class="form-control" name="aciklama" placeholder="Açıklama (ör. Ramazan Bayramı)" /></div>
+                <div class="col-2"><button class="btn btn-success w-100">Ekle</button></div>
+            </form>
+            <div style="max-height:300px; overflow-y:auto;">
+                <ul class="list-group">
+                    @foreach (var t in resmiTatiller)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><span class="badge bg-secondary me-2">@t.Tarih.ToString("dd.MM.yyyy")</span>@t.Aciklama</span>
+                            <form asp-action="ResmiTatilSil" method="post" onsubmit="return confirm('Silinsin mi?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@t.Id" />
+                                <button class="btn btn-sm btn-outline-danger">Sil</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
     </div>
 

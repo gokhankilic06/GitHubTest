@@ -211,44 +211,23 @@
     <input type="hidden" asp-for="KomisyonUye4" />
 
     <div class="form-section-title">4. Satış Bilgileri</div>
-    <p class="text-muted small">Bu dosyanın satışı daha önce gerçekleşmişse (ör. eski kayıtların dijitalleştirilmesi) aşağıya girebilirsiniz; henüz satılmamış bir dosya için boş bırakabilirsiniz - satış bilgisi daha sonra "Satışa İlişkin Bilgiler" ekranından da girilebilir.</p>
+    <p class="text-muted small">İhaleler her hafta Çarşamba günü yapılır. Satış tarihleri, resmi tatile denk gelmediği sürece otomatik olarak hesaplanır; bu nedenle burada değiştirilemez. İhale gerçekleştikten sonra sonuç, satış bedeli ve alıcı bilgileri "Satışa İlişkin Bilgiler" ekranından girilir.</p>
     <div class="table-responsive">
         <table class="table table-bordered align-middle">
             <thead class="table-light">
                 <tr>
-                    <th style="width:8%"></th>
+                    <th style="width:20%">Satış Türü</th>
                     <th>Satış Tarihi</th>
-                    <th>Sonuç</th>
-                    <th>Satış Bedeli (TL)</th>
-                    <th>Satın Alan Adı Soyadı/Unvanı</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
                     <td class="fw-semibold">1. Satış</td>
-                    <td><input class="form-control" type="date" name="satis1Tarihi" /></td>
-                    <td>
-                        <select class="form-select" name="satis1Sonuc">
-                            <option value="">-- Seçiniz --</option>
-                            <option value="1">Satıldı</option>
-                            <option value="2">Alıcı Çıkmadı</option>
-                        </select>
-                    </td>
-                    <td><input class="form-control" type="number" step="0.01" name="satis1Bedel" /></td>
-                    <td><input class="form-control" name="satis1Alici" /></td>
+                    <td><input class="form-control" asp-for="Satis1Tarihi" type="date" readonly /></td>
                 </tr>
                 <tr>
                     <td class="fw-semibold">2. Satış</td>
-                    <td><input class="form-control" type="date" name="satis2Tarihi" /></td>
-                    <td>
-                        <select class="form-select" name="satis2Sonuc">
-                            <option value="">-- Seçiniz --</option>
-                            <option value="1">Satıldı</option>
-                            <option value="2">Alıcı Çıkmadı</option>
-                        </select>
-                    </td>
-                    <td><input class="form-control" type="number" step="0.01" name="satis2Bedel" /></td>
-                    <td><input class="form-control" name="satis2Alici" /></td>
+                    <td><input class="form-control" asp-for="Satis2Tarihi" type="date" readonly /></td>
                 </tr>
             </tbody>
         </table>

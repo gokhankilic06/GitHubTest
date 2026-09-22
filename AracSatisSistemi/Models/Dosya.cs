@@ -103,6 +103,19 @@ namespace AracSatisSistemi.Models
 
         public DosyaDurumu Durum { get; set; } = DosyaDurumu.Kayitli;
 
+        // ---- SATIŞ BİLGİLERİ (Kayıt anında otomatik hesaplanan planlanan ihale tarihleri) ----
+        // İhaleler her hafta Çarşamba günü yapılır. 1. Satış = kayıttan sonraki ilk Çarşamba,
+        // 2. Satış = 1. Satıştan bir sonraki Çarşamba. Resmi tatile denk gelirse bir hafta ertelenir.
+        // Sonuç/bedel/alıcı bilgileri ihale gerçekleştikten sonra "Satışa İlişkin Bilgiler"
+        // ekranından (Satis entity'si olarak) ayrıca girilir.
+        [Display(Name = "1. Satış Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime Satis1Tarihi { get; set; }
+
+        [Display(Name = "2. Satış Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime Satis2Tarihi { get; set; }
+
         // Navigasyon
         public List<Satis> Satislar { get; set; } = new();
         public IptalIade? IptalIade { get; set; }

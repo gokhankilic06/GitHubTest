@@ -56,4 +56,18 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Günlük Otopark Ücreti (TL)")]
         public decimal GunlukOtoparkUcreti { get; set; }
     }
+
+    // Resmi tatil günleri: ihale (satış) tarihi hesaplanırken bu günler atlanır.
+    // Sabit tarihli milli/resmi bayramlar başlangıçta otomatik yüklenir; Ramazan/Kurban
+    // Bayramı gibi dini bayramlar her yıl değiştiğinden Güncellemeler ekranından elle
+    // eklenmelidir.
+    public class ResmiTatil
+    {
+        public int Id { get; set; }
+        [Display(Name = "Tarih")]
+        [DataType(DataType.Date)]
+        public DateTime Tarih { get; set; }
+        [Display(Name = "Açıklama")]
+        public string? Aciklama { get; set; }
+    }
 }
