@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Alıcı Ödeme Bilgileri";
+}
+<h3>Alıcı Ödeme Bilgileri</h3>
+<p class="text-muted">Satılan aracın alıcı kimlik ve ödeme bilgilerini girmek için dosya numarasını yazın. (Not: Bu ekran, "Satıldı" sonucu girilmiş dosyalar içindir.)</p>
+
+<form asp-action="Bul" method="post" class="row g-2">
+    @Html.AntiForgeryToken()
+    <div class="col-md-4">
+        <input class="form-control" name="dosyaNo" placeholder="Dosya No (ör. 2026/0001)" value="@ViewBag.DosyaNo" required />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit">Dosyayı Getir</button>
+    </div>
+</form>

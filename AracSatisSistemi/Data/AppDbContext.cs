@@ -20,6 +20,7 @@ namespace AracSatisSistemi.Data
         public DbSet<KomisyonAyari> KomisyonAyarlari => Set<KomisyonAyari>();
         public DbSet<GenelAyar> GenelAyarlar => Set<GenelAyar>();
         public DbSet<ResmiTatil> ResmiTatiller => Set<ResmiTatil>();
+        public DbSet<AliciKaydi> AliciKayitlari => Set<AliciKaydi>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +39,10 @@ namespace AracSatisSistemi.Data
                 .WithOne(i => i.Dosya!)
                 .HasForeignKey<IptalIade>(i => i.DosyaId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<AliciKaydi>()
+                .HasIndex(a => a.VergiNumarasi)
+                .IsUnique();
         }
     }
 }

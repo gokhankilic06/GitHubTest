@@ -1,0 +1,131 @@
+@model Satis
+@{
+    ViewData["Title"] = "Alıcı Ödeme Bilgileri";
+    var dosya = (Dosya)ViewBag.Dosya;
+    var otoparklar = (List<OtoparkKaydi>)ViewBag.Otoparklar;
+    var mevcutVergiNo = Model.AliciTCKN ?? Model.AliciVKN ?? "";
+}
+<h3>Alıcı Ödeme Bilgileri - Dosya No: @dosya.DosyaNo</h3>
+
+<div class="card p-3 mb-3">
+    <div class="form-section-title">Satış Bilgileri (Otomatik)</div>
+    <div class="row g-3">
+        <div class="col-md-2"><label class="form-label">Dosya No</label><input class="form-control" value="@dosya.DosyaNo" readonly /></div>
+        <div class="col-md-2"><label class="form-label">Plaka</label><input class="form-control" value="@dosya.Plaka" readonly /></div>
+        <div class="col-md-2"><label class="form-label">Satış Türü</label><input class="form-control" value="@Model.SatisTuruGorunen" readonly /></div>
+        <div class="col-md-2"><label class="form-label">Satış Tarihi</label><input class="form-control" value="@Model.SatisTarihi.ToString("dd.MM.yyyy")" readonly /></div>
+        <div class="col-md-2"><label class="form-label">Satış Sonucu</label><input class="form-control" value="@Model.SonucGorunen" readonly /></div>
+        <div class="col-md-2"><label class="form-label">Satış Bedeli (TL)</label><input class="form-control" value="@(Model.SatisBedeli?.ToString("N2") ?? "-")" readonly /></div>
+    </div>
+</div>
+
+<form asp-action="Gir" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="satisId" value="@Model.Id" />
+
+    <div class="card p-3">
+        <div class="form-section-title">Alıcı Bilgileri</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Vergi Numarası (TCKN/VKN)</label>
+                <div class="input-group">
+                    <input class="form-control" name="vergiNumarasi" id="vergiNumarasi" value="@mevcutVergiNo" maxlength="11" placeholder="10 veya 11 haneli" />
+                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#aliciSecModal">
+                        <i class="bi bi-people"></i> Kayıtlı Alıcılardan Seç
+                    </button>
+                </div>
+                <div class="form-text">Bu kişi/kurum ilk kez araç alıyorsa alanları elle doldurun; daha önce kayıtlıysa butonla seçebilirsiniz.</div>
+            </div>
+            <div class="col-md-4"><label class="form-label" asp-for="AliciAdiSoyadi">Satın Alan Adı Soyadı/Ünvanı</label><input class="form-control" asp-for="AliciAdiSoyadi" id="aliciAdiSoyadi" /></div>
+            <div class="col-md-4"><label class="form-label" asp-for="AliciVekili">Satın Alan Vekili</label><input class="form-control" asp-for="AliciVekili" id="aliciVekili" /></div>
+
+            <div class="col-md-6"><label class="form-label" asp-for="Adres">Satın Alan Adresi</label><input class="form-control" asp-for="Adres" id="aliciAdresi" /></div>
+            <div class="col-md-3"><label class="form-label" asp-for="AliciTelefon">Satın Alan Ev/İş Telefonu</label><input class="form-control" asp-for="AliciTelefon" id="aliciTelefon" /></div>
+        </div>
+    </div>
+
+    <div class="card p-3 mt-3">
+        <div class="form-section-title">Ödeme ve Teslim Bilgileri</div>
+        <div class="row g-3">
+            <div class="col-md-3"><label class="form-label" asp-for="VerilenSure"></label><input class="form-control" asp-for="VerilenSure" placeholder="ör. 15 gün" /></div>
+            <div class="col-md-3"><label class="form-label" asp-for="OdemeVadesi"></label><input class="form-control" asp-for="OdemeVadesi" type="date" /></div>
+            <div class="col-md-3">
+                <label class="form-label" asp-for="FaturayiKesenOtopark"></label>
+                <select class="form-select" asp-for="FaturayiKesenOtopark">
+                    <option value="">-- Seçiniz --</option>
+                    @foreach (var o in otoparklar)
+                    {
+                        <option value="@o.Ad">@o.Ad</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi">Aracın Otoparka Giriş Tarihi</label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" /></div>
+            <div class="col-md-3">
+                <label class="form-label" asp-for="CekiciBedeli"></label>
+                <div class="input-group">
+                    <input class="form-control" asp-for="CekiciBedeli" type="number" step="0.01" min="0" />
+                    <span class="input-group-text">TL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Kaydet</button>
+        <a asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>
+
+<!-- Kayıtlı Alıcılardan Seç modalı -->
+<div class="modal fade" id="aliciSecModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Kayıtlı Alıcılardan Seç</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input class="form-control mb-3" id="aliciAramaKutusu" placeholder="Vergi No veya Adı/Ünvanı ile ara..." />
+                <ul class="list-group" id="aliciListesi"></ul>
+                <p class="text-muted text-center mt-3 mb-0" id="aliciBosMesaj" style="display:none;">Kayıtlı alıcı bulunamadı.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const aliciKayitlari = @Html.Raw(ViewBag.AliciKayitlariJson);
+        const listeEl = document.getElementById('aliciListesi');
+        const bosMesajEl = document.getElementById('aliciBosMesaj');
+
+        function aliciListesiniCiz(filtre) {
+            const terim = (filtre || '').toLocaleLowerCase('tr-TR');
+            const filtrelenmis = aliciKayitlari.filter(a =>
+                a.VergiNumarasi.toLowerCase().includes(terim) || a.AdiSoyadiUnvani.toLocaleLowerCase('tr-TR').includes(terim));
+            listeEl.innerHTML = '';
+            filtrelenmis.forEach(a => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item list-group-item-action';
+                li.style.cursor = 'pointer';
+                li.innerHTML = `<strong>${a.AdiSoyadiUnvani}</strong><br><span class="text-muted small">Vergi No: ${a.VergiNumarasi}${a.Adresi ? ' &middot; ' + a.Adresi : ''}</span>`;
+                li.addEventListener('click', () => {
+                    document.getElementById('vergiNumarasi').value = a.VergiNumarasi;
+                    document.getElementById('aliciAdiSoyadi').value = a.AdiSoyadiUnvani;
+                    document.getElementById('aliciVekili').value = a.Vekili || '';
+                    document.getElementById('aliciAdresi').value = a.Adresi || '';
+                    document.getElementById('aliciTelefon').value = a.Telefon || '';
+                    bootstrap.Modal.getInstance(document.getElementById('aliciSecModal')).hide();
+                });
+                listeEl.appendChild(li);
+            });
+            bosMesajEl.style.display = filtrelenmis.length === 0 ? '' : 'none';
+        }
+
+        document.getElementById('aliciAramaKutusu').addEventListener('input', e => aliciListesiniCiz(e.target.value));
+        document.getElementById('aliciSecModal').addEventListener('show.bs.modal', () => {
+            document.getElementById('aliciAramaKutusu').value = '';
+            aliciListesiniCiz('');
+        });
+    </script>
+}

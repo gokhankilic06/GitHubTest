@@ -51,6 +51,27 @@ namespace AracSatisSistemi.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal GunlukOtoparkUcreti { get; set; }
 
+        // ---- ALICI ÖDEME BİLGİLERİ (Satış Bedeli girildikten sonra ayrıca doldurulur) ----
+        [Display(Name = "Satın Alan Vekili")]
+        public string? AliciVekili { get; set; }
+
+        [Display(Name = "Satın Alan Ev/İş Telefonu")]
+        public string? AliciTelefon { get; set; }
+
+        [Display(Name = "Verilen Süre")]
+        public string? VerilenSure { get; set; }
+
+        [Display(Name = "Ödeme Vadesi")]
+        [DataType(DataType.Date)]
+        public DateTime? OdemeVadesi { get; set; }
+
+        [Display(Name = "Faturayı Kesen Otopark Adı/Ünvanı")]
+        public string? FaturayiKesenOtopark { get; set; }
+
+        [Display(Name = "Çekici Bedeli (TL)")]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? CekiciBedeli { get; set; }
+
         // ---- HESAPLANAN ALANLAR ----
         // Vade: satış tarihinden itibaren 3 gün.
         [NotMapped]

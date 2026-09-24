@@ -1,9 +1,23 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
+
+// Uygulama tamamen Türkçe (tarih/sayı biçimleri: 300.000,00 gibi) olduğundan varsayılan
+// kültür sunucunun işletim sistemi ayarından bağımsız olarak sabit tr-TR yapılır.
+var trKultur = new CultureInfo("tr-TR");
+CultureInfo.DefaultThreadCurrentCulture = trKultur;
+CultureInfo.DefaultThreadCurrentUICulture = trKultur;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture(trKultur, trKultur);
+    options.SupportedCultures = new[] { trKultur };
+    options.SupportedUICultures = new[] { trKultur };
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -46,6 +60,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseRequestLocalization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
