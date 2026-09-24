@@ -1,0 +1,90 @@
+@model List<Dosya>
+@{
+    ViewData["Title"] = "Satış Sonuçlarını Gir";
+    var tur = (SatisTuru)ViewBag.Tur;
+    var tarih = (DateTime)ViewBag.Tarih;
+    var sonuclananlar = (List<Satis>)ViewBag.Sonuclananlar;
+    string TurAdi(SatisTuru t) => t switch
+    {
+        SatisTuru.BirinciSatis => "1. Satış",
+        SatisTuru.IkinciSatis => "2. Satış",
+        SatisTuru.Pazarlik => "Pazarlık",
+        SatisTuru.Madde6183_86 => "6183/86 Mad.",
+        _ => t.ToString()
+    };
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <div>
+        <h3>Satış Sonuçlarını Gir</h3>
+        <p class="text-muted mb-0">@TurAdi(tur) &middot; @tarih.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</p>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-arrow-left"></i> Başka Tür / Tarih Seç</a>
+</div>
+
+<div class="card p-3 mb-4">
+    <div class="form-section-title">İhaleye Giren Araçlar (Sonuç Bekleniyor)</div>
+    <p class="text-muted small">Sonucunu girmek istediğiniz araca tıklayın.</p>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya No</th>
+                    <th>Plaka</th>
+                    <th>Satış Türü</th>
+                    <th>Satış Tarihi</th>
+                    <th>Satış Sonucu</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model)
+                {
+                    <tr class="satir-tiklanabilir" onclick="location.href='@Url.Action("SonucGir", new { dosyaId = d.Id, tur, tarih = tarih.ToString("yyyy-MM-dd") })'" style="cursor:pointer;">
+                        <td>@d.DosyaNo</td>
+                        <td>@d.Plaka</td>
+                        <td>@TurAdi(tur)</td>
+                        <td>@tarih.ToString("dd.MM.yyyy")</td>
+                        <td><span class="badge bg-warning text-dark">Bekleniyor</span></td>
+                        <td><a class="btn btn-sm btn-primary" asp-action="SonucGir" asp-route-dosyaId="@d.Id" asp-route-tur="@((int)tur)" asp-route-tarih="@tarih.ToString("yyyy-MM-dd")">Sonuç Gir</a></td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted">Bu tarihte / türde sonucu bekleyen araç bulunamadı.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (sonuclananlar.Any())
+{
+    <div class="card p-3">
+        <div class="form-section-title">Bu Tür/Tarih İçin Girilmiş Sonuçlar</div>
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Dosya No</th>
+                        <th>Plaka</th>
+                        <th>Sonuç</th>
+                        <th>Satış Bedeli (TL)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in sonuclananlar)
+                    {
+                        <tr>
+                            <td>@s.Dosya?.DosyaNo</td>
+                            <td>@s.Dosya?.Plaka</td>
+                            <td>@s.SonucGorunen</td>
+                            <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
+                            <td><a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@s.Id">Düzenle</a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

@@ -16,13 +16,21 @@
             <option value="4" selected="@(ViewBag.SatisTuru?.ToString() == "4")">6183/86</option>
         </select>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label class="form-label">Başlangıç Tarihi</label>
         <input class="form-control" type="date" name="baslangic" value="@ViewBag.Baslangic" />
     </div>
-    <div class="col-md-3">
+    <div class="col-md-2">
         <label class="form-label">Bitiş Tarihi</label>
         <input class="form-control" type="date" name="bitis" value="@ViewBag.Bitis" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Genel Durum</label>
+        <select class="form-select" name="durumFiltre">
+            <option value="">Tümü</option>
+            <option value="aktif" selected="@(ViewBag.DurumFiltre == "aktif")">Sadece Aktif</option>
+            <option value="pasif" selected="@(ViewBag.DurumFiltre == "pasif")">Sadece Pasif</option>
+        </select>
     </div>
     <div class="col-md-3 d-flex align-items-end gap-2">
         <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrele</button>
@@ -47,7 +55,7 @@
 
 <h5>Araç Durum Listesi</h5>
 <table class="table table-sm table-bordered bg-white mb-4">
-    <thead><tr><th>Dosya No</th><th>Plaka</th><th>Marka/Cins</th><th>Adı Soyadı</th><th>Durum</th><th>Muhammen Bedel</th></tr></thead>
+    <thead><tr><th>Dosya No</th><th>Plaka</th><th>Marka/Cins</th><th>Adı Soyadı</th><th>Genel Durum</th><th>Durum</th><th>Muhammen Bedel</th></tr></thead>
     <tbody>
     @foreach (var d in aracListesi)
     {
@@ -56,13 +64,14 @@
             <td>@d.Plaka</td>
             <td>@d.AracMarkasi / @d.AracCinsi</td>
             <td>@d.AdiSoyadiUnvani</td>
-            <td>@d.Durum</td>
+            <td><span class="badge @(d.Aktif ? "bg-success" : "bg-secondary")">@d.GenelDurumGorunen</span></td>
+            <td>@d.DurumGorunenAd</td>
             <td>@d.MuhammenBedel.ToString("N2") TL</td>
         </tr>
     }
     @if (!aracListesi.Any())
     {
-        <tr><td colspan="6" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+        <tr><td colspan="7" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
     }
     </tbody>
 </table>
@@ -75,9 +84,9 @@
     {
         <tr>
             <td>@s.Dosya?.DosyaNo</td>
-            <td>@s.SatisTuru</td>
+            <td>@s.SatisTuruGorunen</td>
             <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
-            <td>@s.SatisSonucu</td>
+            <td>@s.SonucGorunen</td>
             <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
             <td>@s.AliciAdiSoyadi</td>
         </tr>

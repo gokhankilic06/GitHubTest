@@ -1,0 +1,95 @@
+@model Satis
+@{
+    ViewData["Title"] = "Satış Sonucu Gir";
+    var dosya = (Dosya)ViewBag.Dosya;
+    string TurAdi(SatisTuru t) => t switch
+    {
+        SatisTuru.BirinciSatis => "1. Satış",
+        SatisTuru.IkinciSatis => "2. Satış",
+        SatisTuru.Pazarlik => "Pazarlık",
+        SatisTuru.Madde6183_86 => "6183/86 Mad.",
+        _ => t.ToString()
+    };
+}
+<h3>Satış Sonucu Gir</h3>
+
+<form asp-action="SonucGir" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="DosyaId" value="@Model.DosyaId" />
+    <input type="hidden" name="SatisTuru" value="@((int)Model.SatisTuru)" />
+    <input type="hidden" name="SatisTarihi" value="@Model.SatisTarihi.ToString("yyyy-MM-dd")" />
+
+    <div class="card p-3 mb-3">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Dosya No</label>
+                <input class="form-control" value="@dosya.DosyaNo" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Plaka</label>
+                <input class="form-control" value="@dosya.Plaka" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Satış Türü</label>
+                <input class="form-control" value="@TurAdi(Model.SatisTuru)" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Satış Tarihi</label>
+                <input class="form-control" value="@Model.SatisTarihi.ToString("dd.MM.yyyy")" readonly />
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-3">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label" asp-for="SatisSonucu"></label>
+                <select class="form-select" asp-for="SatisSonucu" id="satisSonucu">
+                    <option value="">-- Seçiniz --</option>
+                    <option value="1">Satıldı</option>
+                    <option value="2">Alıcı Çıkmadı</option>
+                </select>
+            </div>
+            <div class="col-md-3" id="satisBedeliAlani">
+                <label class="form-label" asp-for="SatisBedeli"></label>
+                <div class="input-group">
+                    <input class="form-control" asp-for="SatisBedeli" type="number" step="0.01" min="0" />
+                    <span class="input-group-text">TL</span>
+                </div>
+            </div>
+
+            <div class="col-md-3" id="aliciTcknAlani"><label class="form-label" asp-for="AliciTCKN"></label><input class="form-control" asp-for="AliciTCKN" maxlength="11" /></div>
+            <div class="col-md-3" id="aliciVknAlani"><label class="form-label" asp-for="AliciVKN"></label><input class="form-control" asp-for="AliciVKN" maxlength="10" /></div>
+            <div class="col-md-3" id="aliciAdiAlani"><label class="form-label" asp-for="AliciAdiSoyadi"></label><input class="form-control" asp-for="AliciAdiSoyadi" /></div>
+            <div class="col-md-3" id="adresAlani"><label class="form-label" asp-for="Adres"></label><input class="form-control" asp-for="Adres" /></div>
+
+            <div class="col-md-3">
+                <label class="form-label">Vade (Satış tarihinden itibaren 3 gün)</label>
+                <input class="form-control" value="@Model.SatisTarihi.AddDays(3).ToString("dd.MM.yyyy")" readonly />
+            </div>
+            <div class="col-md-3" id="mtvAlani"><label class="form-label" asp-for="MTV"></label><input class="form-control" asp-for="MTV" type="number" step="0.01" /></div>
+            <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi"></label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" /></div>
+            <div class="col-md-3"><label class="form-label" asp-for="GunlukOtoparkUcreti"></label><input class="form-control" asp-for="GunlukOtoparkUcreti" type="number" step="0.01" /></div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Kaydet</button>
+        <a asp-action="Listele" asp-route-tur="@((int)Model.SatisTuru)" asp-route-tarih="@Model.SatisTarihi.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        const sonucSelect = document.getElementById('satisSonucu');
+        const satildiyaOzelAlanlar = ['satisBedeliAlani', 'aliciTcknAlani', 'aliciVknAlani', 'aliciAdiAlani', 'adresAlani', 'mtvAlani'];
+        function bedelAlaniniAyarla() {
+            const satildi = sonucSelect.value === '1';
+            satildiyaOzelAlanlar.forEach(id => {
+                document.getElementById(id).style.display = satildi ? '' : 'none';
+            });
+        }
+        sonucSelect.addEventListener('change', bedelAlaniniAyarla);
+        bedelAlaniniAyarla();
+    </script>
+}

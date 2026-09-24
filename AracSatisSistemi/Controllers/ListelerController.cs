@@ -13,16 +13,26 @@ namespace AracSatisSistemi.Controllers
 
         // Araç Durum Listesi + Satış Sonuç Listesi
         // "Satış türü ve/veya tarih seçilerek liste alınabilmeli" gereksinimi.
-        public async Task<IActionResult> Index(SatisTuru? satisTuru, DateTime? baslangic, DateTime? bitis)
+        public async Task<IActionResult> Index(SatisTuru? satisTuru, DateTime? baslangic, DateTime? bitis, string? durumFiltre)
         {
             ViewBag.SatisTuru = satisTuru;
             ViewBag.Baslangic = baslangic?.ToString("yyyy-MM-dd");
             ViewBag.Bitis = bitis?.ToString("yyyy-MM-dd");
+            ViewBag.DurumFiltre = durumFiltre;
 
-            // Araç Durum Listesi: tüm dosyalar (durumuna göre)
+            // Araç Durum Listesi: tüm dosyalar (durumuna / aktif-pasif ayrımına göre)
             var dosyaSorgu = _db.Dosyalar.AsQueryable();
             if (baslangic.HasValue) dosyaSorgu = dosyaSorgu.Where(d => d.KayitTarihi >= baslangic.Value);
             if (bitis.HasValue) dosyaSorgu = dosyaSorgu.Where(d => d.KayitTarihi <= bitis.Value);
+            if (durumFiltre == "aktif")
+            {
+                dosyaSorgu = dosyaSorgu.Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti);
+            }
+            else if (durumFiltre == "pasif")
+            {
+                dosyaSorgu = dosyaSorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi);
+            }
             ViewBag.AracDurumListesi = await dosyaSorgu.OrderByDescending(d => d.KayitTarihi).ToListAsync();
 
             // Satış Sonuç Listesi: satış türü / tarih aralığına göre filtrelenmiş satışlar
@@ -36,11 +46,20 @@ namespace AracSatisSistemi.Controllers
         }
 
         // Filtrelenmiş listeleri (Araç Durum Listesi + Satış Sonuç Listesi) Excel olarak indirir.
-        public async Task<IActionResult> ExcelIndir(SatisTuru? satisTuru, DateTime? baslangic, DateTime? bitis)
+        public async Task<IActionResult> ExcelIndir(SatisTuru? satisTuru, DateTime? baslangic, DateTime? bitis, string? durumFiltre)
         {
             var dosyaSorgu = _db.Dosyalar.AsQueryable();
             if (baslangic.HasValue) dosyaSorgu = dosyaSorgu.Where(d => d.KayitTarihi >= baslangic.Value);
             if (bitis.HasValue) dosyaSorgu = dosyaSorgu.Where(d => d.KayitTarihi <= bitis.Value);
+            if (durumFiltre == "aktif")
+            {
+                dosyaSorgu = dosyaSorgu.Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti);
+            }
+            else if (durumFiltre == "pasif")
+            {
+                dosyaSorgu = dosyaSorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi);
+            }
             var aracListesi = await dosyaSorgu.OrderByDescending(d => d.KayitTarihi).ToListAsync();
 
             var satisSorgu = _db.Satislar.Include(s => s.Dosya).AsQueryable();
@@ -52,7 +71,7 @@ namespace AracSatisSistemi.Controllers
             using var wb = new XLWorkbook();
 
             var ws1 = wb.Worksheets.Add("Arac Durum Listesi");
-            string[] b1 = { "Dosya No", "Plaka", "Marka", "Cins", "Adı Soyadı", "Durum", "Muhammen Bedel" };
+            string[] b1 = { "Dosya No", "Plaka", "Marka", "Cins", "Adı Soyadı", "Genel Durum", "Durum", "Muhammen Bedel" };
             for (int i = 0; i < b1.Length; i++) ws1.Cell(1, i + 1).Value = b1[i];
             int r = 2;
             foreach (var d in aracListesi)
@@ -62,8 +81,9 @@ namespace AracSatisSistemi.Controllers
                 ws1.Cell(r, 3).Value = d.AracMarkasi;
                 ws1.Cell(r, 4).Value = d.AracCinsi;
                 ws1.Cell(r, 5).Value = d.AdiSoyadiUnvani;
-                ws1.Cell(r, 6).Value = d.Durum.ToString();
-                ws1.Cell(r, 7).Value = d.MuhammenBedel;
+                ws1.Cell(r, 6).Value = d.GenelDurumGorunen;
+                ws1.Cell(r, 7).Value = d.DurumGorunenAd;
+                ws1.Cell(r, 8).Value = d.MuhammenBedel;
                 r++;
             }
             ws1.Columns().AdjustToContents();

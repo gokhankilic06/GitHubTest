@@ -12,7 +12,7 @@ namespace AracSatisSistemi.Controllers
         public DosyaController(AppDbContext db) => _db = db;
 
         // GET: /Dosya  -> dosya arama / listeleme
-        public async Task<IActionResult> Index(string? arama)
+        public async Task<IActionResult> Index(string? arama, string? durumFiltre)
         {
             var sorgu = _db.Dosyalar.AsQueryable();
             if (!string.IsNullOrWhiteSpace(arama))
@@ -21,7 +21,19 @@ namespace AracSatisSistemi.Controllers
                     || d.Plaka.Contains(arama)
                     || d.AdiSoyadiUnvani.Contains(arama));
             }
+
+            if (durumFiltre == "aktif")
+            {
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti);
+            }
+            else if (durumFiltre == "pasif")
+            {
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi);
+            }
+
             ViewBag.Arama = arama;
+            ViewBag.DurumFiltre = durumFiltre;
             var liste = await sorgu.OrderByDescending(d => d.KayitTarihi).ToListAsync();
             return View(liste);
         }

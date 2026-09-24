@@ -7,7 +7,7 @@
     <h3>Dosya No: @Model.DosyaNo <span class="badge bg-secondary">@Model.DurumGorunenAd</span></h3>
     <div class="d-flex flex-wrap gap-2">
         <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i> Düzenle</a>
-        <a class="btn btn-outline-dark" asp-controller="Satis" asp-action="Create" asp-route-dosyaId="@Model.Id"><i class="bi bi-cash-coin"></i> Satış Bilgisi Gir</a>
+        <a class="btn btn-outline-dark" asp-controller="Satis" asp-action="DosyaIcinYonlendir" asp-route-dosyaId="@Model.Id"><i class="bi bi-cash-coin"></i> Satış Sonucu Gir</a>
         <a class="btn btn-outline-danger" asp-controller="IptalIade" asp-action="Islem" asp-route-dosyaId="@Model.Id"><i class="bi bi-arrow-return-left"></i> İptal / İade / Kapama</a>
         <a class="btn btn-outline-dark" asp-action="IhaleTutanagi" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-text"></i> İhale Tutanağı</a>
         <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>

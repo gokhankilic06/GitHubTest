@@ -8,6 +8,13 @@
     <div class="col-md-4">
         <input class="form-control" name="arama" value="@ViewBag.Arama" placeholder="Dosya No / Plaka / Adı Soyadı" />
     </div>
+    <div class="col-md-3">
+        <select class="form-select" name="durumFiltre">
+            <option value="">Tümü (Aktif + Pasif)</option>
+            <option value="aktif" selected="@(ViewBag.DurumFiltre == "aktif")">Sadece Aktif</option>
+            <option value="pasif" selected="@(ViewBag.DurumFiltre == "pasif")">Sadece Pasif</option>
+        </select>
+    </div>
     <div class="col-auto">
         <button class="btn btn-primary" type="submit">Ara</button>
         <a asp-action="Create" class="btn btn-success">+ Yeni Dosya</a>
@@ -22,6 +29,7 @@
             <th>Plaka</th>
             <th>Adı Soyadı / Unvanı</th>
             <th>Vergi Dairesi</th>
+            <th>Genel Durum</th>
             <th>Durum</th>
             <th></th>
         </tr>
@@ -35,13 +43,14 @@
                 <td>@d.Plaka</td>
                 <td>@d.AdiSoyadiUnvani</td>
                 <td>@d.VergiDairesiAdi</td>
-                <td><span class="badge bg-secondary">@d.Durum</span></td>
+                <td><span class="badge @(d.Aktif ? "bg-success" : "bg-secondary")">@d.GenelDurumGorunen</span></td>
+                <td>@d.DurumGorunenAd</td>
                 <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@d.Id">Görüntüle</a></td>
             </tr>
         }
         @if (!Model.Any())
         {
-            <tr><td colspan="7" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+            <tr><td colspan="8" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
         }
     </tbody>
 </table>

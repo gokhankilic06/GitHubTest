@@ -146,5 +146,14 @@ namespace AracSatisSistemi.Models
             DosyaDurumu.Kapandi => "Kapandı",
             _ => Durum.ToString()
         };
+
+        // Genel liste ayrıştırması için: dosya süreci devam ediyorsa (kayıtlı / satışa çıktı)
+        // AKTİF, süreç bir şekilde sonuçlanmışsa (satıldı / iptal / iade / kapandı) PASİF sayılır.
+        // Satış sonucu "Satıldı" girilip kaydedildiği anda Durum=Satildi olur ve dosya PASİF'e düşer.
+        [NotMapped]
+        public bool Aktif => Durum == DosyaDurumu.Kayitli || Durum == DosyaDurumu.SatisaCikti;
+
+        [NotMapped]
+        public string GenelDurumGorunen => Aktif ? "Aktif" : "Pasif";
     }
 }

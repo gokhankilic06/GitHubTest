@@ -1,15 +1,27 @@
 @{
-    ViewData["Title"] = "Satışa İlişkin Bilgiler";
+    ViewData["Title"] = "Satış Sonuçlarını Gir";
 }
-<h3>Satışa İlişkin Bilgiler</h3>
-<p class="text-muted">Satış bilgisi girmek istediğiniz dosyanın numarasını yazın.</p>
+<h3>Satış Sonuçlarını Gir</h3>
+<p class="text-muted">İhale yapıldıktan sonra sonuçları buradan girersiniz. Önce satış türünü ve ihalenin yapıldığı tarihi seçin; o gün ihaleye giren, sonucu henüz girilmemiş araçların listesi gelecektir.</p>
 
-<form asp-action="Bul" method="post" class="row g-2">
-    @Html.AntiForgeryToken()
-    <div class="col-md-4">
-        <input class="form-control" name="dosyaNo" placeholder="Dosya No (ör. 2026/000001)" value="@ViewBag.DosyaNo" required />
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-primary" type="submit">Dosyayı Getir</button>
-    </div>
-</form>
+<div class="card p-3" style="max-width:600px;">
+    <form asp-action="Listele" method="get" class="row g-3">
+        <div class="col-md-7">
+            <label class="form-label">Satış Türü</label>
+            <select class="form-select" name="tur" required>
+                <option value="">-- Seçiniz --</option>
+                <option value="1">1. Satış</option>
+                <option value="2">2. Satış</option>
+                <option value="3">Pazarlık</option>
+                <option value="4">6183/86 Mad.</option>
+            </select>
+        </div>
+        <div class="col-md-5">
+            <label class="form-label">Satış Tarihi</label>
+            <input class="form-control" name="tarih" type="date" required />
+        </div>
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-list-check"></i> Listele</button>
+        </div>
+    </form>
+</div>
