@@ -138,16 +138,19 @@ namespace AracSatisSistemi.Controllers
             ws.Cell(1, 1).Value = "ANKARA DEFTERDARLIĞI";
             ws.Cell(2, 1).Value = $"{TurAdiBuyuk(tur)} LİSTESİ  {tarih.Date:dd.MM.yyyy}";
 
-            string[] baslik = { "Sıra No", "Dosya No", "Vergi Dairesi", "Plaka", "Model", "Markası/Cinsi", "KDV", "Muammen Bedel", "(%) 75", "Satış Sonucu", "Satış Bedeli", "SB/MB %" };
+            string[] baslik = { "Sıra No", "Dosya No", "Vergi Dairesi", "Plaka", "Model", "Markası/Cinsi", "KDV", "Muammen Bedel", "(%) 75", "(%) 40", "Teminat", "Satış Sonucu", "Satış Bedeli", "SB/MB %" };
             var basSatir = 4;
             for (int i = 0; i < baslik.Length; i++) ws.Cell(basSatir, i + 1).Value = baslik[i];
 
             var satir = basSatir + 1;
             var sira = 1;
+            decimal muhammenToplam = 0m;
+            decimal satisBedeliToplam = 0m;
             foreach (var s in liste)
             {
                 var d = s.Dosya!;
-                var yuzde75 = d.MuhammenBedel * 0.75m;
+                muhammenToplam += d.MuhammenBedel;
+                satisBedeliToplam += s.SatisBedeli ?? 0m;
                 ws.Cell(satir, 1).Value = sira++;
                 ws.Cell(satir, 2).Value = d.DosyaNo;
                 ws.Cell(satir, 3).Value = d.VergiDairesiAdi;
@@ -156,13 +159,25 @@ namespace AracSatisSistemi.Controllers
                 ws.Cell(satir, 6).Value = $"{d.AracMarkasi} / {d.AracTipi} ({d.AracCinsi})";
                 ws.Cell(satir, 7).Value = $"%{d.KdvOrani}";
                 ws.Cell(satir, 8).Value = d.MuhammenBedel;
-                ws.Cell(satir, 9).Value = yuzde75;
-                ws.Cell(satir, 10).Value = $"{s.SatisTuruGorunen} {s.SonucGorunen}";
-                ws.Cell(satir, 11).Value = s.SatisBedeli;
-                ws.Cell(satir, 12).Value = s.SatisBedeli.HasValue && d.MuhammenBedel != 0
+                ws.Cell(satir, 9).Value = d.MuhammenBedel * 0.75m;
+                ws.Cell(satir, 10).Value = d.MuhammenBedel * 0.40m;
+                ws.Cell(satir, 11).Value = d.Teminat;
+                ws.Cell(satir, 12).Value = $"{s.SatisTuruGorunen} {s.SonucGorunen}";
+                ws.Cell(satir, 13).Value = s.SatisBedeli;
+                ws.Cell(satir, 14).Value = s.SatisBedeli.HasValue && d.MuhammenBedel != 0
                     ? $"%{(s.SatisBedeli.Value / d.MuhammenBedel * 100m):N2}"
                     : "";
                 satir++;
+            }
+
+            if (liste.Count > 0)
+            {
+                ws.Cell(satir, 7).Value = "TOPLAM";
+                ws.Cell(satir, 7).Style.Font.Bold = true;
+                ws.Cell(satir, 8).Value = muhammenToplam;
+                ws.Cell(satir, 8).Style.Font.Bold = true;
+                ws.Cell(satir, 13).Value = satisBedeliToplam;
+                ws.Cell(satir, 13).Style.Font.Bold = true;
             }
             ws.Columns().AdjustToContents();
 

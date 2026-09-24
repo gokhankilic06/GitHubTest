@@ -43,16 +43,20 @@
                     <th>KDV</th>
                     <th>MUAMMEN<br />BEDEL</th>
                     <th>(%) 75</th>
+                    <th>(%) 40</th>
+                    <th>TEMİNAT</th>
                     <th>SATIŞ<br />SONUCU</th>
                     <th>SATIŞ<br />BEDELİ</th>
                     <th>SB/MB %</th>
                 </tr>
             </thead>
             <tbody>
-                @{ var sira = 1; }
+                @{ var sira = 1; decimal muhammenToplam = 0m; decimal satisBedeliToplam = 0m; }
                 @foreach (var s in Model)
                 {
                     var d = s.Dosya!;
+                    muhammenToplam += d.MuhammenBedel;
+                    satisBedeliToplam += s.SatisBedeli ?? 0m;
                     <tr>
                         <td class="text-center">@sira</td>
                         <td>@d.DosyaNo</td>
@@ -63,6 +67,8 @@
                         <td class="text-center">%@d.KdvOrani</td>
                         <td class="text-end">@ParaFormat(d.MuhammenBedel)</td>
                         <td class="text-end">@ParaFormat(d.MuhammenBedel * 0.75m)</td>
+                        <td class="text-end">@ParaFormat(d.MuhammenBedel * 0.40m)</td>
+                        <td class="text-end">@ParaFormat(d.Teminat)</td>
                         <td>@s.SatisTuruGorunen @s.SonucGorunen</td>
                         <td class="text-end">@(s.SatisBedeli.HasValue ? ParaFormat(s.SatisBedeli.Value) : "")</td>
                         <td class="text-end">@YuzdeFormat(s.SatisBedeli, d.MuhammenBedel)</td>
@@ -71,9 +77,24 @@
                 }
                 @if (!Model.Any())
                 {
-                    <tr><td colspan="12" class="text-center text-muted">Bu tarihte / türde girilmiş satış sonucu bulunamadı.</td></tr>
+                    <tr><td colspan="14" class="text-center text-muted">Bu tarihte / türde girilmiş satış sonucu bulunamadı.</td></tr>
                 }
             </tbody>
+            @if (Model.Any())
+            {
+                <tfoot class="table-light fw-bold">
+                    <tr>
+                        <td colspan="7" class="text-end">TOPLAM</td>
+                        <td class="text-end">@ParaFormat(muhammenToplam)</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-end">@ParaFormat(satisBedeliToplam)</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            }
         </table>
     </div>
 </div>
