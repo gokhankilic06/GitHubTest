@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
+using ClosedXML.Excel;
 
 namespace AracSatisSistemi.Controllers
 {
@@ -95,6 +96,81 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Tarih = tarihGunu;
             ViewBag.Sonuclananlar = sonuclananlar;
             return View(bekleyenler);
+        }
+
+        // Türün resmi belgelerde kullanılan adı (ör. "1. SATIŞ").
+        private static string TurAdiBuyuk(SatisTuru tur) => tur switch
+        {
+            SatisTuru.BirinciSatis => "1. SATIŞ",
+            SatisTuru.IkinciSatis => "2. SATIŞ",
+            SatisTuru.Pazarlik => "PAZARLIK",
+            SatisTuru.Madde6183_86 => "6183/86 MAD.",
+            _ => tur.ToString()
+        };
+
+        private async Task<List<Satis>> SonucListesiGetir(SatisTuru tur, DateTime tarih)
+        {
+            var tarihGunu = tarih.Date;
+            return await _db.Satislar
+                .Include(s => s.Dosya)
+                .Where(s => s.SatisTuru == tur && s.SatisTarihi.Date == tarihGunu)
+                .OrderBy(s => s.Dosya!.DosyaNo)
+                .ToListAsync();
+        }
+
+        // GET: /Satis/Liste?tur=..&tarih=.. - Resmi "Satış Listesi" yazdırma/PDF çıktısı.
+        public async Task<IActionResult> Liste(SatisTuru tur, DateTime tarih)
+        {
+            var liste = await SonucListesiGetir(tur, tarih);
+            ViewBag.Tur = tur;
+            ViewBag.Tarih = tarih.Date;
+            ViewBag.TurAdiBuyuk = TurAdiBuyuk(tur);
+            return View(liste);
+        }
+
+        // "Satış Listesi" çıktısını Excel olarak indirir.
+        public async Task<IActionResult> ListeExcelIndir(SatisTuru tur, DateTime tarih)
+        {
+            var liste = await SonucListesiGetir(tur, tarih);
+
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Satis Listesi");
+            ws.Cell(1, 1).Value = "ANKARA DEFTERDARLIĞI";
+            ws.Cell(2, 1).Value = $"{TurAdiBuyuk(tur)} LİSTESİ  {tarih.Date:dd.MM.yyyy}";
+
+            string[] baslik = { "Sıra No", "Dosya No", "Vergi Dairesi", "Plaka", "Model", "Markası/Cinsi", "KDV", "Muammen Bedel", "(%) 75", "Satış Sonucu", "Satış Bedeli", "SB/MB %" };
+            var basSatir = 4;
+            for (int i = 0; i < baslik.Length; i++) ws.Cell(basSatir, i + 1).Value = baslik[i];
+
+            var satir = basSatir + 1;
+            var sira = 1;
+            foreach (var s in liste)
+            {
+                var d = s.Dosya!;
+                var yuzde75 = d.MuhammenBedel * 0.75m;
+                ws.Cell(satir, 1).Value = sira++;
+                ws.Cell(satir, 2).Value = d.DosyaNo;
+                ws.Cell(satir, 3).Value = d.VergiDairesiAdi;
+                ws.Cell(satir, 4).Value = d.Plaka;
+                ws.Cell(satir, 5).Value = d.ModelYili;
+                ws.Cell(satir, 6).Value = $"{d.AracMarkasi} / {d.AracTipi} ({d.AracCinsi})";
+                ws.Cell(satir, 7).Value = $"%{d.KdvOrani}";
+                ws.Cell(satir, 8).Value = d.MuhammenBedel;
+                ws.Cell(satir, 9).Value = yuzde75;
+                ws.Cell(satir, 10).Value = $"{s.SatisTuruGorunen} {s.SonucGorunen}";
+                ws.Cell(satir, 11).Value = s.SatisBedeli;
+                ws.Cell(satir, 12).Value = s.SatisBedeli.HasValue && d.MuhammenBedel != 0
+                    ? $"%{(s.SatisBedeli.Value / d.MuhammenBedel * 100m):N2}"
+                    : "";
+                satir++;
+            }
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            stream.Position = 0;
+            var dosyaAdi = $"SatisListesi_{TurAdiBuyuk(tur).Replace("/", "-").Replace(" ", "")}_{tarih.Date:yyyyMMdd}.xlsx";
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", dosyaAdi);
         }
 
         // GET: /Satis/SonucGir?dosyaId=..&tur=..&tarih=.. - Adım 3: seçilen aracın sonucunu girme formu.
