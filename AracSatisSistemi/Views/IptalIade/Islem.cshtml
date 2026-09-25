@@ -2,15 +2,19 @@
 @{
     ViewData["Title"] = "İptal / İade / Kapama";
     var dosya = (Dosya)ViewBag.Dosya;
+    var satilanKayit = (Satis?)ViewBag.SatilanKayit;
 }
 <h3>Dosya No: @dosya.DosyaNo</h3>
 <div class="card p-3 mb-3">
-    <div class="row">
+    <div class="form-section-title">Satış Özeti</div>
+    <div class="row g-3">
+        <div class="col-md-3"><strong>Dosya No:</strong> @dosya.DosyaNo</div>
         <div class="col-md-3"><strong>Plaka:</strong> @dosya.Plaka</div>
-        <div class="col-md-3"><strong>Vergi Dairesi:</strong> @dosya.VergiDairesiAdi</div>
-        <div class="col-md-3"><strong>TCKN:</strong> @dosya.TCKimlikNumarasi</div>
-        <div class="col-md-3"><strong>VKN:</strong> @dosya.VergiKimlikNumarasi</div>
-        <div class="col-md-6"><strong>Adı Soyadı/Unvanı:</strong> @dosya.AdiSoyadiUnvani</div>
+        <div class="col-md-3"><strong>Borçlu:</strong> @dosya.AdiSoyadiUnvani</div>
+        <div class="col-md-3"><strong>Satış Türü:</strong> @(satilanKayit?.SatisTuruGorunen ?? "-")</div>
+        <div class="col-md-3"><strong>Satış Tarihi:</strong> @(satilanKayit?.SatisTarihi.ToString("dd.MM.yyyy") ?? "-")</div>
+        <div class="col-md-3"><strong>Alıcı Adı Soyadı:</strong> @(satilanKayit?.AliciAdiSoyadi ?? "-")</div>
+        <div class="col-md-3"><strong>Alınan Satış Bedeli:</strong> @(satilanKayit?.SatisBedeli?.ToString("N2") ?? "-") TL</div>
     </div>
 </div>
 
@@ -20,6 +24,7 @@
     <input type="hidden" asp-for="DosyaId" value="@dosya.Id" />
 
     <div class="form-section-title">Satış İptali</div>
+    <p class="text-muted small">Satış iptal edilirse dosya tekrar AKTİF duruma döner ve "Satış Sonuçlarını Gir" ekranından yeniden satışa çıkabilir. Alıcıya ödediği bedel için aşağıdaki "İade Bilgileri" otomatik açılır.</p>
     <div class="row g-3">
         <div class="col-md-3 form-check mt-4">
             <input class="form-check-input" type="checkbox" asp-for="SatisIptaliSecildi" id="iptalCheck" />
@@ -30,16 +35,36 @@
         <div class="col-md-12"><label class="form-label" asp-for="IptalNedeni"></label><textarea class="form-control" asp-for="IptalNedeni" rows="2"></textarea></div>
     </div>
 
-    <div class="form-section-title">Satış İadesi</div>
-    <div class="row g-3">
+    <div class="form-section-title" id="iadeBaslik">İade Bilgileri</div>
+    <div class="row g-3" id="iadeAlani">
         <div class="col-md-3 form-check mt-4">
             <input class="form-check-input" type="checkbox" asp-for="SatisIadesiSecildi" id="iadeCheck" />
             <label class="form-check-label" asp-for="SatisIadesiSecildi">Satış İade Edildi</label>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Alıcının Ödediği Tutar (TL)</label>
+            <input class="form-control" value="@(satilanKayit?.SatisBedeli?.ToString("N2") ?? "-")" readonly />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="IadeTutari"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="IadeTutari" type="number" step="0.01" min="0" />
+                <span class="input-group-text">TL</span>
+            </div>
         </div>
         <div class="col-md-3"><label class="form-label" asp-for="IadeYaziTarihi"></label><input class="form-control" asp-for="IadeYaziTarihi" type="date" /></div>
         <div class="col-md-3"><label class="form-label" asp-for="IadeYaziSayisi"></label><input class="form-control" asp-for="IadeYaziSayisi" /></div>
         <div class="col-md-12"><label class="form-label" asp-for="IadeNedeni"></label><textarea class="form-control" asp-for="IadeNedeni" rows="2"></textarea></div>
     </div>
+
+    @if (Model.IptalEdilenSatisBedeli.HasValue)
+    {
+        <div class="alert alert-secondary mt-3">
+            <strong>Geçmiş:</strong> Bu dosyada daha önce iptal edilmiş bir satış var -
+            @Model.IptalEdilenSatisTuru, @Model.IptalEdilenSatisBedeli.Value.ToString("N2") TL,
+            Alıcı: @Model.IptalEdilenAliciAdiSoyadi
+        </div>
+    }
 
     <div class="form-section-title">Dosya Kapatma</div>
     <div class="row g-3">
@@ -56,3 +81,24 @@
         <a asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id" class="btn btn-outline-secondary">Vazgeç</a>
     </div>
 </form>
+
+@section Scripts {
+    <script>
+        const iptalCheck = document.getElementById('iptalCheck');
+        const iadeCheck = document.getElementById('iadeCheck');
+        const iadeAlani = document.getElementById('iadeAlani');
+        const iadeBaslik = document.getElementById('iadeBaslik');
+
+        function iadeGorunumunuAyarla() {
+            const goster = iptalCheck.checked || iadeCheck.checked;
+            iadeAlani.style.display = goster ? '' : 'none';
+            iadeBaslik.style.display = goster ? '' : 'none';
+        }
+        iptalCheck.addEventListener('change', () => {
+            if (iptalCheck.checked) iadeCheck.checked = true; // iptal => iade de otomatik işaretlenir
+            iadeGorunumunuAyarla();
+        });
+        iadeCheck.addEventListener('change', iadeGorunumunuAyarla);
+        iadeGorunumunuAyarla();
+    </script>
+}

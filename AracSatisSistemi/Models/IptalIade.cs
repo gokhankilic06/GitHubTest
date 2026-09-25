@@ -32,6 +32,20 @@ namespace AracSatisSistemi.Models
         public string? IadeYaziSayisi { get; set; }
         [Display(Name = "İade Nedeni")]
         public string? IadeNedeni { get; set; }
+        [Display(Name = "İade Edilecek Tutar (TL)")]
+        [System.ComponentModel.DataAnnotations.Schema.Column(TypeName = "decimal(18,2)")]
+        public decimal? IadeTutari { get; set; }
+
+        // İptal edilirken satılmış olan Satış kaydı silinir (dosya yeniden satışa
+        // çıkabilsin diye); bu iki alan o satışın özetini (kim, ne kadar) kalıcı
+        // olarak saklar - Dosya Detayı ve bu ekranda geçmiş bilgi olarak gösterilir.
+        [Display(Name = "İptal Edilen Satış Türü")]
+        public string? IptalEdilenSatisTuru { get; set; }
+        [Display(Name = "İptal Edilen Satış Bedeli (TL)")]
+        [System.ComponentModel.DataAnnotations.Schema.Column(TypeName = "decimal(18,2)")]
+        public decimal? IptalEdilenSatisBedeli { get; set; }
+        [Display(Name = "İptal Edilen Satış - Alıcı")]
+        public string? IptalEdilenAliciAdiSoyadi { get; set; }
 
         // ---- DOSYA KAPATMA ----
         [Display(Name = "Dosya Kapatıldı mı?")]

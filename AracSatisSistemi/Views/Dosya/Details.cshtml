@@ -147,7 +147,7 @@
     </div>
 }
 
-@if (Model.IptalIade != null)
+@if (Model.IptalIade != null && (Model.IptalIade.SatisIptaliSecildi || Model.IptalIade.SatisIadesiSecildi || Model.IptalIade.DosyaKapatildi))
 {
     <div class="card p-3 mb-3">
         <div class="form-section-title">İptal / İade / Kapama</div>
@@ -157,6 +157,28 @@
                 <td class="etiket">Satış İadesi</td><td>@(Model.IptalIade.SatisIadesiSecildi ? "Evet" : "Hayır")</td>
                 <td class="etiket">Dosya Kapatıldı</td><td>@(Model.IptalIade.DosyaKapatildi ? "Evet" : "Hayır")</td>
             </tr>
+            @if (Model.IptalIade.SatisIptaliSecildi)
+            {
+                <tr>
+                    <td class="etiket">İptal Edilen Satış</td>
+                    <td>@Model.IptalIade.IptalEdilenSatisTuru - @(Model.IptalIade.IptalEdilenSatisBedeli?.ToString("N2") ?? "-") TL</td>
+                    <td class="etiket">İptal Edilen Alıcı</td>
+                    <td>@Model.IptalIade.IptalEdilenAliciAdiSoyadi</td>
+                    <td class="etiket">İptal Nedeni</td>
+                    <td>@Model.IptalIade.IptalNedeni</td>
+                </tr>
+            }
+            @if (Model.IptalIade.SatisIadesiSecildi)
+            {
+                <tr>
+                    <td class="etiket">İade Edilecek Tutar</td>
+                    <td>@(Model.IptalIade.IadeTutari?.ToString("N2") ?? "-") TL</td>
+                    <td class="etiket">İade Tarihi</td>
+                    <td>@(Model.IptalIade.IadeYaziTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                    <td class="etiket">İade Nedeni</td>
+                    <td>@Model.IptalIade.IadeNedeni</td>
+                </tr>
+            }
         </table>
     </div>
 }

@@ -1,15 +1,85 @@
 @{
     ViewData["Title"] = "İade / İptal / Kapama";
+    var aktifDosyalar = (List<Dosya>)ViewBag.AktifDosyalar;
+    var satilmisDosyalar = (List<Dosya>)ViewBag.SatilmisDosyalar;
 }
-<h3>İade Kapama İşlemleri</h3>
-<p class="text-muted">Dosya numarasını yazdığınızda dosya bilgileri otomatik gelecektir.</p>
+<h3>İade / İptal / Kapama</h3>
 
-<form asp-action="Bul" method="post" class="row g-2">
-    @Html.AntiForgeryToken()
-    <div class="col-md-4">
-        <input class="form-control" name="dosyaNo" placeholder="Dosya No (ör. 2026/000001)" required />
+<div class="card p-3 mb-4">
+    <div class="form-section-title">Dosya Kapama</div>
+    <p class="text-muted small">Açık (aktif) dosyalardan birini kapatmak için "Dosyayı Kapat" butonuna basın.</p>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya No</th>
+                    <th>Plaka</th>
+                    <th>Adı Soyadı / Ünvanı</th>
+                    <th>Durum</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in aktifDosyalar)
+                {
+                    <tr>
+                        <td>@d.DosyaNo</td>
+                        <td>@d.Plaka</td>
+                        <td>@d.AdiSoyadiUnvani</td>
+                        <td><span class="badge bg-success">@d.DurumGorunenAd</span></td>
+                        <td>
+                            <form asp-action="Kapat" method="post" onsubmit="return confirm('@d.DosyaNo nolu dosyayı kapatmak istediğinizden emin misiniz?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="dosyaId" value="@d.Id" />
+                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-lock"></i> Dosyayı Kapat</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!aktifDosyalar.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted">Açık dosya bulunmuyor.</td></tr>
+                }
+            </tbody>
+        </table>
     </div>
-    <div class="col-auto">
-        <button class="btn btn-primary" type="submit">Dosyayı Getir</button>
+</div>
+
+<div class="card p-3">
+    <div class="form-section-title">Satış İptali / İadesi</div>
+    <p class="text-muted small">Satılmış bir dosyanın satışını iptal etmek veya iade işlemi girmek için "İşlem Yap" butonuna basın.</p>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya No</th>
+                    <th>Plaka</th>
+                    <th>Satış Türü</th>
+                    <th>Satış Tarihi</th>
+                    <th>Alıcı</th>
+                    <th>Satış Bedeli (TL)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in satilmisDosyalar)
+                {
+                    var satis = d.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+                    <tr>
+                        <td>@d.DosyaNo</td>
+                        <td>@d.Plaka</td>
+                        <td>@satis?.SatisTuruGorunen</td>
+                        <td>@satis?.SatisTarihi.ToString("dd.MM.yyyy")</td>
+                        <td>@satis?.AliciAdiSoyadi</td>
+                        <td>@(satis?.SatisBedeli?.ToString("N2") ?? "-")</td>
+                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Islem" asp-route-dosyaId="@d.Id">İşlem Yap</a></td>
+                    </tr>
+                }
+                @if (!satilmisDosyalar.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted">Satılmış dosya bulunmuyor.</td></tr>
+                }
+            </tbody>
+        </table>
     </div>
-</form>
+</div>
