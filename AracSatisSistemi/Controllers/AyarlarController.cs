@@ -20,12 +20,22 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.ResmiTatiller = await _db.ResmiTatiller.OrderBy(t => t.Tarih).ToListAsync();
+            ViewBag.Memurlar = await _db.Memurlar.OrderBy(m => m.AdSoyad).ToListAsync();
             return View();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> KomisyonGuncelle(KomisyonAyari form)
         {
+            // Seçmeli listede boş bırakılan bir alan model binding tarafından null'a
+            // dönüştürülür (ConvertEmptyStringToNull); Baskan/Uye1-4 NOT NULL olduğundan
+            // burada boş string'e çevrilir.
+            form.Baskan ??= string.Empty;
+            form.Uye1 ??= string.Empty;
+            form.Uye2 ??= string.Empty;
+            form.Uye3 ??= string.Empty;
+            form.Uye4 ??= string.Empty;
+
             var kayit = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
             if (kayit == null) { kayit = form; _db.KomisyonAyarlari.Add(kayit); }
             else
@@ -186,6 +196,21 @@ namespace AracSatisSistemi.Controllers
         {
             var kayit = await _db.AracRenkleri.FindAsync(id);
             if (kayit != null) { _db.AracRenkleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> MemurEkle(string adSoyad)
+        {
+            if (!string.IsNullOrWhiteSpace(adSoyad)) { _db.Memurlar.Add(new Memur { AdSoyad = adSoyad.Trim() }); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> MemurSil(int id)
+        {
+            var kayit = await _db.Memurlar.FindAsync(id);
+            if (kayit != null) { _db.Memurlar.Remove(kayit); await _db.SaveChangesAsync(); }
             return RedirectToAction(nameof(Index));
         }
 

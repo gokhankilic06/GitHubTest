@@ -46,5 +46,24 @@ namespace AracSatisSistemi.Data
             }
             return tarih;
         }
+
+        // "Yıllık toplu satış tarihi" listesi ayrıca elle girilmez: sistem zaten her hafta
+        // Çarşamba satış yapıldığını ve resmi tatilleri bildiğinden, verilen tarih aralığındaki
+        // (resmi tatile denk gelenler hariç) tüm Çarşambaları otomatik üretir. Komisyon İşlemleri
+        // ekranındaki Satış Tarihi seçim listesi buradan gelir.
+        public static List<DateTime> YilinSatisGunleri(DateTime baslangic, DateTime bitis, ICollection<DateTime> resmiTatiller)
+        {
+            var gunler = new List<DateTime>();
+            var tarih = baslangic.Date;
+            var farkGun = ((int)DayOfWeek.Wednesday - (int)tarih.DayOfWeek + 7) % 7;
+            tarih = tarih.AddDays(farkGun);
+
+            while (tarih <= bitis.Date)
+            {
+                if (!resmiTatiller.Contains(tarih)) gunler.Add(tarih);
+                tarih = tarih.AddDays(7);
+            }
+            return gunler;
+        }
     }
 }

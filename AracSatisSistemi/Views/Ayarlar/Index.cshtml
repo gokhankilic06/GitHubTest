@@ -8,21 +8,66 @@
     var otoparklar = (List<AracSatisSistemi.Models.OtoparkKaydi>)ViewBag.Otoparklar;
     var renkler = (List<AracSatisSistemi.Models.AracRengi>)ViewBag.Renkler;
     var resmiTatiller = (List<AracSatisSistemi.Models.ResmiTatil>)ViewBag.ResmiTatiller;
+    var memurlar = (List<AracSatisSistemi.Models.Memur>)ViewBag.Memurlar;
+    var memurAdlari = memurlar.Select(m => m.AdSoyad).ToHashSet();
+    string MemurSecenekleri(string? mevcutDeger)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append("<option value=\"\">-- Seçiniz --</option>");
+        if (!string.IsNullOrWhiteSpace(mevcutDeger) && !memurAdlari.Contains(mevcutDeger))
+        {
+            sb.Append($"<option value=\"{System.Net.WebUtility.HtmlEncode(mevcutDeger)}\" selected>{System.Net.WebUtility.HtmlEncode(mevcutDeger)} (listede yok)</option>");
+        }
+        foreach (var ad in memurAdlari.OrderBy(a => a))
+        {
+            var secili = ad == mevcutDeger ? " selected" : "";
+            sb.Append($"<option value=\"{System.Net.WebUtility.HtmlEncode(ad)}\"{secili}>{System.Net.WebUtility.HtmlEncode(ad)}</option>");
+        }
+        return sb.ToString();
+    }
 }
 <h3>Güncellemeler</h3>
 
 <div class="card p-3">
-    <div class="form-section-title">Komisyon Bilgileri</div>
+    <div class="form-section-title">Komisyon Bilgileri (Varsayılan)</div>
+    <p class="text-muted small">Yeni bir dosya kaydedildiğinde İhale Tutanağı'nda görünecek varsayılan komisyon. Belirli bir satış tarihi/saati için farklı bir komisyon atamak isterseniz <a asp-controller="Komisyon" asp-action="Index">Komisyon İşlemleri</a> ekranını kullanın.</p>
     <form asp-action="KomisyonGuncelle" method="post" class="row g-3">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@komisyon?.Id" />
-        <div class="col-md-4"><label class="form-label">Başkan</label><input class="form-control" name="Baskan" value="@komisyon?.Baskan" /></div>
-        <div class="col-md-2"><label class="form-label">Üye 1</label><input class="form-control" name="Uye1" value="@komisyon?.Uye1" /></div>
-        <div class="col-md-2"><label class="form-label">Üye 2</label><input class="form-control" name="Uye2" value="@komisyon?.Uye2" /></div>
-        <div class="col-md-2"><label class="form-label">Üye 3</label><input class="form-control" name="Uye3" value="@komisyon?.Uye3" /></div>
-        <div class="col-md-2"><label class="form-label">Üye 4</label><input class="form-control" name="Uye4" value="@komisyon?.Uye4" /></div>
+        <div class="col-md-4"><label class="form-label">Başkan</label><select class="form-select" name="Baskan">@Html.Raw(MemurSecenekleri(komisyon?.Baskan))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 1</label><select class="form-select" name="Uye1">@Html.Raw(MemurSecenekleri(komisyon?.Uye1))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 2</label><select class="form-select" name="Uye2">@Html.Raw(MemurSecenekleri(komisyon?.Uye2))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 3</label><select class="form-select" name="Uye3">@Html.Raw(MemurSecenekleri(komisyon?.Uye3))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 4</label><select class="form-select" name="Uye4">@Html.Raw(MemurSecenekleri(komisyon?.Uye4))</select></div>
         <div class="col-12"><button class="btn btn-primary">Komisyonu Güncelle</button></div>
     </form>
+</div>
+
+<div class="card p-3 mt-3">
+    <div class="form-section-title">Komisyon Üyesi Olabilecek Memurlar</div>
+    <p class="text-muted small mb-2">Bu listeye eklenen isimler yukarıdaki "Komisyon Bilgileri" ve Komisyon İşlemleri ekranındaki başkan/üye seçim listelerinde görünür.</p>
+    <form asp-action="MemurEkle" method="post" class="d-flex gap-2 mb-2">
+        @Html.AntiForgeryToken()
+        <input class="form-control" name="adSoyad" placeholder="Adı Soyadı" required />
+        <button class="btn btn-success">Ekle</button>
+    </form>
+    <ul class="list-group">
+        @foreach (var m in memurlar)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                @m.AdSoyad
+                <form asp-action="MemurSil" method="post" onsubmit="return confirm('Silinsin mi?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@m.Id" />
+                    <button class="btn btn-sm btn-outline-danger">Sil</button>
+                </form>
+            </li>
+        }
+        @if (!memurlar.Any())
+        {
+            <li class="list-group-item text-muted text-center">Henüz memur eklenmedi.</li>
+        }
+    </ul>
 </div>
 
 <div class="card p-3">
