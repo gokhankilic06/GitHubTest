@@ -10,12 +10,24 @@ namespace AracSatisSistemi.Data
 
             if (!context.AracCinsleri.Any())
             {
-                var cinsler = new[]
+                // Otopark ücret tarifesindeki 4 kategoriye göre varsayılan eşleme; Güncellemeler
+                // ekranından her cins için gerekirse değiştirilebilir.
+                var cinsler = new (string Ad, OtoparkAracKategorisi Kategori)[]
                 {
-                    "Otomobil", "Kamyonet", "Kamyon", "Minibüs", "Midibüs", "Otobüs",
-                    "Traktör", "Motosiklet", "Çekici", "Römork", "İş Makinesi", "Diğer"
+                    ("Otomobil", OtoparkAracKategorisi.KucukArac),
+                    ("Kamyonet", OtoparkAracKategorisi.MinibusKamyonet),
+                    ("Kamyon", OtoparkAracKategorisi.BuyukArac),
+                    ("Minibüs", OtoparkAracKategorisi.MinibusKamyonet),
+                    ("Midibüs", OtoparkAracKategorisi.BuyukArac),
+                    ("Otobüs", OtoparkAracKategorisi.BuyukArac),
+                    ("Traktör", OtoparkAracKategorisi.BuyukArac),
+                    ("Motosiklet", OtoparkAracKategorisi.Motor),
+                    ("Çekici", OtoparkAracKategorisi.BuyukArac),
+                    ("Römork", OtoparkAracKategorisi.BuyukArac),
+                    ("İş Makinesi", OtoparkAracKategorisi.BuyukArac),
+                    ("Diğer", OtoparkAracKategorisi.KucukArac),
                 };
-                context.AracCinsleri.AddRange(cinsler.Select(a => new AracCinsi { Ad = a }));
+                context.AracCinsleri.AddRange(cinsler.Select(a => new AracCinsi { Ad = a.Ad, OtoparkKategorisi = a.Kategori }));
             }
 
             if (!context.AracMarkalari.Any())
@@ -78,7 +90,21 @@ namespace AracSatisSistemi.Data
 
             if (!context.GenelAyarlar.Any())
             {
-                context.GenelAyarlar.Add(new GenelAyar { GunlukOtoparkUcreti = 0m });
+                // Paylaşılan tarife tablosundaki başlangıç değerleri; Güncellemeler ekranından
+                // değiştirilebilir.
+                context.GenelAyarlar.Add(new GenelAyar
+                {
+                    GunlukOtoparkUcreti = 0m,
+                    KucukArac6AyaKadar = 83.00m,
+                    KucukArac6AydanSonra = 41.50m,
+                    MinibusKamyonet6AyaKadar = 91.50m,
+                    MinibusKamyonet6AydanSonra = 45.75m,
+                    BuyukArac6AyaKadar = 124.80m,
+                    BuyukArac6AydanSonra = 62.40m,
+                    Motor6AyaKadar = 41.50m,
+                    Motor6AydanSonra = 20.75m,
+                    CekiciUcretiSabit = 2000.00m
+                });
             }
 
             if (!context.ResmiTatiller.Any())

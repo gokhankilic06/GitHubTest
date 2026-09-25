@@ -46,9 +46,21 @@ namespace AracSatisSistemi.Controllers
         {
             var kayit = await _db.GenelAyarlar.FirstOrDefaultAsync();
             if (kayit == null) { kayit = form; _db.GenelAyarlar.Add(kayit); }
-            else kayit.GunlukOtoparkUcreti = form.GunlukOtoparkUcreti;
+            else
+            {
+                kayit.GunlukOtoparkUcreti = form.GunlukOtoparkUcreti;
+                kayit.KucukArac6AyaKadar = form.KucukArac6AyaKadar;
+                kayit.KucukArac6AydanSonra = form.KucukArac6AydanSonra;
+                kayit.MinibusKamyonet6AyaKadar = form.MinibusKamyonet6AyaKadar;
+                kayit.MinibusKamyonet6AydanSonra = form.MinibusKamyonet6AydanSonra;
+                kayit.BuyukArac6AyaKadar = form.BuyukArac6AyaKadar;
+                kayit.BuyukArac6AydanSonra = form.BuyukArac6AydanSonra;
+                kayit.Motor6AyaKadar = form.Motor6AyaKadar;
+                kayit.Motor6AydanSonra = form.Motor6AydanSonra;
+                kayit.CekiciUcretiSabit = form.CekiciUcretiSabit;
+            }
             await _db.SaveChangesAsync();
-            TempData["Basari"] = "Otopark günlük ücret tarifesi güncellendi.";
+            TempData["Basari"] = "Otopark ücret tarifesi güncellendi.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -69,9 +81,13 @@ namespace AracSatisSistemi.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> CinsEkle(string ad)
+        public async Task<IActionResult> CinsEkle(string ad, OtoparkAracKategorisi otoparkKategorisi)
         {
-            if (!string.IsNullOrWhiteSpace(ad)) { _db.AracCinsleri.Add(new AracCinsi { Ad = ad.Trim() }); await _db.SaveChangesAsync(); }
+            if (!string.IsNullOrWhiteSpace(ad))
+            {
+                _db.AracCinsleri.Add(new AracCinsi { Ad = ad.Trim(), OtoparkKategorisi = otoparkKategorisi });
+                await _db.SaveChangesAsync();
+            }
             return RedirectToAction(nameof(Index));
         }
 
@@ -80,6 +96,20 @@ namespace AracSatisSistemi.Controllers
         {
             var kayit = await _db.AracCinsleri.FindAsync(id);
             if (kayit != null) { _db.AracCinsleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Bir araç cinsinin otopark ücret kategorisini günceller (ör. "Kamyon" için Büyük Araç).
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> CinsKategoriGuncelle(int id, OtoparkAracKategorisi otoparkKategorisi)
+        {
+            var kayit = await _db.AracCinsleri.FindAsync(id);
+            if (kayit != null)
+            {
+                kayit.OtoparkKategorisi = otoparkKategorisi;
+                await _db.SaveChangesAsync();
+                TempData["Basari"] = $"\"{kayit.Ad}\" için otopark kategorisi güncellendi.";
+            }
             return RedirectToAction(nameof(Index));
         }
 

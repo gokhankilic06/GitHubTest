@@ -58,8 +58,11 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Satın Alan Ev/İş Telefonu")]
         public string? AliciTelefon { get; set; }
 
-        [Display(Name = "Verilen Süre")]
-        public string? VerilenSure { get; set; }
+        // İhale (satış) tarihinden sonraki 3 iş günü (hafta sonu ve resmi tatiller hariç);
+        // Alıcı Ödeme Bilgileri ekranında otomatik önerilir, gerekirse elle değiştirilebilir.
+        [Display(Name = "Verilen Süre (Son Gün)")]
+        [DataType(DataType.Date)]
+        public DateTime? VerilenSure { get; set; }
 
         [Display(Name = "Ödeme Vadesi")]
         [DataType(DataType.Date)]

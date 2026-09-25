@@ -29,4 +29,29 @@ namespace AracSatisSistemi.Models
         IadeEdildi = 4,
         Kapandi = 5
     }
+
+    // Otopark ücret tarifesindeki 4 araç kategorisi.
+    public enum OtoparkAracKategorisi
+    {
+        [System.ComponentModel.Description("Küçük Araç")]
+        KucukArac = 1,
+        [System.ComponentModel.Description("Minibüs/Kamyonet")]
+        MinibusKamyonet = 2,
+        [System.ComponentModel.Description("Büyük Araç/Kamyon/Tır")]
+        BuyukArac = 3,
+        [System.ComponentModel.Description("Motor")]
+        Motor = 4
+    }
+
+    public static class OtoparkAracKategorisiUzantilari
+    {
+        public static string Gorunen(this OtoparkAracKategorisi kategori) => kategori switch
+        {
+            OtoparkAracKategorisi.KucukArac => "Küçük Araç",
+            OtoparkAracKategorisi.MinibusKamyonet => "Minibüs/Kamyonet",
+            OtoparkAracKategorisi.BuyukArac => "Büyük Araç/Kamyon/Tır",
+            OtoparkAracKategorisi.Motor => "Motor",
+            _ => kategori.ToString()
+        };
+    }
 }

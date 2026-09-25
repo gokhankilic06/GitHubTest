@@ -26,5 +26,25 @@ namespace AracSatisSistemi.Data
             var satis2 = SonrakiCarsamba(satis1.AddDays(1), resmiTatiller);
             return (satis1, satis2);
         }
+
+        // Bir tarih hafta sonu (Cumartesi/Pazar) veya resmi tatil ise iş günü sayılmaz.
+        private static bool IsGunuMu(DateTime tarih, ICollection<DateTime> resmiTatiller)
+            => tarih.DayOfWeek != DayOfWeek.Saturday
+            && tarih.DayOfWeek != DayOfWeek.Sunday
+            && !resmiTatiller.Contains(tarih.Date);
+
+        // Verilen tarihten itibaren N iş günü sonrasını bulur (hafta sonu ve resmi tatiller
+        // sayılmaz). Ör: Çarşamba ihale + 3 iş günü = Perşembe, Cuma, (hafta sonu atlanır) Pazartesi.
+        public static DateTime IsGunuEkle(DateTime baslangic, int isGunuSayisi, ICollection<DateTime> resmiTatiller)
+        {
+            var tarih = baslangic.Date;
+            var sayac = 0;
+            while (sayac < isGunuSayisi)
+            {
+                tarih = tarih.AddDays(1);
+                if (IsGunuMu(tarih, resmiTatiller)) sayac++;
+            }
+            return tarih;
+        }
     }
 }

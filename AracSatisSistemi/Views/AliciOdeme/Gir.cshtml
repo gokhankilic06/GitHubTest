@@ -47,7 +47,11 @@
     <div class="card p-3 mt-3">
         <div class="form-section-title">Ödeme ve Teslim Bilgileri</div>
         <div class="row g-3">
-            <div class="col-md-3"><label class="form-label" asp-for="VerilenSure"></label><input class="form-control" asp-for="VerilenSure" placeholder="ör. 15 gün" /></div>
+            <div class="col-md-3">
+                <label class="form-label" asp-for="VerilenSure"></label>
+                <input class="form-control" asp-for="VerilenSure" type="date" />
+                <div class="form-text">İhale tarihinden sonraki 3 iş günü (hafta sonu/resmi tatil hariç) otomatik önerilir; gerekirse değiştirebilirsiniz.</div>
+            </div>
             <div class="col-md-3"><label class="form-label" asp-for="OdemeVadesi"></label><input class="form-control" asp-for="OdemeVadesi" type="date" /></div>
             <div class="col-md-3">
                 <label class="form-label" asp-for="FaturayiKesenOtopark"></label>
@@ -59,14 +63,29 @@
                     }
                 </select>
             </div>
-            <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi">Aracın Otoparka Giriş Tarihi</label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" /></div>
+            <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi">Aracın Otoparka Giriş Tarihi</label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" id="otoparkaGirisTarihi" /></div>
             <div class="col-md-3">
                 <label class="form-label" asp-for="CekiciBedeli"></label>
                 <div class="input-group">
-                    <input class="form-control" asp-for="CekiciBedeli" type="number" step="0.01" min="0" />
+                    <input class="form-control" asp-for="CekiciBedeli" type="number" step="0.01" min="0" id="cekiciBedeli" />
                     <span class="input-group-text">TL</span>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="card p-3 mt-3">
+        <div class="form-section-title">Otopark Ücreti Hesaplama</div>
+        <p class="text-muted small">
+            Araç kategorisi (<strong>@ViewBag.OtoparkKategoriAdi</strong>) ve otoparkta kalınan gün sayısına göre
+            kademeli tarife üzerinden otomatik hesaplanır: ilk 6 ay (180 gün) "6 Aya Kadar" günlük ücreti, sonrası
+            "6 Aydan Sonra" günlük ücreti üzerinden. Tarifeler Güncellemeler ekranından değiştirilebilir.
+        </p>
+        <div class="row g-3">
+            <div class="col-md-3"><label class="form-label">Otoparkta Kalınan Gün</label><input class="form-control" id="otoparkGunSayisiGoster" readonly /></div>
+            <div class="col-md-3"><label class="form-label">Hesaplanan Otopark Ücreti (TL)</label><input class="form-control" id="otoparkUcretiGoster" readonly /></div>
+            <div class="col-md-3"><label class="form-label">Çekici Ücreti (TL)</label><input class="form-control" id="cekiciUcretiGoster" readonly /></div>
+            <div class="col-md-3"><label class="form-label fw-bold">Toplam (TL)</label><input class="form-control fw-bold" id="toplamGoster" readonly /></div>
         </div>
     </div>
 
@@ -127,5 +146,42 @@
             document.getElementById('aliciAramaKutusu').value = '';
             aliciListesiniCiz('');
         });
+
+        // Otopark ücreti hesaplama - Otoparka Giriş Tarihi veya Çekici Bedeli değiştikçe
+        // sunucudaki (OtoparkHesaplayici) ile aynı mantıkla anlık olarak yeniden hesaplanır.
+        const ALTI_AY_GUN = 180;
+        const ilkDonemUcret = @Html.Raw(((decimal)ViewBag.OtoparkIlkDonemUcret).ToString(System.Globalization.CultureInfo.InvariantCulture));
+        const ikinciDonemUcret = @Html.Raw(((decimal)ViewBag.OtoparkIkinciDonemUcret).ToString(System.Globalization.CultureInfo.InvariantCulture));
+        const satisTarihi = new Date('@Model.SatisTarihi.ToString("yyyy-MM-dd")');
+
+        function paraGoster(deger) {
+            return deger.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function otoparkHesapla() {
+            const girisInput = document.getElementById('otoparkaGirisTarihi').value;
+            let gunSayisi = 0;
+            if (girisInput) {
+                const giris = new Date(girisInput);
+                gunSayisi = Math.max(Math.round((satisTarihi - giris) / (1000 * 60 * 60 * 24)), 0);
+            }
+            let otoparkUcreti;
+            if (gunSayisi <= ALTI_AY_GUN) {
+                otoparkUcreti = gunSayisi * ilkDonemUcret;
+            } else {
+                otoparkUcreti = ALTI_AY_GUN * ilkDonemUcret + (gunSayisi - ALTI_AY_GUN) * ikinciDonemUcret;
+            }
+            const cekiciBedeli = parseFloat(document.getElementById('cekiciBedeli').value) || 0;
+            const toplam = Math.round(otoparkUcreti + cekiciBedeli);
+
+            document.getElementById('otoparkGunSayisiGoster').value = gunSayisi;
+            document.getElementById('otoparkUcretiGoster').value = paraGoster(otoparkUcreti);
+            document.getElementById('cekiciUcretiGoster').value = paraGoster(cekiciBedeli);
+            document.getElementById('toplamGoster').value = paraGoster(toplam);
+        }
+
+        document.getElementById('otoparkaGirisTarihi').addEventListener('input', otoparkHesapla);
+        document.getElementById('cekiciBedeli').addEventListener('input', otoparkHesapla);
+        otoparkHesapla();
     </script>
 }

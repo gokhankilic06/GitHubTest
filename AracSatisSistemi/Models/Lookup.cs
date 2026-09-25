@@ -16,6 +16,12 @@ namespace AracSatisSistemi.Models
     {
         public int Id { get; set; }
         [Required] public string Ad { get; set; } = string.Empty;
+
+        // Otopark ücret tarifesinde hangi kategoriye (Küçük Araç / Minibüs-Kamyonet /
+        // Büyük Araç / Motor) girdiği. Alıcı Ödeme Bilgileri ekranındaki otopark ücreti
+        // hesaplamasında kullanılır.
+        [Display(Name = "Otopark Ücret Kategorisi")]
+        public OtoparkAracKategorisi OtoparkKategorisi { get; set; } = OtoparkAracKategorisi.KucukArac;
     }
 
     public class VergiDairesiKaydi
@@ -53,8 +59,47 @@ namespace AracSatisSistemi.Models
     public class GenelAyar
     {
         public int Id { get; set; }
+
+        // Eski tekli (kategori ayrımı olmayan) günlük otopark ücreti - geriye dönük uyumluluk
+        // için korunuyor; yeni hesaplamalar kategoriye göre aşağıdaki tarifeleri kullanır.
         [Display(Name = "Günlük Otopark Ücreti (TL)")]
         public decimal GunlukOtoparkUcreti { get; set; }
+
+        // ---- KADEMELİ OTOPARK ÜCRET TARİFESİ (araç kategorisi + süreye göre) ----
+        // İlk 180 gün (6 ay) "6 Aya Kadar" tarifesi, sonraki günler "6 Aydan Sonra"
+        // (genelde ilkin yarısı) tarifesi üzerinden hesaplanır.
+        [Display(Name = "Küçük Araç - 6 Aya Kadar (TL/gün)")]
+        public decimal KucukArac6AyaKadar { get; set; }
+        [Display(Name = "Küçük Araç - 6 Aydan Sonra (TL/gün)")]
+        public decimal KucukArac6AydanSonra { get; set; }
+
+        [Display(Name = "Minibüs/Kamyonet - 6 Aya Kadar (TL/gün)")]
+        public decimal MinibusKamyonet6AyaKadar { get; set; }
+        [Display(Name = "Minibüs/Kamyonet - 6 Aydan Sonra (TL/gün)")]
+        public decimal MinibusKamyonet6AydanSonra { get; set; }
+
+        [Display(Name = "Büyük Araç/Kamyon/Tır - 6 Aya Kadar (TL/gün)")]
+        public decimal BuyukArac6AyaKadar { get; set; }
+        [Display(Name = "Büyük Araç/Kamyon/Tır - 6 Aydan Sonra (TL/gün)")]
+        public decimal BuyukArac6AydanSonra { get; set; }
+
+        [Display(Name = "Motor - 6 Aya Kadar (TL/gün)")]
+        public decimal Motor6AyaKadar { get; set; }
+        [Display(Name = "Motor - 6 Aydan Sonra (TL/gün)")]
+        public decimal Motor6AydanSonra { get; set; }
+
+        [Display(Name = "Çekici Ücreti (TL, sabit)")]
+        public decimal CekiciUcretiSabit { get; set; }
+
+        // Kategoriye göre (6 aya kadar, 6 aydan sonra) günlük ücret çiftini döner.
+        public (decimal IlkDonem, decimal IkinciDonem) OtoparkTarifesi(OtoparkAracKategorisi kategori) => kategori switch
+        {
+            OtoparkAracKategorisi.KucukArac => (KucukArac6AyaKadar, KucukArac6AydanSonra),
+            OtoparkAracKategorisi.MinibusKamyonet => (MinibusKamyonet6AyaKadar, MinibusKamyonet6AydanSonra),
+            OtoparkAracKategorisi.BuyukArac => (BuyukArac6AyaKadar, BuyukArac6AydanSonra),
+            OtoparkAracKategorisi.Motor => (Motor6AyaKadar, Motor6AydanSonra),
+            _ => (0m, 0m)
+        };
     }
 
     // Daha önce araç satın almış kişi/kurumların kaydı. Alıcı Ödeme Bilgileri ekranında
