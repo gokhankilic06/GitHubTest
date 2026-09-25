@@ -30,7 +30,7 @@
             <th>Adı Soyadı / Unvanı</th>
             <th>Vergi Dairesi</th>
             <th>Genel Durum</th>
-            <th>Durum</th>
+            <th>Aşama</th>
             <th></th>
         </tr>
     </thead>
@@ -44,7 +44,7 @@
                 <td>@d.AdiSoyadiUnvani</td>
                 <td>@d.VergiDairesiAdi</td>
                 <td><span class="badge @(d.Aktif ? "bg-success" : "bg-secondary")">@d.GenelDurumGorunen</span></td>
-                <td>@d.DurumGorunenAd</td>
+                <td>@d.AsamaGorunen</td>
                 <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@d.Id">Görüntüle</a></td>
             </tr>
         }

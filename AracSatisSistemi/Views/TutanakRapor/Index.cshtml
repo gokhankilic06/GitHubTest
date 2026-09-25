@@ -1,0 +1,288 @@
+@model List<AracSatisSistemi.Controllers.TutanakRaporController.SatirSonuc>
+@{
+    ViewData["Title"] = "Tutanak ve Raporlar";
+    var dosyaNolar = (List<string>)ViewBag.DosyaNolar;
+    var plakalar = (List<string>)ViewBag.Plakalar;
+    var vergiDaireleriListesi = (List<string>)ViewBag.VergiDaireleriListesi;
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
+    var tutanakTuru = (string)ViewBag.TutanakTuru;
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+    <h3>Tutanak ve Raporlar</h3>
+    <span class="text-muted small" id="tutanakSaat"></span>
+</div>
+
+<div class="card p-3 mb-4 no-print">
+    <form method="get" class="row g-3" id="filtreFormu">
+        <div class="col-md-3">
+            <label class="form-label">Tutanak Türü</label>
+            <select class="form-select" name="tutanakTuru" id="tutanakTuruSecim">
+                <option value="ihale" selected="@(tutanakTuru == "ihale")">İhale Tutanağı</option>
+                <option value="satiskarari" selected="@(tutanakTuru == "satiskarari")">Satış Kararı</option>
+                <option value="1satis" selected="@(tutanakTuru == "1satis")">1 Satış Listesi</option>
+                <option value="2satis" selected="@(tutanakTuru == "2satis")">2 Satış Listesi</option>
+                <option value="pazarlik" selected="@(tutanakTuru == "pazarlik")">Pazarlıktaki Araçlar</option>
+                <option value="6183" selected="@(tutanakTuru == "6183")">6183/86 Tek Satış</option>
+                <option value="vergidairesi" selected="@(tutanakTuru == "vergidairesi")">Vergi Dairesi Bazında</option>
+                <option value="otopark" selected="@(tutanakTuru == "otopark")">Otopark Listesi</option>
+                <option value="ilan" selected="@(tutanakTuru == "ilan")">İlan Listesi</option>
+                <option value="aracsorgu" selected="@(tutanakTuru == "aracsorgu")">Araç Satış Sorgu</option>
+                <option value="sorgu" selected="@(tutanakTuru == "sorgu")">Sorgu</option>
+                <option value="acikdosyalar" selected="@(tutanakTuru == "acikdosyalar")">Açık Dosyalar</option>
+            </select>
+            <div class="form-text">Tür seçimi, aşağıdaki kriterlerden ilgili olanları otomatik önerir; Listele'ye basmadan önce isterseniz değiştirebilirsiniz.</div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Dosya No</label>
+            <select class="form-select" name="dosyaNo">
+                <option value="">-- Tümü --</option>
+                @foreach (var no in dosyaNolar)
+                {
+                    <option value="@no" selected="@(ViewBag.DosyaNo == no)">@no</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Satış Türü</label>
+            <select class="form-select" name="satisTuru" id="satisTuruSecim">
+                <option value="">-- Tümü --</option>
+                <option value="1" selected="@(ViewBag.SatisTuru?.ToString() == "BirinciSatis")">1. Satış</option>
+                <option value="2" selected="@(ViewBag.SatisTuru?.ToString() == "IkinciSatis")">2. Satış</option>
+                <option value="3" selected="@(ViewBag.SatisTuru?.ToString() == "Pazarlik")">Pazarlık</option>
+                <option value="4" selected="@(ViewBag.SatisTuru?.ToString() == "Madde6183_86")">6183/86 Mad.</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Plaka</label>
+            <select class="form-select" name="plaka">
+                <option value="">-- Tümü --</option>
+                @foreach (var p in plakalar)
+                {
+                    <option value="@p" selected="@(ViewBag.Plaka == p)">@p</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Satış Tarihi</label>
+            <input class="form-control" type="date" name="satisTarihi" value="@ViewBag.SatisTarihi" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Vergi Dairesi</label>
+            <select class="form-select" name="vergiDairesi" id="vergiDairesiSecim">
+                <option value="">-- Tümü --</option>
+                @foreach (var v in vergiDaireleriListesi)
+                {
+                    <option value="@v" selected="@(ViewBag.VergiDairesi == v)">@v</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Satış Sonucu</label>
+            <select class="form-select" name="satisSonucu">
+                <option value="">-- Tümü --</option>
+                <option value="1" selected="@(ViewBag.SatisSonucu?.ToString() == "Satildi")">Satıldı</option>
+                <option value="2" selected="@(ViewBag.SatisSonucu?.ToString() == "AliciCikmadi")">Alıcı Çıkmadı</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="durum" id="durumSecim">
+                <option value="" selected="@(ViewBag.Durum == "")">Tümü</option>
+                <option value="aktif" selected="@(ViewBag.Durum == "aktif")">Aktif</option>
+                <option value="pasif" selected="@(ViewBag.Durum == "pasif")">Pasif</option>
+            </select>
+        </div>
+        <div class="col-12 d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="yazdir()"><i class="bi bi-printer"></i> Yazdır</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="pdfKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+            <a class="btn btn-outline-success" id="excelLink" href="#"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
+        </div>
+    </form>
+</div>
+
+<div class="card p-3 no-print">
+    <div class="form-section-title">Liste</div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya No</th>
+                    <th>Plaka</th>
+                    <th>Cinsi</th>
+                    <th>Markası</th>
+                    <th>M.Bedel</th>
+                    <th>Satış Türü</th>
+                    <th>Satış Tarih</th>
+                    <th>SONUÇ</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td>@s.DosyaNo</td>
+                        <td>@s.Plaka</td>
+                        <td>@s.AracCinsi</td>
+                        <td>@s.AracMarkasi</td>
+                        <td>@s.MuhammenBedel.ToString("N2", trTR)</td>
+                        <td>@s.SatisTuruGorunen</td>
+                        <td>@(s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                        <td>@s.SonucGorunen</td>
+                        <td>
+                            <a class="btn btn-sm btn-outline-primary" asp-controller="Dosya" asp-action="Details" asp-route-id="@s.DosyaId">Detay</a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="9" class="text-center text-muted">Kriterlere uyan kayıt bulunamadı.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* ---- YAZDIRMA / PDF ALANI: sadece yazdırırken görünür, ekranda gizli ---- *@
+<div id="yazdirmaAlani" style="display:none;">
+    @foreach (var s in Model)
+    {
+        <div class="tutanak-blok">
+            <div class="text-center mb-2">
+                <h5 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h5>
+                <h6 class="mb-0">İHALE TUTANAĞI</h6>
+            </div>
+
+            <table class="tutanak-tablo">
+                <tr><td class="baslik" colspan="2">BORÇLU MÜKELLEFİN:</td><td class="baslik text-end" colspan="2">Dosya No: <strong>@s.DosyaNo</strong></td></tr>
+                <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td colspan="3">@s.AdiSoyadiUnvani</td></tr>
+                <tr><td class="etiket">Vergi Numarası</td><td>@s.VergiKimlikNumarasi</td><td class="etiket">TC Kimlik Numarası</td><td>@s.TCKimlikNumarasi</td></tr>
+                <tr><td class="etiket">Vergi Dairesi Adı</td><td>@s.VergiDairesiAdi</td><td class="etiket">Alacaklı Vergi Dairesi</td><td>@s.AlacakliVergiDairesi</td></tr>
+            </table>
+
+            <table class="tutanak-tablo mt-2">
+                <tr><td class="baslik" colspan="2">ARAÇ DETAYI:</td><td class="baslik text-end" colspan="2">Plaka: <strong>@s.Plaka</strong></td></tr>
+                <tr><td class="etiket">Cinsi</td><td>@s.AracCinsi</td><td class="etiket">Tipi</td><td>@s.AracTipi</td></tr>
+                <tr><td class="etiket">Markası</td><td>@s.AracMarkasi</td><td class="etiket">Model Yılı</td><td>@s.ModelYili</td></tr>
+            </table>
+
+            <table class="tutanak-tablo mt-2">
+                <tr><td class="baslik" colspan="2">İHALE BİLGİLERİ:</td><td class="baslik text-end" colspan="2">Muhammen Bedeli: <strong>@s.MuhammenBedel.ToString("N2", trTR) TL</strong></td></tr>
+                <tr><td class="etiket">Satış Türü</td><td colspan="3">@s.SatisTuruGorunen</td></tr>
+                <tr><td class="etiket">İhale Tarihi / Saati</td><td colspan="3">@(s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "-") @(s.SatisSaati.HasValue ? s.SatisSaati.Value.ToString(@"hh\:mm") : "")</td></tr>
+                <tr><td class="etiket">Verilen Süre</td><td colspan="3">3 Gün</td></tr>
+            </table>
+
+            <p class="tutanak-paragraf mt-2">
+                Yukarıda detay bilgileri bulunan haczedilen menkul malın, yapılan ihaleye iştirak eden kişilerden
+                en yüksek bedeli teklif eden, aşağıda adı soyadı ve imzası bulunan şahsa ihale edildiğine ilişkin tutanaktır.
+            </p>
+
+            <table class="tutanak-tablo">
+                <tr class="baslik">
+                    <td>Adı ve Soyadı (Ünvanı)</td>
+                    <td>TC Kimlik No / Vergi Kimlik No</td>
+                    <td>İrtibat Adresi</td>
+                    <td>Satış Bedeli</td>
+                    <td>İmzası</td>
+                </tr>
+                <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+            </table>
+
+            <div class="text-center mt-3 mb-2 fw-bold">SATIŞ KOMİSYONU</div>
+            <div class="row text-center">
+                <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
+                <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
+                <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+                <div class="col-3"><div class="imza-cizgi">@s.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
+            </div>
+        </div>
+    }
+    @if (!Model.Any())
+    {
+        <p class="text-muted text-center">Kriterlere uyan kayıt bulunamadı.</p>
+    }
+</div>
+
+<style>
+    .tutanak-blok { padding: 12px 4px; page-break-after: always; }
+    .tutanak-blok:last-child { page-break-after: auto; }
+    .tutanak-tablo { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .tutanak-tablo td { border: 1px solid #333; padding: 4px 6px; vertical-align: middle; }
+    .tutanak-tablo td.etiket { font-weight: 600; background: #f8f9fa; width: 22%; }
+    .tutanak-tablo td.baslik { font-weight: 700; background: #eaeaea; }
+    .tutanak-paragraf { font-size: 0.8rem; }
+    .imza-cizgi { border-top: 1px solid #333; margin: 2.5rem 1rem 0.25rem 1rem; padding-top: 0.25rem; min-height: 1.2rem; }
+
+    @@media print {
+        #yazdirmaAlani { display: block !important; }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        (function () {
+            const form = document.getElementById('filtreFormu');
+            const excelLink = document.getElementById('excelLink');
+            function baglantiyiGuncelle() {
+                const params = new URLSearchParams(new FormData(form));
+                excelLink.href = '@Url.Action("ExcelIndir")?' + params.toString();
+            }
+            form.addEventListener('change', baglantiyiGuncelle);
+            baglantiyiGuncelle();
+        })();
+
+        // Tutanak Türü seçimi, ilgili filtreleri otomatik önerir (Listele'ye basınca uygulanır).
+        document.getElementById('tutanakTuruSecim').addEventListener('change', function () {
+            const satisTuru = document.getElementById('satisTuruSecim');
+            const durum = document.getElementById('durumSecim');
+            switch (this.value) {
+                case '1satis': satisTuru.value = '1'; break;
+                case '2satis': satisTuru.value = '2'; break;
+                case 'pazarlik': satisTuru.value = '3'; break;
+                case '6183': satisTuru.value = '4'; break;
+                case 'acikdosyalar': durum.value = 'aktif'; break;
+            }
+        });
+
+        function saatiGoster() {
+            const el = document.getElementById('tutanakSaat');
+            if (!el) return;
+            const simdi = new Date();
+            el.textContent = simdi.toLocaleDateString('tr-TR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+                + ' ' + simdi.toLocaleTimeString('tr-TR');
+        }
+        saatiGoster();
+        setInterval(saatiGoster, 1000);
+
+        function yazdir() {
+            window.print();
+        }
+
+        function pdfKaydet() {
+            const bloklar = document.querySelectorAll('#yazdirmaAlani .tutanak-blok');
+            if (bloklar.length === 0) { alert('Yazdırılacak kayıt bulunamadı.'); return; }
+            const alan = document.getElementById('yazdirmaAlani');
+            alan.style.display = 'block';
+
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const genislik = 210;
+
+            let zincir = Promise.resolve();
+            bloklar.forEach((blok, i) => {
+                zincir = zincir.then(() => html2canvas(blok, { scale: 2 }).then(canvas => {
+                    if (i > 0) pdf.addPage();
+                    const yukseklik = (canvas.height * genislik) / canvas.width;
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                }));
+            });
+            zincir.then(() => {
+                alan.style.display = 'none';
+                pdf.save('IhaleTutanaklari_@(DateTime.Now.ToString("yyyyMMdd_HHmmss")).pdf');
+            });
+        }
+    </script>
+}

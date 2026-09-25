@@ -40,6 +40,10 @@
             <span class="kimlik-etiket">Durum:</span>
             <span class="durum-rozet durum-@Model.Durum">@Model.DurumGorunenAd</span>
         </div>
+        <div class="kimlik-kutu">
+            <span class="kimlik-etiket">Aşama:</span>
+            <span class="badge @(Model.Aktif ? "bg-info text-dark" : "bg-secondary")">@Model.AsamaGorunen</span>
+        </div>
     </div>
 </div>
 

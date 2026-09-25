@@ -14,7 +14,7 @@ namespace AracSatisSistemi.Controllers
         // GET: /Dosya  -> dosya arama / listeleme
         public async Task<IActionResult> Index(string? arama, string? durumFiltre)
         {
-            var sorgu = _db.Dosyalar.AsQueryable();
+            var sorgu = _db.Dosyalar.Include(d => d.Satislar).AsQueryable();
             if (!string.IsNullOrWhiteSpace(arama))
             {
                 sorgu = sorgu.Where(d => d.DosyaNo.Contains(arama)

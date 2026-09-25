@@ -134,6 +134,39 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Damga Vergisi Tutarı (TL)")]
         public decimal DamgaVergisiTutari => Math.Round(MuhammenBedel * DamgaVergisiOrani / 1000m, 2);
 
+        // Aktif bir dosyanın süreçte tam olarak hangi aşamada olduğunu gösterir (ör. 2. Satışta
+        // "Alıcı Çıkmadı" sonucu girilince otomatik olarak "Pazarlık Bekliyor" olur). Satislar
+        // navigasyon koleksiyonunun yüklenmiş (Include) olması gerekir.
+        [NotMapped]
+        public string AsamaGorunen
+        {
+            get
+            {
+                if (Durum == DosyaDurumu.Satildi) return "Satıldı";
+                if (Durum == DosyaDurumu.IptalEdildi) return "İptal Edildi";
+                if (Durum == DosyaDurumu.IadeEdildi) return "İade Edildi";
+                if (Durum == DosyaDurumu.Kapandi) return "Kapandı";
+
+                var siralama = new[] { SatisTuru.BirinciSatis, SatisTuru.IkinciSatis, SatisTuru.Pazarlik, SatisTuru.Madde6183_86 };
+                foreach (var tur in siralama)
+                {
+                    var mevcut = Satislar.FirstOrDefault(s => s.SatisTuru == tur);
+                    if (mevcut == null)
+                    {
+                        return tur switch
+                        {
+                            SatisTuru.BirinciSatis => "1. Satış Bekliyor",
+                            SatisTuru.IkinciSatis => "2. Satış Bekliyor",
+                            SatisTuru.Pazarlik => "Pazarlık Bekliyor",
+                            SatisTuru.Madde6183_86 => "6183/86 Bekliyor",
+                            _ => tur.ToString()
+                        };
+                    }
+                }
+                return "Süreç Tamamlandı (Satılamadı)";
+            }
+        }
+
         // Ekranda / yazdırmada gösterilen Türkçe durum adı (ör. "Kayitli" -> "Aktif").
         [NotMapped]
         public string DurumGorunenAd => Durum switch
