@@ -1,0 +1,109 @@
+@{
+    ViewData["Title"] = "Yazışma";
+    var tumDosyaNolar = (List<string>)ViewBag.TumDosyaNolar;
+    var dosyaNo = (string?)ViewBag.DosyaNo;
+    var dosya = ViewBag.Dosya as Dosya;
+    var satis = ViewBag.Satis as Satis;
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
+    string Para(object? deger) => deger is decimal d ? d.ToString("N2", trTR) + " TL" : "-";
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <h3>Yazışma</h3>
+    <span class="text-muted small" id="yazismaSaat"></span>
+</div>
+
+<div class="card p-3 mb-3">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Dosya Ara</label>
+            <div class="input-group">
+                <input class="form-control" name="dosyaNo" value="@dosyaNo" list="dosyaNoListesi" placeholder="Dosya No (ör. 2026/0001)" autocomplete="off" />
+                <button class="btn btn-outline-primary" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+            <datalist id="dosyaNoListesi">
+                @foreach (var no in tumDosyaNolar)
+                {
+                    <option value="@no"></option>
+                }
+            </datalist>
+        </div>
+        <div class="col-auto">
+            @if (ViewBag.OncekiDosyaNo != null)
+            {
+                <a class="btn btn-outline-secondary" asp-action="Index" asp-route-dosyaNo="@ViewBag.OncekiDosyaNo" title="Önceki Dosya"><i class="bi bi-chevron-left"></i></a>
+            }
+            else
+            {
+                <button class="btn btn-outline-secondary" disabled><i class="bi bi-chevron-left"></i></button>
+            }
+            @if (ViewBag.SonrakiDosyaNo != null)
+            {
+                <a class="btn btn-outline-secondary" asp-action="Index" asp-route-dosyaNo="@ViewBag.SonrakiDosyaNo" title="Sonraki Dosya"><i class="bi bi-chevron-right"></i></a>
+            }
+            else
+            {
+                <button class="btn btn-outline-secondary" disabled><i class="bi bi-chevron-right"></i></button>
+            }
+        </div>
+    </form>
+</div>
+
+@if (dosya != null)
+{
+    <div class="card p-3 mb-3">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="row g-3">
+                    <div class="col-12"><label class="form-label">Dosya No</label><input class="form-control fw-bold" value="@dosya.DosyaNo" readonly /></div>
+                    <div class="col-12"><label class="form-label">Vergi Dairesi Adı</label><input class="form-control" value="@dosya.VergiDairesiAdi" readonly /></div>
+                    <div class="col-12"><label class="form-label">Borçlu Adı/Soyadı</label><input class="form-control" value="@dosya.AdiSoyadiUnvani" readonly /></div>
+                    <div class="col-12"><label class="form-label">Alıcı Adı/Soyadı</label><input class="form-control" value="@(satis?.AliciAdiSoyadi ?? "-")" readonly /></div>
+                    <div class="col-12"><label class="form-label">Plaka</label><input class="form-control" value="@dosya.Plaka" readonly /></div>
+                    <div class="col-12"><label class="form-label">Satış Türü</label><input class="form-control" value="@(satis?.SatisTuruGorunen ?? "-")" readonly /></div>
+                    <div class="col-12"><label class="form-label">Satış Tarihi</label><input class="form-control" value="@(satis?.SatisTarihi.ToString("dd.MM.yyyy") ?? "-")" readonly /></div>
+                    <div class="col-12"><label class="form-label">Muhammen Bedeli</label><input class="form-control" value="@Para(dosya.MuhammenBedel)" readonly /></div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="row g-3">
+                    <div class="col-12"><label class="form-label">Satış Bedeli</label><input class="form-control fw-bold" value="@Para(ViewBag.SatisBedeli)" readonly /></div>
+                    <div class="col-12"><label class="form-label">KDV Oranı</label><input class="form-control" value="%@dosya.KdvOrani" readonly /></div>
+                    <div class="col-12"><label class="form-label">KDV Tutarı</label><input class="form-control" value="@Para(ViewBag.KdvTutari)" readonly /></div>
+                    <div class="col-12"><label class="form-label">DV Oranı</label><input class="form-control" value="%0,569" readonly /></div>
+                    <div class="col-12"><label class="form-label">DV Tutarı</label><input class="form-control" value="@Para(ViewBag.DvTutari)" readonly /></div>
+                    <div class="col-12"><label class="form-label fw-bold">Toplam Tutar</label><input class="form-control fw-bold" value="@Para(ViewBag.ToplamTutar)" readonly /></div>
+                    <div class="col-12"><label class="form-label">Otopark Tutarı</label><input class="form-control" value="@Para(ViewBag.OtoparkTutari)" readonly /></div>
+                    <div class="col-12"><label class="form-label">MTV Tutarı</label><input class="form-control" value="@Para(ViewBag.MtvTutari)" readonly /></div>
+                    <div class="col-12"><label class="form-label fw-bold">Kalan Tutar</label><input class="form-control fw-bold" value="@Para(ViewBag.KalanTutar)" readonly /></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary" asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id"><i class="bi bi-arrow-left"></i> Geri</a>
+        <a class="btn btn-outline-dark" asp-action="VergiDairesiYazisiIndir" asp-route-dosyaNo="@dosya.DosyaNo">
+            <i class="bi bi-envelope"></i> @dosya.VergiDairesiAdi
+        </a>
+        <a class="btn btn-outline-dark" asp-action="UstYaziIndir" asp-route-dosyaNo="@dosya.DosyaNo"><i class="bi bi-file-earmark-word"></i> Üst Yazı</a>
+        <a class="btn btn-outline-danger ms-auto" asp-controller="Home" asp-action="Index"><i class="bi bi-x-circle"></i> Çıkış</a>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">Görüntülemek için yukarıdan bir dosya numarası seçin veya yazın.</div>
+}
+
+@section Scripts {
+    <script>
+        function saatiGoster() {
+            const el = document.getElementById('yazismaSaat');
+            if (!el) return;
+            const simdi = new Date();
+            el.textContent = simdi.toLocaleDateString('tr-TR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })
+                + ' ' + simdi.toLocaleTimeString('tr-TR');
+        }
+        saatiGoster();
+        setInterval(saatiGoster, 1000);
+    </script>
+}
