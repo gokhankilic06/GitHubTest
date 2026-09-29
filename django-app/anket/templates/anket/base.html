@@ -1,0 +1,14 @@
+{% load static %}<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ ANKET_ADI }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'anket/vendor/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="{% static 'anket/style.css' %}">
+</head>
+<body>
+{% block body %}{% endblock %}
+{% block scripts %}{% endblock %}
+</body>
+</html>

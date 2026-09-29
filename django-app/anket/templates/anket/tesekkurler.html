@@ -1,0 +1,15 @@
+{% extends "anket/base.html" %}
+{% block body %}
+<div class="container survey-wrap py-3">
+  <div class="text-center mb-3">
+    <h1 class="school-title">{{ OKUL_ADI }}</h1>
+    <div class="survey-subtitle">{{ ANKET_ADI }}</div>
+  </div>
+  <div class="card shadow-sm"><div class="card-body p-4">
+    <div class="alert alert-success mb-0">
+      <h5 class="alert-heading">Teşekkür ederiz!</h5>
+      Yanıtlarınız başarıyla kaydedildi.
+    </div>
+  </div></div>
+</div>
+{% endblock %}

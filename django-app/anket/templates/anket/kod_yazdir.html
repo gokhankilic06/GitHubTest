@@ -1,0 +1,24 @@
+{% extends "anket/base.html" %}
+{% block title %}Veli Kodları - Yazdır{% endblock %}
+{% block body %}
+<div class="container py-3 no-print">
+  <div class="alert alert-info d-flex justify-content-between align-items-center">
+    <span>{{ kodlar|length }} kullanılmamış kod yazdırılacak. Kartları keserek velilere dağıtabilirsiniz.</span>
+    <button class="btn btn-primary btn-sm" onclick="window.print()">Yazdır</button>
+  </div>
+</div>
+<div class="slip-grid">
+  {% for k in kodlar %}
+  <div class="code-slip">
+    <div class="slip-school">{{ OKUL_ADI }}</div>
+    <div class="slip-title">{{ ANKET_ADI }}</div>
+    <div>Sınıf: <strong>{{ k.sinif.ad }}</strong></div>
+    <div class="slip-code">{{ k.kod }}</div>
+    <div class="slip-url">{{ site }} adresine girip bu kodu yazınız.</div>
+  </div>
+  {% empty %}
+  <p class="text-center text-muted">Yazdırılacak kullanılmamış kod yok.</p>
+  {% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}<script>if (document.querySelector('.code-slip')) window.addEventListener('load', () => window.print());</script>{% endblock %}

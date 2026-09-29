@@ -1,0 +1,8 @@
+<form method="get" class="d-flex align-items-center gap-2">
+  <label for="sinifFiltre" class="form-label mb-0 fw-semibold">Sınıf:</label>
+  <select id="sinifFiltre" name="sinif" class="form-select form-select-sm" style="width:auto" onchange="this.form.submit()">
+    <option value="">Tüm Sınıflar</option>
+    {% for s in siniflar %}<option value="{{ s.ad }}"{% if secili_sinif and secili_sinif.pk == s.pk %} selected{% endif %}>{{ s.ad }}</option>{% endfor %}
+  </select>
+  <noscript><button class="btn btn-sm btn-outline-secondary">Filtrele</button></noscript>
+</form>
