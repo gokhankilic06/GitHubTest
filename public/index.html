@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Riba Veli Anket Sistemi</title>
+  <link rel="stylesheet" href="/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container survey-wrap py-3">
+    <div class="text-center mb-3">
+      <h1 class="school-title" id="schoolName">&nbsp;</h1>
+      <div class="survey-subtitle" id="surveyName">&nbsp;</div>
+    </div>
+
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <div id="thanks" class="alert alert-success d-none mb-0">
+          <h5 class="alert-heading">Teşekkür ederiz!</h5>
+          Yanıtlarınız başarıyla kaydedildi.
+        </div>
+
+        <form id="surveyForm" novalidate>
+          <div class="mb-3">
+            <label for="name" class="form-label">Ad Soyad</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/></svg></span>
+              <input type="text" class="form-control" id="name" placeholder="Veli adı soyadı" maxlength="100" required>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label for="className" class="form-label">Sınıf</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917z"/><path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466z"/></svg></span>
+              <select class="form-select" id="className" required>
+                <option value="">Sınıf Seçiniz</option>
+              </select>
+            </div>
+          </div>
+
+          <p class="explanation">
+            <strong>Açıklama:</strong> Sayın Veli,<br>
+            Bu anketin amacı okulda öğrencilerimizin hangi rehberlik hizmetlerine ihtiyaç duyduğunu belirlemektir.<br>
+            Her soruda A ve B olmak üzere iki rehberlik hizmeti verilmektedir.<br>
+            Sorulara yanıt verirken çocuğunuzun hangi konuda öncelikli olarak rehberlik hizmeti alması gerektiğini düşününüz. Sadece birini seçiniz.
+          </p>
+
+          <div id="questions" class="mt-4"></div>
+
+          <div id="error" class="alert alert-danger d-none py-2"></div>
+
+          <button type="submit" class="btn btn-success w-100 btn-sm py-2" id="submitBtn">Yanıtları Gönder</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/survey.js"></script>
+</body>
+</html>

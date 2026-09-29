@@ -1,0 +1,13 @@
+{
+  "name": "veli-anketi",
+  "version": "1.0.0",
+  "description": "İki seçenekli veli anketi ve sonuçları gösteren admin paneli",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
