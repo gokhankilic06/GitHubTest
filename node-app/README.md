@@ -1,0 +1,95 @@
+# Riba Veli Anket Sistemi — Node.js sürümü
+
+Yavuz Sultan Selim İlkokulu için iki seçenekli (A/B) veli anketi ve yönetici paneli.
+
+## Özellikler
+
+**Veli sayfası**
+- **Tek kullanımlık veli kodu:** Her veli kendisine verilen kodu girer. Kod doğrulanınca sınıf otomatik yazılır ve kod bir daha kullanılamaz.
+- Kod bağlantıyla da gelebilir: `https://siteniz/?kod=AB12CD`
+- 13 adet A/B sorusu vardır. Eksik bırakılan sorular kırmızı ile işaretlenir.
+
+**Yönetici paneli (`/admin`)**
+- **Sonuçlar** sekmesi:
+  - **Sınıf filtresi:** Tüm tablolar, grafikler ve Excel çıktısı seçilen sınıfa göre değişir.
+  - **Grafikler:** soru bazlı A/B oranı ve sınıflara göre katılım.
+  - **Tablolar:** katılımcı listesi, soru bazlı dağılım, bireysel yanıt tablosu (M1–M13), şık bazlı sonuçlar ve sınıf özeti (katılım oranı).
+  - **Excel'e Aktar (.xlsx):** 5 sayfalık rapor. Sayfalar: Katılımcılar, Soru Bazlı Dağılım, Bireysel Yanıtlar, Şık Bazlı Sonuçlar, Sınıf Özeti.
+  - Tek bir yanıtı silme (velinin kodu yeniden kullanılabilir olur) ve tüm verileri sıfırlama.
+- **Veli Kodları** sekmesi:
+  - Sınıf seçip istenen sayıda kod üretme
+  - Kullanılmamış kodları kesilip dağıtılabilecek **kartlar halinde yazdırma**
+  - Kod listesini Excel'e aktarma ve kullanılmamış kodları silme
+  - Her kod için veliye gönderilecek bağlantıyı kopyalama
+
+| Veli formu | Sonuçlar (sınıf filtresi + grafikler) |
+|---|---|
+| ![Anket](docs/anket.png) | ![Panel](docs/panel.png) |
+
+| Veli kodları | Yazdırılan kod kartları |
+|---|---|
+| ![Kodlar](docs/kodlar.png) | ![Kartlar](docs/kod-kartlari.png) |
+
+## Kurulum
+
+Node.js 20 veya üzeri gerekir.
+
+```bash
+cd node-app
+npm install
+ADMIN_PASSWORD=gucluBirSifre SESSION_SECRET=uzunRastgeleMetin npm start
+```
+
+- Veli sayfası: http://localhost:3000
+- Yönetici paneli: http://localhost:3000/admin
+
+### Ortam değişkenleri
+
+| Değişken | Açıklama |
+|---|---|
+| `ADMIN_PASSWORD` | Yönetici şifresi. **Mutlaka değiştirin.** Varsayılan: `admin123` |
+| `SESSION_SECRET` | Oturum çerezini imzalayan gizli anahtar (uzun, rastgele bir metin) |
+| `DATABASE_URL` | Tanımlıysa **PostgreSQL / Supabase** kullanılır |
+| `SQLITE_FILE` | SQLite dosyasının yolu. Varsayılan: `data/anket.db` |
+| `PORT` | Sunucu portu. Varsayılan: `3000` |
+| `NODE_ENV=production` | Çerezleri yalnızca HTTPS üzerinden gönderir |
+
+## Veritabanı seçimi
+
+### 1) Kendi sunucunuzda: SQLite (varsayılan)
+Hiçbir ayar gerekmez. Veriler `data/anket.db` dosyasında tutulur. Yedek almak için bu dosyayı kopyalamanız yeterlidir.
+
+### 2) Ücretsiz barındırmada: Supabase (PostgreSQL)
+Render, Railway gibi ücretsiz servislerde disk kalıcı değildir ve SQLite dosyası silinir. Bu durumda Supabase kullanın:
+
+1. https://supabase.com adresinde ücretsiz bir proje oluşturun.
+2. **Project Settings → Database → Connection string** bölümüne gidin ve **Session pooler** adresini kopyalayın. Adres şu şekildedir:
+   `postgresql://postgres.xxxx:SIFRE@aws-0-eu-central-1.pooler.supabase.com:5432/postgres`
+3. Barındırma servisinde bu adresi `DATABASE_URL` ortam değişkeni olarak girin.
+
+Tablolar ilk çalıştırmada otomatik oluşturulur.
+
+**Örnek: Render.com**
+- Build Command: `cd node-app && npm install`
+- Start Command: `cd node-app && npm start`
+- Environment: `DATABASE_URL`, `ADMIN_PASSWORD`, `SESSION_SECRET`, `NODE_ENV=production`
+
+## Soruları / sınıfları düzenleme
+
+Okul adı, sorular, şıklar ve sınıf listesi `questions.js` dosyasındadır.
+Soru sırası değiştirilirse mevcut yanıtlar yanlış soruya eşleşir. Bu durumda önce panelden verileri sıfırlayın.
+
+## Testler
+
+```bash
+npm test                                                   # SQLite üzerinde
+TEST_DATABASE_URL=postgres://localhost/anket_test npm test # ayrıca PostgreSQL üzerinde
+```
+
+> Uyarı: `TEST_DATABASE_URL` veritabanındaki anket verileri test sırasında silinir. Canlı veritabanını vermeyin.
+
+## Güvenlik
+
+- Yönetici oturumu imzalı ve `HttpOnly` bir çerezle tutulur. Sunucu yeniden başlasa da oturum korunur; şifre değişince eski oturumlar geçersiz olur.
+- Hatalı şifre denemeleri sınırlıdır: IP başına 15 dakikada 10 deneme.
+- Aynı kodla eşzamanlı iki gönderim yapılırsa yalnızca biri kabul edilir. Bu, veritabanı işlemiyle garanti edilir.

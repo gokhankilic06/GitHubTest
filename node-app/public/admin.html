@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Yönetici Paneli</title>
+  <link rel="stylesheet" href="/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Giriş -->
+  <div id="loginView" class="container py-5 d-none no-print" style="max-width:380px">
+    <h1 class="h4 mb-3 text-center">Yönetici Girişi</h1>
+    <form id="loginForm" class="card card-body shadow-sm">
+      <label for="password" class="form-label">Şifre</label>
+      <input type="password" id="password" class="form-control mb-3" autocomplete="current-password" required>
+      <div id="loginError" class="alert alert-danger py-2 d-none"></div>
+      <button class="btn btn-primary w-100">Giriş Yap</button>
+    </form>
+  </div>
+
+  <!-- Panel -->
+  <div id="adminView" class="container-fluid admin-wrap py-3 d-none no-print">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <h1 class="h3 mb-0">Yönetici Paneli</h1>
+      <button id="logoutBtn" class="btn btn-outline-secondary btn-sm">Çıkış</button>
+    </div>
+
+    <ul class="nav nav-tabs mt-3" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-tab="results" type="button">Sonuçlar</button></li>
+      <li class="nav-item"><button class="nav-link" data-tab="codes" type="button">Veli Kodları</button></li>
+    </ul>
+
+    <!-- ========== SONUÇLAR ========== -->
+    <section id="tab-results" class="pt-3">
+      <div class="filter-bar d-flex flex-wrap align-items-center gap-2 mb-2">
+        <label for="classFilter" class="form-label mb-0 fw-semibold">Sınıf:</label>
+        <select id="classFilter" class="form-select form-select-sm" style="width:auto"></select>
+        <a id="excelBtn" href="/api/admin/export.xlsx" class="btn btn-success btn-sm ms-auto">Excel'e Aktar</a>
+      </div>
+
+      <p class="mt-3 mb-2" id="participantCount"></p>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead>
+            <tr><th style="width:80px">Sıra No</th><th>Ad Soyad</th><th>Sınıf</th><th>Yanıtlar</th><th style="width:60px">İşlem</th></tr>
+          </thead>
+          <tbody id="responsesBody"></tbody>
+        </table>
+      </div>
+      <div class="text-end">
+        <button id="resetBtn" class="btn btn-danger btn-sm">Verileri Sıfırla</button>
+      </div>
+
+      <h2>Grafikler</h2>
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <div class="card card-body">
+            <div class="chart-title">Soru bazlı A / B tercih oranı (%)</div>
+            <div class="chart-legend">
+              <span><i class="swatch" style="background:var(--series-a)"></i>A seçeneği</span>
+              <span><i class="swatch" style="background:var(--series-b)"></i>B seçeneği</span>
+            </div>
+            <div class="chart-box" style="height:460px"><canvas id="questionChart" aria-label="Soru bazlı A/B tercih oranı grafiği" role="img"></canvas></div>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card card-body">
+            <div class="chart-title">Sınıflara göre katılan veli sayısı</div>
+            <div class="chart-box" style="height:460px"><canvas id="classChart" aria-label="Sınıflara göre katılım grafiği" role="img"></canvas></div>
+            <div id="classChartEmpty" class="text-muted small d-none">Henüz katılım yok.</div>
+          </div>
+        </div>
+      </div>
+
+      <h2>Soru Bazlı Dağılım</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead><tr><th>Soru</th><th>A Seçeneği</th><th>B Seçeneği</th></tr></thead>
+          <tbody id="distributionBody"></tbody>
+        </table>
+      </div>
+
+      <h2>Bireysel Yanıt Tablosu</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm individual">
+          <thead id="individualHead"></thead>
+          <tbody id="individualBody"></tbody>
+        </table>
+      </div>
+
+      <h2>Soruya Göre Filtrelenmiş Sonuçlar</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead><tr><th>Şık</th><th style="width:130px">Seçen Sayısı</th><th style="width:130px">Yüzde</th></tr></thead>
+          <tbody id="filteredBody"></tbody>
+        </table>
+      </div>
+
+      <h2>Sınıf Özeti</h2>
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm" style="max-width:600px">
+          <thead><tr><th>Sınıf</th><th>Katılan Veli</th><th>Dağıtılan Kod</th><th>Katılım Oranı</th></tr></thead>
+          <tbody id="classSummaryBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ========== VELİ KODLARI ========== -->
+    <section id="tab-codes" class="pt-3 d-none">
+      <div class="card card-body mb-3">
+        <h2 class="mt-0">Yeni Kod Üret</h2>
+        <form id="codeForm" class="row g-2 align-items-end">
+          <div class="col-auto">
+            <label for="codeClass" class="form-label mb-1">Sınıf</label>
+            <select id="codeClass" class="form-select form-select-sm" required></select>
+          </div>
+          <div class="col-auto">
+            <label for="codeCount" class="form-label mb-1">Kod Sayısı</label>
+            <input type="number" id="codeCount" class="form-control form-control-sm" min="1" max="200" value="25" style="width:110px" required>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary btn-sm">Kod Üret</button>
+          </div>
+          <div class="col-12 small text-muted">Her velinin tek bir kodu olur ve kod yalnızca bir kez kullanılabilir. Kodun sınıfı ankete otomatik yazılır.</div>
+        </form>
+        <div id="codeMsg" class="alert py-2 mt-2 mb-0 d-none"></div>
+      </div>
+
+      <div class="filter-bar d-flex flex-wrap align-items-center gap-2 mb-2">
+        <label for="codeFilter" class="form-label mb-0 fw-semibold">Sınıf:</label>
+        <select id="codeFilter" class="form-select form-select-sm" style="width:auto"></select>
+        <span id="codeCounts" class="small text-muted"></span>
+        <div class="ms-auto d-flex gap-2 flex-wrap">
+          <button id="printCodesBtn" class="btn btn-outline-primary btn-sm">Kullanılmayanları Yazdır</button>
+          <a id="codesExcelBtn" href="/api/admin/codes.xlsx" class="btn btn-success btn-sm">Excel'e Aktar</a>
+          <button id="deleteUnusedBtn" class="btn btn-outline-danger btn-sm">Kullanılmayanları Sil</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-sm">
+          <thead><tr><th>Sınıf</th><th>Veli Kodu</th><th>Durum</th><th>Kullanan Veli</th><th style="width:230px">İşlem</th></tr></thead>
+          <tbody id="codesBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- Yazdırma alanı: veliye dağıtılacak kod kartları -->
+  <div id="printArea" class="print-only"></div>
+
+  <script src="/vendor/chart.umd.min.js"></script>
+  <script src="/admin.js"></script>
+</body>
+</html>
