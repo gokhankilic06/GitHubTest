@@ -1,0 +1,11 @@
+{
+  "name": "veraset-randevu",
+  "private": true,
+  "description": "Veraset randevu sistemi - ortak API testleri (Node.js, Python, C# backendleri)",
+  "scripts": {
+    "test:node": "BACKEND=node node --test test/api.test.mjs",
+    "test:python": "BACKEND=python node --test test/api.test.mjs",
+    "test:csharp": "BACKEND=csharp node --test test/api.test.mjs",
+    "test": "npm run test:node && npm run test:python && npm run test:csharp"
+  }
+}

@@ -1,0 +1,7 @@
+node_modules/
+data/*.db
+data/*.db-*
+python/.venv/
+__pycache__/
+csharp/bin/
+csharp/obj/

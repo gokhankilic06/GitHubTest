@@ -1,0 +1,28 @@
+{
+  "vergiDairesi": "Ankara Veraset ve Harçlar Vergi Dairesi",
+  "saatDilimi": "Europe/Istanbul",
+  "ilceler": [
+    "Akyurt", "Altındağ", "Ayaş", "Bala", "Beypazarı", "Çamlıdere", "Çankaya",
+    "Çubuk", "Elmadağ", "Etimesgut", "Evren", "Gölbaşı", "Güdül", "Haymana",
+    "Kahramankazan", "Kalecik", "Keçiören", "Kızılcahamam", "Mamak", "Nallıhan",
+    "Polatlı", "Pursaklar", "Sincan", "Şereflikoçhisar", "Yenimahalle"
+  ],
+  "mesaiBloklari": [
+    { "baslangic": "09:00", "bitis": "12:00" },
+    { "baslangic": "13:30", "bitis": "16:30" }
+  ],
+  "randevuAraligiDakika": 15,
+  "slotKapasitesi": 1,
+  "ileriGunSayisi": 14,
+  "yeniGunAcilisSaati": "17:00",
+  "tatiller": [
+    "2026-10-29",
+    "2027-01-01", "2027-04-23", "2027-05-01", "2027-05-19",
+    "2027-07-15", "2027-08-30", "2027-10-29"
+  ],
+  "yarimGunler": ["2026-10-28", "2027-10-28"],
+  "belge": {
+    "ad": "Veraset ve İntikal Vergisi Beyannamesi",
+    "dosya": "veraset-beyannamesi.pdf"
+  }
+}

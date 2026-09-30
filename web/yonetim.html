@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Randevu Yönetimi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="ust">
+    <div class="kap">
+      <h1>Randevu Yönetimi</h1>
+      <p class="vd">Personel paneli</p>
+    </div>
+  </header>
+
+  <main class="kap" style="max-width: 1200px">
+    <div id="genelHata" class="uyari hata" hidden></div>
+
+    <div class="filtre">
+      <label for="tarih"><strong>Tarih:</strong></label>
+      <input type="date" id="tarih">
+      <button type="button" class="btn mavi kucuk" id="listele">Listele</button>
+      <button type="button" class="btn gri-btn kucuk" id="tumu">Tüm Gelecek Randevular</button>
+      <button type="button" class="btn gri-btn kucuk" onclick="window.print()">Yazdır</button>
+      <span id="sayac"></span>
+    </div>
+
+    <div class="liste-kap">
+      <table class="liste">
+        <thead>
+          <tr>
+            <th>No</th><th>Tarih</th><th>Saat</th><th>İlçe</th>
+            <th>Vefat Eden</th><th>Vefat Eden T.C.</th>
+            <th>Randevuyu Alan</th><th>Doğum Yılı</th><th>T.C.</th><th>Cep</th>
+            <th>Durum</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="liste"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script src="/js/ortak.js"></script>
+  <script src="/js/yonetim.js"></script>
+</body>
+</html>

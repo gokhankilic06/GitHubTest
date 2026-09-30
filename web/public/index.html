@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Veraset Randevu Sistemi</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="ust">
+    <div class="kap">
+      <h1>Veraset Randevu Sistemi</h1>
+      <p class="vd" id="vergiDairesiBaslik"></p>
+    </div>
+  </header>
+
+  <main class="kap">
+    <ol class="adimlar" aria-label="Randevu adımları">
+      <li data-adim="1" class="aktif">Açıklama ve Tarih</li>
+      <li data-adim="2">Saat Seçimi</li>
+      <li data-adim="3">Bilgiler</li>
+      <li data-adim="4">Onay</li>
+    </ol>
+
+    <div id="genelHata" class="uyari hata" hidden></div>
+
+    <!-- 1. ADIM: Açıklama, belge, taahhüt, ilçe ve gün -->
+    <section id="adim1" class="adim">
+      <div id="aciklama" class="aciklama">Yükleniyor…</div>
+
+      <div class="belge-kutu" id="belgeKutu" hidden>
+        <span>Randevuya gelmeden önce aşağıdaki belgeyi indirip doldurunuz:</span>
+        <a id="belgeLink" class="btn mavi" download>Belgeyi İndir</a>
+      </div>
+
+      <label class="taahhut">
+        <input type="checkbox" id="taahhut">
+        <span>Yukarıdaki açıklamaları okudum. Randevu zamanında belgeleri eksiksiz olarak getireceğimi taahhüt ederim.</span>
+      </label>
+
+      <div class="satir">
+        <label for="ilce">Vefat edenin ikamet ettiği ilçe ;</label>
+        <select id="ilce">
+          <option value="">-- Seçilmemiş --</option>
+        </select>
+      </div>
+
+      <div class="satir">
+        <label for="tarihGoster">Randevu almak istenilen gün ;</label>
+        <div class="tarih-alan">
+          <div class="tarih-giris">
+            <input type="text" id="tarihGoster" readonly placeholder="gg.aa.yyyy">
+            <button type="button" id="takvimAc" class="takvim-btn" aria-label="Takvimi aç">&#128197;</button>
+          </div>
+          <div id="takvim" class="takvim" hidden></div>
+          <p class="aciklama-kucuk"><span class="kare gri"></span> Gri renkle boyanan günlere randevu alınamaz.</p>
+          <p class="aciklama-kucuk"><span class="kare yesil"></span> Yeşil renkle boyanan günler randevu için uygundur (Saat <span id="acilisSaati">17:00</span>'den sonra bir sonraki gün için randevu açılır).</p>
+        </div>
+      </div>
+
+      <div class="butonlar">
+        <button type="button" class="btn mavi" id="ilerle1">İLERLE</button>
+        <button type="button" class="btn sari" data-iptal>İPTAL</button>
+      </div>
+    </section>
+
+    <!-- 2. ADIM: Saat seçimi -->
+    <section id="adim2" class="adim" hidden>
+      <h2 class="baslik">Randevu Saati Seçimi</h2>
+      <p><strong id="secilenGunYazi"></strong> tarihi için uygun saatlerden birini seçiniz.</p>
+      <div id="saatler" class="saatler"></div>
+      <div class="butonlar">
+        <button type="button" class="btn gri-btn" id="geri2">GERİ</button>
+        <button type="button" class="btn sari" data-iptal>İPTAL</button>
+      </div>
+    </section>
+
+    <!-- 3. ADIM: Kişi bilgileri -->
+    <section id="adim3" class="adim" hidden>
+      <h2 class="baslik">Randevu Bilgileri</h2>
+      <form id="randevuForm" novalidate>
+        <div class="satir">
+          <label>Randevu alınan vergi dairesi ;</label>
+          <input type="text" id="gosterVd" readonly class="salt">
+        </div>
+        <div class="satir">
+          <label>Randevu tarihi ;</label>
+          <input type="text" id="gosterTarih" readonly class="salt">
+        </div>
+        <div class="satir">
+          <label>Randevu Saati ;</label>
+          <input type="text" id="gosterSaat" readonly class="salt">
+        </div>
+
+        <div class="bosluk"></div>
+
+        <div class="satir">
+          <label for="vefatEdenAd">Vefat Edenin Adı ;</label>
+          <div class="alan"><input type="text" id="vefatEdenAd" name="vefatEdenAd" placeholder="Adı" maxlength="50" autocomplete="off"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="vefatEdenSoyad">Vefat Edenin Soyadı ;</label>
+          <div class="alan"><input type="text" id="vefatEdenSoyad" name="vefatEdenSoyad" placeholder="Soyadı" maxlength="50" autocomplete="off"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="vefatEdenTc">Vefat Edenin T.C. Kimlik Numarası ;</label>
+          <div class="alan"><input type="text" id="vefatEdenTc" name="vefatEdenTc" placeholder="T.C. Kimlik Numarası" maxlength="11" inputmode="numeric" autocomplete="off"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="basvuranAd">Randevuyu Alanın Adı ;</label>
+          <div class="alan"><input type="text" id="basvuranAd" name="basvuranAd" placeholder="Adı" maxlength="50" autocomplete="given-name"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="basvuranSoyad">Randevuyu Alanın Soyadı ;</label>
+          <div class="alan"><input type="text" id="basvuranSoyad" name="basvuranSoyad" placeholder="Soyadı" maxlength="50" autocomplete="family-name"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="basvuranDogumYili">Randevuyu Alanın Doğum Yılı ;</label>
+          <div class="alan"><input type="text" id="basvuranDogumYili" name="basvuranDogumYili" placeholder="Örn: 1980" maxlength="4" inputmode="numeric"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="basvuranTc">Randevuyu Alanın T.C. Kimlik Numarası ;</label>
+          <div class="alan"><input type="text" id="basvuranTc" name="basvuranTc" placeholder="T.C. Kimlik Numarası" maxlength="11" inputmode="numeric"><small class="alan-hata"></small></div>
+        </div>
+        <div class="satir">
+          <label for="basvuranCep">Randevuyu Alanın Cep Numarası ;</label>
+          <div class="alan"><input type="text" id="basvuranCep" name="basvuranCep" placeholder="5xxxxxxxxx" maxlength="10" inputmode="tel" autocomplete="tel-national"><small class="alan-hata"></small></div>
+        </div>
+
+        <div class="butonlar">
+          <button type="submit" class="btn yesil" id="kaydet">RANDEVUYU KAYDET</button>
+          <button type="button" class="btn sari" data-iptal>İPTAL ET</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- 4. ADIM: Onay -->
+    <section id="adim4" class="adim" hidden>
+      <div class="uyari basari">Randevunuz başarıyla oluşturulmuştur.</div>
+      <table class="ozet">
+        <tbody id="ozet"></tbody>
+      </table>
+      <p class="not">Lütfen randevu numaranızı not alınız ve randevu saatinden önce doldurduğunuz belgelerle birlikte vergi dairesinde hazır bulununuz.</p>
+      <div class="butonlar">
+        <button type="button" class="btn mavi" onclick="window.print()">YAZDIR</button>
+        <button type="button" class="btn gri-btn" id="yeniRandevu">YENİ RANDEVU</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/ortak.js"></script>
+  <script src="/js/takvim.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

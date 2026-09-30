@@ -1,0 +1,16 @@
+{
+  "name": "veraset-randevu-node",
+  "version": "1.0.0",
+  "description": "Veraset randevu sistemi - Node.js backend",
+  "main": "src/server.js",
+  "private": true,
+  "scripts": {
+    "start": "node --no-warnings=ExperimentalWarning src/server.js"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
