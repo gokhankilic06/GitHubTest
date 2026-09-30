@@ -17,4 +17,6 @@ Aynı sistemin iki bağımsız sürümü vardır. İkisinden birini seçip kulla
 - Soruları ileride sık değiştirecekseniz veya birden fazla öğretmen panele girecekse **Django** sürümünü seçin.
 - En sade kurulum için **Node.js** sürümünü seçin.
 
+**Windows'ta hızlı başlangıç:** Node.js LTS'i kurun (https://nodejs.org), sonra bu klasördeki **`BASLAT.bat`** dosyasına çift tıklayın.
+
 Kurulum ve yayına alma adımları her klasörün kendi README dosyasındadır.

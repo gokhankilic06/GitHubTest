@@ -32,7 +32,16 @@ Yavuz Sultan Selim İlkokulu için iki seçenekli (A/B) veli anketi ve yönetici
 
 ## Kurulum
 
-Node.js 20 veya üzeri gerekir.
+### Windows'ta en kolay yol
+1. https://nodejs.org adresinden **LTS** sürümünü kurun (Node.js 22.13 veya üzeri).
+2. Zip'i çıkarın ve **`baslat.bat`** dosyasına çift tıklayın.
+
+İlk açılışta kurulum otomatik yapılır ve yönetici paneli tarayıcıda açılır (şifre: `admin123`). Siyah pencere açık kaldığı sürece site çalışır.
+
+> PowerShell'de `npm` komutu "running scripts is disabled" hatası verirse `npm` yerine `npm.cmd` yazın veya `baslat.bat` dosyasını kullanın.
+
+### Komut satırından
+Node.js 22.13 veya üzeri gerekir. Derleme gerektiren bir paket yoktur, SQLite için Node.js'in kendi modülü kullanılır.
 
 ```bash
 cd node-app

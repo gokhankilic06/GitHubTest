@@ -4,15 +4,14 @@
   "description": "Riba Veli Anket Sistemi - Node.js sürümü",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "node --test test/*.test.js"
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   },
   "license": "MIT",
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
     "exceljs": "^4.4.0",
     "express": "^5.2.1",
     "pg": "^8.23.0"

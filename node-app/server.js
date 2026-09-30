@@ -7,6 +7,12 @@
 //   DATABASE_URL    Tanımlıysa PostgreSQL/Supabase kullanılır
 //   SQLITE_FILE     SQLite dosya yolu (varsayılan data/anket.db)
 
+const [major, minor] = process.versions.node.split('.').map(Number);
+if (major < 22 || (major === 22 && minor < 13)) {
+  console.error(`HATA: Node.js ${process.versions.node} çok eski. Lütfen https://nodejs.org adresinden LTS sürümünü kurun (en az 22.13).`);
+  process.exit(1);
+}
+
 const { createDb } = require('./src/db');
 const { createApp } = require('./src/app');
 

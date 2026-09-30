@@ -1,9 +1,10 @@
 // SQLite adaptörü (tek sunucuda çalışan kurulumlar için).
 // Veritabanı dosyası: SQLITE_FILE (varsayılan data/anket.db)
+// Node.js'in kendi SQLite modülü (node:sqlite) kullanılır; derleme gerektiren ek paket yoktur.
 
 const fs = require('fs');
 const path = require('path');
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite');
 
 const SCHEMA = `
 CREATE TABLE IF NOT EXISTS codes (
@@ -26,15 +27,27 @@ CREATE INDEX IF NOT EXISTS idx_codes_class ON codes(class_name);
 
 function createSqliteDb(file) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  const db = new Database(file);
-  db.pragma('journal_mode = WAL');
-  db.pragma('busy_timeout = 5000');
+  const db = new DatabaseSync(file);
+  db.exec('PRAGMA journal_mode = WAL; PRAGMA busy_timeout = 5000;');
   db.exec(SCHEMA);
+
+  // fn'i tek bir işlem (transaction) içinde çalıştırır
+  const transaction = fn => (...args) => {
+    db.exec('BEGIN IMMEDIATE');
+    try {
+      const out = fn(...args);
+      db.exec('COMMIT');
+      return out;
+    } catch (err) {
+      db.exec('ROLLBACK');
+      throw err;
+    }
+  };
 
   const toResponse = r => ({ id: r.id, code: r.code, name: r.name, className: r.class_name, answers: r.answers.split(''), createdAt: r.created_at });
   const toCode = c => ({ code: c.code, className: c.class_name, createdAt: c.created_at, usedAt: c.used_at, usedBy: c.used_by || null });
 
-  const submit = db.transaction(({ code, name, answers, now }) => {
+  const submit = transaction(({ code, name, answers, now }) => {
     const row = db.prepare('SELECT class_name FROM codes WHERE code = ? AND used_at IS NULL').get(code);
     if (!row) return null;
     db.prepare('UPDATE codes SET used_at = ? WHERE code = ?').run(now, code);
@@ -43,7 +56,7 @@ function createSqliteDb(file) {
     return { id: Number(info.lastInsertRowid), className: row.class_name };
   });
 
-  const deleteResponse = db.transaction(id => {
+  const deleteResponse = transaction(id => {
     const row = db.prepare('SELECT code FROM responses WHERE id = ?').get(id);
     if (!row) return false;
     db.prepare('DELETE FROM responses WHERE id = ?').run(id);
@@ -51,7 +64,7 @@ function createSqliteDb(file) {
     return true;
   });
 
-  const reset = db.transaction(() => {
+  const reset = transaction(() => {
     db.prepare('DELETE FROM responses').run();
     db.prepare('UPDATE codes SET used_at = NULL').run();
   });
@@ -62,7 +75,7 @@ function createSqliteDb(file) {
     async insertCodes(rows) {
       const stmt = db.prepare('INSERT OR IGNORE INTO codes (code, class_name, created_at) VALUES (?, ?, ?)');
       const inserted = [];
-      db.transaction(() => {
+      transaction(() => {
         for (const r of rows) if (stmt.run(r.code, r.className, r.createdAt).changes) inserted.push(r.code);
       })();
       return inserted;
