@@ -5,30 +5,19 @@ Yavuz Sultan Selim İlkokulu için iki seçenekli (A/B) veli anketi ve yönetici
 ## Özellikler
 
 **Veli sayfası**
-- **Tek kullanımlık veli kodu:** Her veli kendisine verilen kodu girer. Kod doğrulanınca sınıf otomatik yazılır ve kod bir daha kullanılamaz.
-- Kod bağlantıyla da gelebilir: `https://siteniz/?kod=AB12CD`
+- Veli adını soyadını yazar ve sınıfını listeden seçer.
 - 13 adet A/B sorusu vardır. Eksik bırakılan sorular kırmızı ile işaretlenir.
 
 **Yönetici paneli (`/admin`)**
-- **Sonuçlar** sekmesi:
-  - **Sınıf filtresi:** Tüm tablolar, grafikler ve Excel çıktısı seçilen sınıfa göre değişir.
-  - **Grafikler:** soru bazlı A/B oranı ve sınıflara göre katılım.
-  - **Tablolar:** katılımcı listesi, soru bazlı dağılım, bireysel yanıt tablosu (M1–M13), şık bazlı sonuçlar ve sınıf özeti (katılım oranı).
-  - **Excel'e Aktar (.xlsx):** 5 sayfalık rapor. Sayfalar: Katılımcılar, Soru Bazlı Dağılım, Bireysel Yanıtlar, Şık Bazlı Sonuçlar, Sınıf Özeti.
-  - Tek bir yanıtı silme (velinin kodu yeniden kullanılabilir olur) ve tüm verileri sıfırlama.
-- **Veli Kodları** sekmesi:
-  - Sınıf seçip istenen sayıda kod üretme
-  - Kullanılmamış kodları kesilip dağıtılabilecek **kartlar halinde yazdırma**
-  - Kod listesini Excel'e aktarma ve kullanılmamış kodları silme
-  - Her kod için veliye gönderilecek bağlantıyı kopyalama
+- **Sınıf filtresi:** Tüm tablolar, grafikler ve Excel çıktısı seçilen sınıfa göre değişir.
+- **Grafikler:** soru bazlı A/B oranı ve sınıflara göre katılım.
+- **Tablolar:** katılımcı listesi, soru bazlı dağılım, bireysel yanıt tablosu (M1–M13), şık bazlı sonuçlar ve sınıf özeti.
+- **Excel'e Aktar (.xlsx):** 5 sayfalık rapor. Sayfalar: Katılımcılar, Soru Bazlı Dağılım, Bireysel Yanıtlar, Şık Bazlı Sonuçlar, Sınıf Özeti.
+- Tek bir yanıtı silme ve tüm verileri sıfırlama.
 
 | Veli formu | Sonuçlar (sınıf filtresi + grafikler) |
 |---|---|
 | ![Anket](docs/anket.png) | ![Panel](docs/panel.png) |
-
-| Veli kodları | Yazdırılan kod kartları |
-|---|---|
-| ![Kodlar](docs/kodlar.png) | ![Kartlar](docs/kod-kartlari.png) |
 
 ## Kurulum
 
@@ -101,4 +90,3 @@ TEST_DATABASE_URL=postgres://localhost/anket_test npm test # ayrıca PostgreSQL 
 
 - Yönetici oturumu imzalı ve `HttpOnly` bir çerezle tutulur. Sunucu yeniden başlasa da oturum korunur; şifre değişince eski oturumlar geçersiz olur.
 - Hatalı şifre denemeleri sınırlıdır: IP başına 15 dakikada 10 deneme.
-- Aynı kodla eşzamanlı iki gönderim yapılırsa yalnızca biri kabul edilir. Bu, veritabanı işlemiyle garanti edilir.

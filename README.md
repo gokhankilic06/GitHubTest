@@ -9,9 +9,7 @@ Aynı sistemin iki bağımsız sürümü vardır. İkisinden birini seçip kulla
 | Veritabanı | SQLite veya Supabase (`DATABASE_URL`) | SQLite veya Supabase (`DATABASE_URL`) |
 | Yönetici girişi | Tek şifre (`ADMIN_PASSWORD`) | Kullanıcı adı + şifre, birden fazla yönetici |
 | Soruları düzenleme | `questions.js` dosyasından | Tarayıcıdan (Django admin) |
-| Tek kullanımlık veli kodları | ✓ | ✓ |
 | Sınıf filtresi, grafikler, Excel | ✓ | ✓ |
-| Kod kartı yazdırma | ✓ | ✓ |
 
 **Hangisini seçmeli?**
 - Soruları ileride sık değiştirecekseniz veya birden fazla öğretmen panele girecekse **Django** sürümünü seçin.

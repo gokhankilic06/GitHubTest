@@ -18,7 +18,7 @@ function styleSheet(ws, headerRows = 1) {
   ws.views = [{ state: 'frozen', ySplit: headerRows }];
 }
 
-async function resultsWorkbook({ survey, responses, codes, className }) {
+async function resultsWorkbook({ survey, responses, className }) {
   const wb = new ExcelJS.Workbook();
   wb.creator = survey.surveyName;
   const qs = survey.questions;
@@ -31,12 +31,11 @@ async function resultsWorkbook({ survey, responses, codes, className }) {
     { header: 'Sıra No', width: 9 },
     { header: 'Ad Soyad', width: 28 },
     { header: 'Sınıf', width: 12 },
-    { header: 'Veli Kodu', width: 12 },
     { header: 'Tarih', width: 20 },
     { header: 'Yanıtlar', width: 40 }
   ];
-  responses.forEach((r, i) => ws1.addRow([i + 1, r.name, r.className, r.code || '', new Date(r.createdAt), r.answers.join(', ')]));
-  ws1.getColumn(5).numFmt = 'dd.mm.yyyy hh:mm';
+  responses.forEach((r, i) => ws1.addRow([i + 1, r.name, r.className, new Date(r.createdAt), r.answers.join(', ')]));
+  ws1.getColumn(4).numFmt = 'dd.mm.yyyy hh:mm';
   styleSheet(ws1);
 
   // 2) Soru bazlı dağılım
@@ -108,12 +107,9 @@ async function resultsWorkbook({ survey, responses, codes, className }) {
   const ws5 = wb.addWorksheet('Sınıf Özeti');
   ws5.columns = [
     { header: 'Sınıf', width: 14 },
-    { header: 'Katılan Veli', width: 14 },
-    { header: 'Dağıtılan Kod', width: 14 },
-    { header: 'Katılım Oranı', width: 14 }
+    { header: 'Katılan Veli', width: 14 }
   ];
-  classSummary(responses, codes, survey.classes).forEach(s => ws5.addRow([s.className, s.participants, s.codeCount, s.codeCount ? s.rate / 100 : null]));
-  ws5.getColumn(4).numFmt = '0%';
+  classSummary(responses, survey.classes).forEach(s => ws5.addRow([s.className, s.participants]));
   styleSheet(ws5);
 
   wb.eachSheet(ws => {
@@ -122,19 +118,4 @@ async function resultsWorkbook({ survey, responses, codes, className }) {
   return wb;
 }
 
-async function codesWorkbook({ survey, codes }) {
-  const wb = new ExcelJS.Workbook();
-  const ws = wb.addWorksheet('Veli Kodları');
-  ws.columns = [
-    { header: 'Sınıf', width: 14 },
-    { header: 'Veli Kodu', width: 14 },
-    { header: 'Durum', width: 14 },
-    { header: 'Kullanan Veli', width: 28 }
-  ];
-  codes.forEach(c => ws.addRow([c.className, c.code, c.usedAt ? 'Kullanıldı' : 'Kullanılmadı', c.usedBy || '']));
-  styleSheet(ws);
-  ws.headerFooter.oddHeader = `&C${survey.schoolName} - Veli Kodları`;
-  return wb;
-}
-
-module.exports = { resultsWorkbook, codesWorkbook };
+module.exports = { resultsWorkbook };

@@ -19,14 +19,10 @@ function questionStats(responses, questionCount) {
   return out;
 }
 
-function classSummary(responses, codes, classes) {
+function classSummary(responses, classes) {
   return classes
-    .map(className => {
-      const participants = responses.filter(r => r.className === className).length;
-      const codeCount = codes.filter(c => c.className === className).length;
-      return { className, participants, codeCount, rate: pct(participants, codeCount) };
-    })
-    .filter(s => s.participants || s.codeCount);
+    .map(className => ({ className, participants: responses.filter(r => r.className === className).length }))
+    .filter(s => s.participants);
 }
 
 module.exports = { pct, questionStats, classSummary };

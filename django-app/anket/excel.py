@@ -39,14 +39,13 @@ def sonuc_raporu(veri, ozet):
     # 1) Katılımcılar
     ws = wb.active
     ws.title = 'Katılımcılar'
-    ws.append(['Sıra No', 'Ad Soyad', 'Sınıf', 'Veli Kodu', 'Tarih', 'Yanıtlar'])
+    ws.append(['Sıra No', 'Ad Soyad', 'Sınıf', 'Tarih', 'Yanıtlar'])
     for i, s in enumerate(veri['satirlar'], start=1):
         y = s['yanit']
-        ws.append([i, y.ad_soyad, y.sinif.ad, y.kod.kod if y.kod else '',
-                   timezone.localtime(y.tarih).replace(tzinfo=None), ', '.join(s['secimler'])])
-    for cell in ws['E'][1:]:
+        ws.append([i, y.ad_soyad, y.sinif.ad, timezone.localtime(y.tarih).replace(tzinfo=None), ', '.join(s['secimler'])])
+    for cell in ws['D'][1:]:
         cell.number_format = 'dd.mm.yyyy hh:mm'
-    _bicimle(ws, genislikler=[9, 28, 12, 12, 18, 40])
+    _bicimle(ws, genislikler=[9, 28, 12, 18, 40])
 
     # 2) Soru bazlı dağılım
     ws = wb.create_sheet('Soru Bazlı Dağılım')
@@ -104,23 +103,9 @@ def sonuc_raporu(veri, ozet):
 
     # 5) Sınıf özeti
     ws = wb.create_sheet('Sınıf Özeti')
-    ws.append(['Sınıf', 'Katılan Veli', 'Dağıtılan Kod', 'Katılım Oranı'])
+    ws.append(['Sınıf', 'Katılan Veli'])
     for o in ozet:
-        ws.append([o['sinif'].ad, o['katilan'], o['kod_sayisi'], o['oran'] / 100 if o['kod_sayisi'] else None])
-    for cell in ws['D'][1:]:
-        cell.number_format = '0%'
-    _bicimle(ws, genislikler=[14, 14, 14, 14])
+        ws.append([o['sinif'].ad, o['katilan']])
+    _bicimle(ws, genislikler=[14, 14])
 
-    return _kaydet(wb)
-
-
-def kod_raporu(kodlar):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = 'Veli Kodları'
-    ws.append(['Sınıf', 'Veli Kodu', 'Durum', 'Kullanan Veli'])
-    for k in kodlar:
-        yanit = getattr(k, 'yanit', None)
-        ws.append([k.sinif.ad, k.kod, 'Kullanıldı' if k.kullanildi else 'Kullanılmadı', yanit.ad_soyad if yanit else ''])
-    _bicimle(ws, genislikler=[14, 14, 14, 28])
     return _kaydet(wb)

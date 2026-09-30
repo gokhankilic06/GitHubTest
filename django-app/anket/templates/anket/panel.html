@@ -4,7 +4,7 @@
 <div class="container-fluid admin-wrap py-3">
   {% include "anket/_panel_ust.html" %}
 
-  <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mb-2">
+  <div class="d-flex flex-wrap align-items-center gap-2 mt-4 mb-2">
     {% include "anket/_sinif_filtre.html" %}
     <a href="{% url 'anket:sonuc_excel' %}{{ sinif_sorgu }}" class="btn btn-success btn-sm ms-auto">Excel'e Aktar</a>
   </div>
@@ -21,7 +21,7 @@
           <td class="text-primary">{{ s.yanit.sinif.ad }}</td>
           <td>{{ s.secimler|join:", " }}</td>
           <td>
-            <form method="post" action="{% url 'anket:yanit_sil' s.yanit.pk %}{{ sinif_sorgu }}" onsubmit="return confirm('&quot;{{ s.yanit.ad_soyad|escapejs }}&quot; adlı velinin yanıtları silinsin mi? Velinin kodu yeniden kullanılabilir hale gelir.')">
+            <form method="post" action="{% url 'anket:yanit_sil' s.yanit.pk %}{{ sinif_sorgu }}" onsubmit="return confirm('&quot;{{ s.yanit.ad_soyad|escapejs }}&quot; adlı velinin yanıtları silinsin mi?')">
               {% csrf_token %}<button class="btn btn-danger btn-sm py-0">Sil</button>
             </form>
           </td>
@@ -32,7 +32,7 @@
       </tbody>
     </table>
   </div>
-  <form method="post" action="{% url 'anket:sifirla' %}" class="text-end" onsubmit="return confirm('TÜM anket yanıtları silinecek ve kodlar yeniden kullanılabilir hale gelecek. Bu işlem geri alınamaz. Emin misiniz?')">
+  <form method="post" action="{% url 'anket:sifirla' %}" class="text-end" onsubmit="return confirm('TÜM anket yanıtları silinecek. Bu işlem geri alınamaz. Emin misiniz?')">
     {% csrf_token %}<button class="btn btn-danger btn-sm">Verileri Sıfırla</button>
   </form>
 
@@ -112,13 +112,13 @@
 
   <h2>Sınıf Özeti</h2>
   <div class="table-responsive">
-    <table class="table table-bordered table-sm" style="max-width:600px">
-      <thead><tr><th>Sınıf</th><th>Katılan Veli</th><th>Dağıtılan Kod</th><th>Katılım Oranı</th></tr></thead>
+    <table class="table table-bordered table-sm" style="max-width:400px">
+      <thead><tr><th>Sınıf</th><th>Katılan Veli</th></tr></thead>
       <tbody>
         {% for o in ozet %}
-        <tr><td>{{ o.sinif.ad }}</td><td>{{ o.katilan }}</td><td>{{ o.kod_sayisi }}</td><td>{% if o.kod_sayisi %}{{ o.oran }}%{% else %}-{% endif %}</td></tr>
+        <tr><td>{{ o.sinif.ad }}</td><td>{{ o.katilan }}</td></tr>
         {% empty %}
-        <tr><td colspan="4" class="text-center text-muted">Henüz veri yok.</td></tr>
+        <tr><td colspan="2" class="text-center text-muted">Henüz veri yok.</td></tr>
         {% endfor %}
       </tbody>
     </table>

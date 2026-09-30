@@ -4,7 +4,6 @@
   const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
   let survey = null;         // okul adı, sorular, sınıflar
-  let codes = [];            // son yüklenen kod listesi
   let questionChart = null;
   let classChart = null;
 
@@ -34,14 +33,6 @@
     $('adminView').classList.remove('d-none');
   }
 
-  document.querySelectorAll('[data-tab]').forEach(btn => btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-tab]').forEach(b => b.classList.toggle('active', b === btn));
-    $('tab-results').classList.toggle('d-none', btn.dataset.tab !== 'results');
-    $('tab-codes').classList.toggle('d-none', btn.dataset.tab !== 'codes');
-    if (btn.dataset.tab === 'codes') loadCodes();
-    else loadResults();
-  }));
-
   function fillClassSelect(select, withAll) {
     const current = select.value;
     select.innerHTML = (withAll ? '<option value="">Tüm Sınıflar</option>' : '') +
@@ -55,8 +46,6 @@
     const d = await res.json();
     survey = d;
     fillClassSelect($('classFilter'), true);
-    fillClassSelect($('codeFilter'), true);
-    fillClassSelect($('codeClass'), false);
     renderResults(d);
     showPanel();
   }
@@ -123,8 +112,8 @@
 
     $('classSummaryBody').innerHTML = d.classSummary.length
       ? d.classSummary.map(s => `
-        <tr><td>${esc(s.className)}</td><td>${s.participants}</td><td>${s.codeCount}</td><td>${s.codeCount ? s.rate + '%' : '-'}</td></tr>`).join('')
-      : '<tr><td colspan="4" class="text-center text-muted">Henüz veri yok.</td></tr>';
+        <tr><td>${esc(s.className)}</td><td>${s.participants}</td></tr>`).join('')
+      : '<tr><td colspan="2" class="text-center text-muted">Henüz veri yok.</td></tr>';
 
     renderCharts(d);
   }
@@ -209,120 +198,17 @@
     }
   }
 
-  // ---------- Veli kodları ----------
-  async function loadCodes() {
-    const cls = $('codeFilter').value;
-    const out = await api('/api/admin/codes' + (cls ? '?class=' + encodeURIComponent(cls) : ''));
-    codes = out.codes;
-    renderCodes();
-  }
-
-  function renderCodes() {
-    const used = codes.filter(c => c.usedAt).length;
-    $('codeCounts').textContent = `Toplam ${codes.length} kod · ${used} kullanıldı · ${codes.length - used} kullanılmadı`;
-    $('codesBody').innerHTML = codes.length
-      ? codes.map(c => `
-        <tr>
-          <td>${esc(c.className)}</td>
-          <td class="font-monospace fw-semibold">${esc(c.code)}</td>
-          <td>${c.usedAt ? '<span class="badge text-bg-secondary">Kullanıldı</span>' : '<span class="badge text-bg-success">Kullanılmadı</span>'}</td>
-          <td>${esc(c.usedBy || '')}</td>
-          <td class="text-nowrap">
-            ${c.usedAt ? '' : `
-              <button class="btn btn-outline-secondary btn-sm py-0" data-copy="${esc(c.code)}">Bağlantıyı Kopyala</button>
-              <button class="btn btn-outline-danger btn-sm py-0" data-delcode="${esc(c.code)}">Sil</button>`}
-          </td>
-        </tr>`).join('')
-      : '<tr><td colspan="5" class="text-center text-muted">Henüz kod üretilmedi. Yukarıdan sınıf seçip kod üretebilirsiniz.</td></tr>';
-  }
-
-  function codeLink(code) {
-    return `${location.origin}/?kod=${encodeURIComponent(code)}`;
-  }
-
-  function showCodeMsg(type, text) {
-    $('codeMsg').className = `alert alert-${type} py-2 mt-2 mb-0`;
-    $('codeMsg').textContent = text;
-  }
-
-  $('codeFilter').addEventListener('change', () => {
-    const cls = $('codeFilter').value;
-    $('codesExcelBtn').href = '/api/admin/codes.xlsx' + (cls ? '?class=' + encodeURIComponent(cls) : '');
-    loadCodes();
-  });
-
-  $('codeForm').addEventListener('submit', async e => {
-    e.preventDefault();
-    try {
-      const className = $('codeClass').value;
-      const out = await api('/api/admin/codes', {
-        method: 'POST',
-        body: JSON.stringify({ className, count: Number($('codeCount').value) })
-      });
-      showCodeMsg('success', `${className} sınıfı için ${out.codes.length} kod üretildi.`);
-      $('codeFilter').value = className;
-      $('codeFilter').dispatchEvent(new Event('change'));
-    } catch (err) {
-      showCodeMsg('danger', err.message);
-    }
-  });
-
-  $('codesBody').addEventListener('click', async e => {
-    const copy = e.target.closest('[data-copy]');
-    if (copy) {
-      try {
-        await navigator.clipboard.writeText(codeLink(copy.dataset.copy));
-        copy.textContent = 'Kopyalandı';
-      } catch {
-        prompt('Bağlantıyı kopyalayınız:', codeLink(copy.dataset.copy));
-      }
-      return;
-    }
-    const del = e.target.closest('[data-delcode]');
-    if (del && confirm(`${del.dataset.delcode} kodu silinsin mi?`)) {
-      try {
-        await api('/api/admin/codes/' + encodeURIComponent(del.dataset.delcode), { method: 'DELETE' });
-        loadCodes();
-      } catch (err) {
-        alert(err.message);
-      }
-    }
-  });
-
-  $('deleteUnusedBtn').addEventListener('click', async () => {
-    const cls = $('codeFilter').value;
-    if (!confirm(`${cls || 'Tüm sınıfların'} kullanılmamış kodları silinsin mi?`)) return;
-    const out = await api('/api/admin/codes/delete-unused' + (cls ? '?class=' + encodeURIComponent(cls) : ''), { method: 'POST' });
-    showCodeMsg('info', `${out.deleted} kullanılmamış kod silindi.`);
-    loadCodes();
-  });
-
-  // Kullanılmamış kodları kesilip dağıtılabilecek kartlar halinde yazdırır
-  $('printCodesBtn').addEventListener('click', () => {
-    const unused = codes.filter(c => !c.usedAt);
-    if (!unused.length) return alert('Yazdırılacak kullanılmamış kod yok.');
-    $('printArea').innerHTML = unused.map(c => `
-      <div class="code-slip">
-        <div class="slip-school">${esc(survey.schoolName)}</div>
-        <div class="slip-title">${esc(survey.surveyName)}</div>
-        <div>Sınıf: <strong>${esc(c.className)}</strong></div>
-        <div class="slip-code">${esc(c.code)}</div>
-        <div class="slip-url">${esc(location.origin)} adresine girip bu kodu yazınız.</div>
-      </div>`).join('');
-    window.print();
-  });
-
   // ---------- Katılımcı işlemleri ----------
   $('responsesBody').addEventListener('click', async e => {
     const btn = e.target.closest('[data-delete]');
     if (!btn) return;
-    if (!confirm(`"${btn.dataset.name}" adlı velinin yanıtları silinsin mi? Velinin kodu yeniden kullanılabilir hale gelir.`)) return;
+    if (!confirm(`"${btn.dataset.name}" adlı velinin yanıtları silinsin mi?`)) return;
     await api('/api/admin/responses/' + btn.dataset.delete, { method: 'DELETE' });
     loadResults();
   });
 
   $('resetBtn').addEventListener('click', async () => {
-    if (!confirm('TÜM anket yanıtları silinecek ve kodlar yeniden kullanılabilir hale gelecek. Bu işlem geri alınamaz. Emin misiniz?')) return;
+    if (!confirm('TÜM anket yanıtları silinecek. Bu işlem geri alınamaz. Emin misiniz?')) return;
     await api('/api/admin/reset', { method: 'POST' });
     loadResults();
   });

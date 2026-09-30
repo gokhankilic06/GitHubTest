@@ -4,11 +4,8 @@ const path = require('path');
 const express = require('express');
 const config = require('../questions');
 const { createAuth } = require('./auth');
-const { generateCodes, normalizeCode } = require('./codes');
 const { questionStats, classSummary } = require('./stats');
-const { resultsWorkbook, codesWorkbook } = require('./excel');
-
-const MAX_CODES_PER_REQUEST = 200;
+const { resultsWorkbook } = require('./excel');
 
 function survey() {
   return {
@@ -43,28 +40,17 @@ function createApp({ db, adminPassword, sessionSecret, secureCookies = false }) 
   // ---------- Veli API ----------
   app.get('/api/survey', (req, res) => res.json(survey()));
 
-  app.get('/api/codes/:code', async (req, res) => {
-    const c = await db.getCode(normalizeCode(req.params.code));
-    if (!c) return res.status(404).json({ error: 'Veli kodu bulunamadı. Lütfen kodu kontrol ediniz.' });
-    if (c.usedAt) return res.status(409).json({ error: 'Bu veli kodu daha önce kullanılmış.' });
-    res.json({ className: c.className });
-  });
-
   app.post('/api/responses', async (req, res) => {
     const body = req.body || {};
-    const code = normalizeCode(body.code);
     const name = typeof body.name === 'string' ? body.name.trim().replace(/\s+/g, ' ').slice(0, 100) : '';
+    const className = body.className;
     const answers = Array.isArray(body.answers) ? body.answers : [];
-    if (!code) return res.status(400).json({ error: 'Lütfen veli kodunu giriniz.' });
     if (!name) return res.status(400).json({ error: 'Lütfen adınızı ve soyadınızı giriniz.' });
+    if (!config.CLASSES.includes(className)) return res.status(400).json({ error: 'Lütfen sınıf seçiniz.' });
     if (answers.length !== config.QUESTIONS.length || !answers.every(a => a === 'A' || a === 'B')) {
       return res.status(400).json({ error: 'Lütfen tüm soruları yanıtlayınız.' });
     }
-    const result = await db.submitResponse({ code, name, answers });
-    if (!result) {
-      const c = await db.getCode(code);
-      return res.status(c ? 409 : 404).json({ error: c ? 'Bu veli kodu daha önce kullanılmış.' : 'Veli kodu bulunamadı.' });
-    }
+    await db.submitResponse({ name, className, answers });
     res.json({ ok: true });
   });
 
@@ -91,13 +77,13 @@ function createApp({ db, adminPassword, sessionSecret, secureCookies = false }) 
 
   admin.get('/data', async (req, res) => {
     const className = classFilter(req);
-    const [responses, allResponses, codes] = await Promise.all([db.listResponses(className), db.listResponses(), db.listCodes()]);
+    const [responses, allResponses] = await Promise.all([db.listResponses(className), db.listResponses()]);
     res.json({
       ...survey(),
       className,
       responses,
       stats: questionStats(responses, config.QUESTIONS.length),
-      classSummary: classSummary(allResponses, codes, config.CLASSES)
+      classSummary: classSummary(allResponses, config.CLASSES)
     });
   });
 
@@ -113,48 +99,12 @@ function createApp({ db, adminPassword, sessionSecret, secureCookies = false }) 
 
   admin.get('/export.xlsx', async (req, res) => {
     const className = classFilter(req);
-    const [responses, codes] = await Promise.all([db.listResponses(className), db.listCodes()]);
-    const wb = await resultsWorkbook({ survey: survey(), responses, codes, className });
+    const responses = await db.listResponses(className);
+    const wb = await resultsWorkbook({ survey: survey(), responses, className });
     const suffix = className ? '-' + className : '';
     res.set({
       'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'Content-Disposition': `attachment; filename="veli-anket-sonuclari${suffix}.xlsx"`
-    });
-    await wb.xlsx.write(res);
-    res.end();
-  });
-
-  // Veli kodları
-  admin.get('/codes', async (req, res) => res.json({ codes: await db.listCodes(classFilter(req)) }));
-
-  admin.post('/codes', async (req, res) => {
-    const { className } = req.body || {};
-    const count = Number((req.body || {}).count);
-    if (!config.CLASSES.includes(className)) return res.status(400).json({ error: 'Geçerli bir sınıf seçiniz.' });
-    if (!Number.isInteger(count) || count < 1 || count > MAX_CODES_PER_REQUEST) {
-      return res.status(400).json({ error: `Kod sayısı 1 ile ${MAX_CODES_PER_REQUEST} arasında olmalıdır.` });
-    }
-    const codes = await generateCodes(db, className, count);
-    res.json({ codes });
-  });
-
-  admin.delete('/codes/:code', async (req, res) => {
-    const ok = await db.deleteCode(normalizeCode(req.params.code));
-    ok ? res.json({ ok: true }) : res.status(400).json({ error: 'Kod bulunamadı veya kullanılmış (kullanılmış kodlar silinemez).' });
-  });
-
-  admin.post('/codes/delete-unused', async (req, res) => {
-    const deleted = await db.deleteUnusedCodes(classFilter(req));
-    res.json({ deleted });
-  });
-
-  admin.get('/codes.xlsx', async (req, res) => {
-    const className = classFilter(req);
-    const wb = await codesWorkbook({ survey: survey(), codes: await db.listCodes(className) });
-    const suffix = className ? '-' + className : '';
-    res.set({
-      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'Content-Disposition': `attachment; filename="veli-kodlari${suffix}.xlsx"`
     });
     await wb.xlsx.write(res);
     res.end();

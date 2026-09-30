@@ -37,7 +37,6 @@ for (const [label, envFn] of backends) {
     before(async () => {
       db = await createDb(envFn());
       await db.reset();
-      await db.deleteUnusedCodes();
       const app = createApp({ db, adminPassword: PASSWORD, sessionSecret: 'secret' });
       server = app.listen(0);
       base = `http://127.0.0.1:${server.address().port}`;
@@ -50,7 +49,7 @@ for (const [label, envFn] of backends) {
 
     test('admin uçları oturumsuz erişime kapalı', async () => {
       assert.strictEqual((await req('GET', '/api/admin/data', null, false)).status, 401);
-      assert.strictEqual((await req('POST', '/api/admin/codes', { className: '1-A', count: 1 }, false)).status, 401);
+      assert.strictEqual((await req('POST', '/api/admin/reset', null, false)).status, 401);
     });
 
     test('hatalı şifre reddedilir, doğru şifre oturum açar', async () => {
@@ -61,44 +60,21 @@ for (const [label, envFn] of backends) {
       assert.strictEqual((await req('GET', '/api/admin/data')).status, 200);
     });
 
-    test('kod üretimi doğrulanır', async () => {
-      assert.strictEqual((await req('POST', '/api/admin/codes', { className: 'Yok', count: 5 })).status, 400);
-      assert.strictEqual((await req('POST', '/api/admin/codes', { className: '1-A', count: 0 })).status, 400);
-      assert.strictEqual((await req('POST', '/api/admin/codes', { className: '1-A', count: 999 })).status, 400);
-    });
+    test('anket gönderimi, doğrulama, istatistik ve sınıf filtresi', async () => {
+      // Eksik veya hatalı bilgi reddedilir
+      assert.strictEqual((await req('POST', '/api/responses', { name: 'Ali', className: '1-A', answers: ['A'] })).status, 400);
+      assert.strictEqual((await req('POST', '/api/responses', { name: '', className: '1-A', answers: ALL_A })).status, 400);
+      assert.strictEqual((await req('POST', '/api/responses', { name: 'Ali', className: 'Yok', answers: ALL_A })).status, 400);
 
-    test('tek kullanımlık kod ile anket akışı', async () => {
-      const a = await req('POST', '/api/admin/codes', { className: '1-A', count: 3 });
-      const b = await req('POST', '/api/admin/codes', { className: '2-B', count: 2 });
-      assert.strictEqual(a.body.codes.length, 3);
-      assert.strictEqual(new Set(a.body.codes).size, 3);
-      const [c1, c2] = a.body.codes;
-      const [c3] = b.body.codes;
-
-      // Kod kontrolü sınıfı döndürür, küçük harf ve boşluklar tolere edilir
-      const check = await req('GET', '/api/codes/' + encodeURIComponent(' ' + c1.toLowerCase()));
-      assert.deepStrictEqual(check.body, { className: '1-A' });
-      assert.strictEqual((await req('GET', '/api/codes/XXXXXX')).status, 404);
-
-      // Eksik yanıt reddedilir
-      assert.strictEqual((await req('POST', '/api/responses', { code: c1, name: 'Ali', answers: ['A'] })).status, 400);
-      assert.strictEqual((await req('POST', '/api/responses', { code: c1, name: '', answers: ALL_A })).status, 400);
-      assert.strictEqual((await req('POST', '/api/responses', { code: 'YOKKOD', name: 'Ali', answers: ALL_A })).status, 404);
-
-      // Geçerli gönderim, ardından aynı kodla ikinci gönderim reddedilir
-      assert.strictEqual((await req('POST', '/api/responses', { code: c1, name: 'Ali Veli', answers: ALL_A })).status, 200);
-      assert.strictEqual((await req('POST', '/api/responses', { code: c1, name: 'Başka', answers: ALL_B })).status, 409);
-      assert.strictEqual((await req('GET', '/api/codes/' + c1)).status, 409);
-
-      assert.strictEqual((await req('POST', '/api/responses', { code: c2, name: 'Ayşe', answers: ALL_B })).status, 200);
-      assert.strictEqual((await req('POST', '/api/responses', { code: c3, name: 'Mehmet', answers: ALL_B })).status, 200);
+      assert.strictEqual((await req('POST', '/api/responses', { name: 'Ali Veli', className: '1-A', answers: ALL_A })).status, 200);
+      assert.strictEqual((await req('POST', '/api/responses', { name: 'Ayşe', className: '1-A', answers: ALL_B })).status, 200);
+      assert.strictEqual((await req('POST', '/api/responses', { name: 'Mehmet', className: '2-B', answers: ALL_B })).status, 200);
 
       // Tüm sınıflar
       const all = await req('GET', '/api/admin/data');
       assert.strictEqual(all.body.responses.length, 3);
       assert.deepStrictEqual(all.body.stats[0], { countA: 1, countB: 2, percentA: 33, percentB: 67 });
-      const s1a = all.body.classSummary.find(s => s.className === '1-A');
-      assert.deepStrictEqual(s1a, { className: '1-A', participants: 2, codeCount: 3, rate: 67 });
+      assert.deepStrictEqual(all.body.classSummary, [{ className: '1-A', participants: 2 }, { className: '2-B', participants: 1 }]);
 
       // Sınıf filtresi
       const f = await req('GET', '/api/admin/data?class=1-A');
@@ -106,23 +82,11 @@ for (const [label, envFn] of backends) {
       assert.ok(f.body.responses.every(r => r.className === '1-A'));
       assert.deepStrictEqual(f.body.stats[0], { countA: 1, countB: 1, percentA: 50, percentB: 50 });
 
-      // Kod listesi kullanan veliyi gösterir
-      const codes = await req('GET', '/api/admin/codes?class=1-A');
-      assert.strictEqual(codes.body.codes.find(c => c.code === c1).usedBy, 'Ali Veli');
-
-      // Kullanılmış kod silinemez
-      assert.strictEqual((await req('DELETE', '/api/admin/codes/' + c1)).status, 400);
-
-      // Yanıt silinince kod yeniden kullanılabilir
-      const id = all.body.responses.find(r => r.code === c1).id;
+      // Tek yanıt silme
+      const id = all.body.responses.find(r => r.name === 'Ali Veli').id;
       assert.strictEqual((await req('DELETE', '/api/admin/responses/' + id)).status, 200);
-      assert.strictEqual((await req('GET', '/api/codes/' + c1)).status, 200);
-    });
-
-    test('aynı koda eşzamanlı iki gönderimden yalnızca biri kabul edilir', async () => {
-      const { body } = await req('POST', '/api/admin/codes', { className: '3-C', count: 1 });
-      const results = await Promise.all([1, 2, 3, 4].map(i => req('POST', '/api/responses', { code: body.codes[0], name: 'Veli ' + i, answers: ALL_A })));
-      assert.strictEqual(results.filter(r => r.status === 200).length, 1);
+      assert.strictEqual((await req('DELETE', '/api/admin/responses/' + id)).status, 404);
+      assert.strictEqual((await req('GET', '/api/admin/data')).body.responses.length, 2);
     });
 
     test('Excel çıktısı beş sayfa içerir ve filtreye uyar', async () => {
@@ -134,21 +98,11 @@ for (const [label, envFn] of backends) {
       const participants = wb.getWorksheet('Katılımcılar');
       assert.strictEqual(participants.rowCount, 2); // başlık + 1-A sınıfındaki tek yanıt
       assert.strictEqual(participants.getRow(2).getCell(3).value, '1-A');
-
-      const codesX = await req('GET', '/api/admin/codes.xlsx');
-      const wb2 = new ExcelJS.Workbook();
-      await wb2.xlsx.load(codesX.body);
-      assert.ok(wb2.getWorksheet('Veli Kodları').rowCount > 1);
     });
 
-    test('kullanılmamış kodları silme ve sıfırlama', async () => {
-      const del = await req('POST', '/api/admin/codes/delete-unused?class=2-B');
-      assert.strictEqual(del.body.deleted, 1);
+    test('verileri sıfırlama', async () => {
       await req('POST', '/api/admin/reset');
-      const d = await req('GET', '/api/admin/data');
-      assert.strictEqual(d.body.responses.length, 0);
-      const codes = await req('GET', '/api/admin/codes');
-      assert.ok(codes.body.codes.every(c => !c.usedAt));
+      assert.strictEqual((await req('GET', '/api/admin/data')).body.responses.length, 0);
     });
 
     test('sahte oturum çerezi reddedilir', async () => {

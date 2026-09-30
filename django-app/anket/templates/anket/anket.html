@@ -8,20 +8,8 @@
 
   <div class="card shadow-sm">
     <div class="card-body p-4">
-      <form method="post" id="surveyForm" novalidate data-kod-url="{% url 'anket:kod_kontrol' 'KOD' %}">
+      <form method="post" id="surveyForm" novalidate>
         {% csrf_token %}
-        <div class="mb-3">
-          <label for="code" class="form-label">Veli Kodu</label>
-          <div class="input-group input-group-sm">
-            <span class="input-group-text"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.5 11.5a3.5 3.5 0 1 1 3.163-5H14L15.5 8 14 9.5l-1-1-1 1-1-1-1 1-1-1-1 1H6.663a3.5 3.5 0 0 1-3.163 2M2.5 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2"/></svg></span>
-            <input type="text" class="form-control text-uppercase{% if kod_sinif %} is-valid{% elif kod_hata %} is-invalid{% endif %}" id="code" name="kod" value="{{ kod|default:'' }}" placeholder="Size verilen 6 haneli kod" maxlength="12" autocomplete="off" required>
-            <button type="button" class="btn btn-outline-secondary" id="checkCodeBtn">Kodu Doğrula</button>
-          </div>
-          <div class="form-text{% if kod_sinif %} text-success{% elif kod_hata %} text-danger{% endif %}" id="codeHelp">
-            {% if kod_sinif %}Kod doğrulandı. Sınıf: {{ kod_sinif.ad }}{% elif kod_hata %}{{ kod_hata }}{% else %}Kodunuzu öğretmeninizden alabilirsiniz. Her kod yalnızca bir kez kullanılabilir.{% endif %}
-          </div>
-        </div>
-
         <div class="mb-3">
           <label for="name" class="form-label">Ad Soyad</label>
           <div class="input-group input-group-sm">
@@ -34,7 +22,10 @@
           <label for="className" class="form-label">Sınıf</label>
           <div class="input-group input-group-sm">
             <span class="input-group-text"><svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8.211 2.047a.5.5 0 0 0-.422 0l-7.5 3.5a.5.5 0 0 0 .025.917l7.5 3a.5.5 0 0 0 .372 0L14 7.14V13a1 1 0 0 0-1 1v2h3v-2a1 1 0 0 0-1-1V6.739l.686-.275a.5.5 0 0 0 .025-.917z"/><path d="M4.176 9.032a.5.5 0 0 0-.656.327l-.5 1.7a.5.5 0 0 0 .294.605l4.5 1.8a.5.5 0 0 0 .372 0l4.5-1.8a.5.5 0 0 0 .294-.605l-.5-1.7a.5.5 0 0 0-.656-.327L8 10.466z"/></svg></span>
-            <input type="text" class="form-control" id="className" value="{{ kod_sinif.ad|default:'' }}" placeholder="Veli kodu doğrulanınca otomatik dolar" readonly tabindex="-1">
+            <select class="form-select" id="className" name="sinif" required>
+              <option value="">Sınıf Seçiniz</option>
+              {% for s in siniflar %}<option value="{{ s.ad }}"{% if secili_sinif and secili_sinif.pk == s.pk %} selected{% endif %}>{{ s.ad }}</option>{% endfor %}
+            </select>
           </div>
         </div>
 

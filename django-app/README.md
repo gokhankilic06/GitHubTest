@@ -1,30 +1,28 @@
 # Riba Veli Anket Sistemi — Python / Django sürümü
 
-Node.js sürümüyle aynı özellikleri sunar. Ek olarak Django'nun hazır **yönetim paneli (admin)** sayesinde sorular, sınıflar, kodlar ve yanıtlar kod yazmadan tarayıcıdan düzenlenebilir.
+Node.js sürümüyle aynı özellikleri sunar. Ek olarak Django'nun hazır **yönetim paneli (admin)** sayesinde sorular, sınıflar ve yanıtlar kod yazmadan tarayıcıdan düzenlenebilir.
 
 ## Özellikler
 
-- **Tek kullanımlık veli kodları.** Kod doğrulanınca sınıf otomatik gelir. Kod bağlantıyla da gelebilir: `/?kod=AB12CD`.
-- **Veli formu.** 13 A/B sorusu vardır. Eksik bırakılan sorular kırmızı ile işaretlenir ve hata olursa verilen cevaplar korunur.
+- **Veli formu.** Veli adını soyadını yazar, sınıfını listeden seçer. 13 A/B sorusu vardır. Eksik bırakılan sorular kırmızı ile işaretlenir ve hata olursa verilen cevaplar korunur.
 - **Yönetici paneli (`/panel/`):**
   - Sınıf filtresi
   - Grafikler (Chart.js)
   - Katılımcı listesi, soru bazlı dağılım, bireysel yanıt tablosu, şık bazlı sonuçlar ve sınıf özeti
   - 5 sayfalık **Excel (.xlsx)** raporu
-  - Tek bir yanıtı silme (velinin kodu serbest kalır) ve tüm verileri sıfırlama
-- **Veli kodları (`/panel/kodlar/`):** kod üretme, kesilip dağıtılacak kartlar halinde yazdırma, Excel'e aktarma, bağlantı kopyalama ve kullanılmayan kodları silme.
+  - Tek bir yanıtı silme ve tüm verileri sıfırlama
 - **Django admin (`/admin/`):**
   - Soru metinlerini düzenleme, yeni soru ekleme, soruyu pasif yapma
   - Sınıf ekleme ve sıralama
-  - Yanıtları ve kodları arama
+  - Yanıtları arama
 
 | Veli formu | Sonuçlar (sınıf filtresi + grafikler) |
 |---|---|
 | ![Anket](docs/anket.png) | ![Panel](docs/panel.png) |
 
-| Veli kodları | Django admin (soru yönetimi) |
-|---|---|
-| ![Kodlar](docs/kodlar.png) | ![Admin](docs/admin-sorular.png) |
+| Django admin (soru yönetimi) |
+|---|
+| ![Admin](docs/admin-sorular.png) |
 
 ## Kurulum (yerel)
 
@@ -84,16 +82,14 @@ python manage.py test anket                                               # SQLi
 DATABASE_URL=postgres://postgres@localhost/anket python manage.py test anket  # PostgreSQL
 ```
 
-PostgreSQL'de ek olarak **aynı koda eşzamanlı gönderim** testi çalışır. Bu test, bir kodun gerçekten tek kez kullanılabildiğini doğrular.
-
 ## Proje yapısı
 
 ```
 django-app/
 ├── config/            # Django ayarları ve URL'ler
 ├── anket/
-│   ├── models.py      # Sinif, Soru, VeliKodu, VeliYaniti, Cevap
-│   ├── views.py       # veli formu, panel, kodlar, Excel
+│   ├── models.py      # Sinif, Soru, VeliYaniti, Cevap
+│   ├── views.py       # veli formu, panel, Excel
 │   ├── istatistik.py  # sayı / yüzde hesapları
 │   ├── excel.py       # openpyxl ile .xlsx raporları
 │   ├── admin.py       # Django admin ayarları

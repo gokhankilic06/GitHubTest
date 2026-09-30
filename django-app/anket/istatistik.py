@@ -15,7 +15,7 @@ def sonuclar(sinif=None):
     qs = VeliYaniti.objects.all()
     if sinif:
         qs = qs.filter(sinif=sinif)
-    yanitlar = list(qs.select_related('sinif', 'kod').order_by('id'))
+    yanitlar = list(qs.select_related('sinif').order_by('id'))
     toplam = len(yanitlar)
     cevaplar = Cevap.objects.filter(yanit__in=qs.values('id'))
 
@@ -48,8 +48,7 @@ def sonuclar(sinif=None):
 
 
 def sinif_ozeti():
-    ozet = []
-    for s in Sinif.objects.annotate(katilan=Count('yanitlar', distinct=True), kod_sayisi=Count('kodlar', distinct=True)):
-        if s.katilan or s.kod_sayisi:
-            ozet.append({'sinif': s, 'katilan': s.katilan, 'kod_sayisi': s.kod_sayisi, 'oran': yuzde(s.katilan, s.kod_sayisi)})
-    return ozet
+    return [
+        {'sinif': s, 'katilan': s.katilan}
+        for s in Sinif.objects.annotate(katilan=Count('yanitlar')).filter(katilan__gt=0)
+    ]
