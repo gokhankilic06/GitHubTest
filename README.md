@@ -55,6 +55,31 @@ test/            Üç backend için ortak API testleri
 
 ## Çalıştırma
 
+### Windows'ta kolay başlatma: `baslat.bat`
+
+Klasördeki `baslat.bat` dosyasına çift tıklayın ve sırayla şunları yapın:
+1. Çalıştırılacak sürümü seçin: Node.js, Python veya C#.
+2. Personel paneli için bir şifre belirleyin. Boş bırakırsanız panel kapalı kalır.
+
+Sonrasında script kendisi şunları yapar:
+- Seçilen program kurulu değilse ya da sürümü eskiyse, nereden indirileceğini söyler.
+- İlk çalıştırmada bağımlılıkları yükler (Node.js için `npm install`, Python için sanal ortam ve `pip install`, C# için derleme).
+- Sunucuyu başlatır ve tarayıcıyı açar.
+
+Kapatmak için pencerede **Ctrl+C** tuşlarına basın.
+
+Gereken programlar:
+
+| Sürüm   | Gereken program                        | İndirme adresi                      |
+|---------|----------------------------------------|-------------------------------------|
+| Node.js | Node.js 22.13 veya üstü (22 LTS olur)  | https://nodejs.org                  |
+| Python  | Python 3.10 veya üstü                  | https://www.python.org              |
+| C#      | .NET 8 SDK veya üstü                   | https://dotnet.microsoft.com/download |
+
+Python'u kurarken "Add python.exe to PATH" seçeneğini işaretleyin. İlk çalıştırmada Windows Güvenlik Duvarı izin isteyebilir. Sadece kendi bilgisayarınızda deneyecekseniz izin vermeniz gerekmez.
+
+### Elle çalıştırma
+
 Üç backend'in hepsi varsayılan olarak `data/randevu.db` SQLite dosyasını kullanır.
 
 | Ortam değişkeni  | Açıklama                                               |
