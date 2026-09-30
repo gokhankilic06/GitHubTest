@@ -2,6 +2,7 @@ import base64
 import hmac
 import json
 import os
+import re
 from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
@@ -65,6 +66,13 @@ def uygulama_olustur(depo: Depo) -> Flask:
         yanit.headers["X-Content-Type-Options"] = "nosniff"
         return yanit
 
+    def _json_govde():
+        """İstek gövdesini JSON olarak okur; geçersizse None döner."""
+        try:
+            return True, json.loads(request.get_data(as_text=True) or "null")
+        except ValueError:
+            return False, None
+
     @app.get("/")
     def ana_sayfa():
         return app.send_static_file("index.html")
@@ -114,9 +122,8 @@ def uygulama_olustur(depo: Depo) -> Flask:
 
     @app.post("/api/randevular")
     def randevu_olustur():
-        try:
-            govde = json.loads(request.get_data(as_text=True) or "null")
-        except ValueError:
+        gecerli, govde = _json_govde()
+        if not gecerli:
             return jsonify(hata="Geçersiz istek."), 400
 
         p = takvim.pencere(CONFIG, simdi())
@@ -135,6 +142,63 @@ def uygulama_olustur(depo: Depo) -> Flask:
             c = sonuc["cakisma"]
             return jsonify(hata=c["mesaj"], hatalar={c["alan"]: c["mesaj"]}), 409
         return jsonify(randevu=sonuc["randevu"]), 201
+
+    def _vatandas_randevusu(govde):
+        """Vatandaşın randevu numarası ve kendi T.C. numarasıyla randevusunu bulması.
+        Dönüş: (randevu, None) veya (None, (durum_kodu, hata))"""
+        g = govde if isinstance(govde, dict) else {}
+        randevu_no = g.get("randevuNo").strip().upper() if isinstance(g.get("randevuNo"), str) else ""
+        basvuran_tc = g.get("basvuranTc").strip() if isinstance(g.get("basvuranTc"), str) else ""
+        if not re.fullmatch(r"[A-Z0-9]{8}", randevu_no) or not re.fullmatch(r"[0-9]{11}", basvuran_tc):
+            return None, (400, "Randevu numarası ve T.C. Kimlik Numarası eksik veya hatalı.")
+        r = depo.numara_ile_getir(randevu_no)
+        if not r or r["basvuranTc"] != basvuran_tc:
+            return None, (404, "Girdiğiniz bilgilerle eşleşen bir randevu bulunamadı.")
+        return r, None
+
+    def _vatandas_ozeti(r: dict, bugun: str) -> dict:
+        """Vatandaşa gösterilen randevu özeti (T.C. ve telefon numaraları gösterilmez)."""
+        return {
+            "randevuNo": r["randevuNo"],
+            "vergiDairesi": CONFIG["vergiDairesi"],
+            "ilce": r["ilce"],
+            "tarih": r["tarih"],
+            "saat": r["saat"],
+            "vefatEdenAd": r["vefatEdenAd"],
+            "vefatEdenSoyad": r["vefatEdenSoyad"],
+            "basvuranAd": r["basvuranAd"],
+            "basvuranSoyad": r["basvuranSoyad"],
+            "durum": r["durum"],
+            "iptalEdilebilir": r["durum"] == "aktif" and r["tarih"] >= bugun,
+        }
+
+    @app.post("/api/randevu-sorgula")
+    def randevu_sorgula():
+        gecerli, govde = _json_govde()
+        if not gecerli:
+            return jsonify(hata="Geçersiz istek."), 400
+        r, hata = _vatandas_randevusu(govde)
+        if hata:
+            return jsonify(hata=hata[1]), hata[0]
+        bugun = takvim.pencere(CONFIG, simdi())["bugun"]
+        return jsonify(randevu=_vatandas_ozeti(r, bugun))
+
+    @app.post("/api/randevu-iptal")
+    def randevu_iptal():
+        gecerli, govde = _json_govde()
+        if not gecerli:
+            return jsonify(hata="Geçersiz istek."), 400
+        r, hata = _vatandas_randevusu(govde)
+        if hata:
+            return jsonify(hata=hata[1]), hata[0]
+        bugun = takvim.pencere(CONFIG, simdi())["bugun"]
+        if r["durum"] != "aktif":
+            return jsonify(hata="Bu randevu zaten iptal edilmiş."), 409
+        if r["tarih"] < bugun:
+            return jsonify(hata="Tarihi geçmiş randevular iptal edilemez."), 409
+        if not depo.iptal_et(r["id"]):
+            return jsonify(hata="Bu randevu zaten iptal edilmiş."), 409
+        return jsonify(randevu=_vatandas_ozeti(depo.getir(r["id"]), bugun))
 
     @app.get("/yonetim")
     @yonetici_dogrula

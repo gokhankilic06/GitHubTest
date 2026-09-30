@@ -173,6 +173,20 @@ public class Depo
         }
     }
 
+    public Randevu? Getir(long id)
+    {
+        using var b = Baglan();
+        using var k = Komut(b, "SELECT * FROM randevular WHERE id = $p0", id);
+        return Liste(k).FirstOrDefault();
+    }
+
+    public Randevu? NumaraIleGetir(string randevuNo)
+    {
+        using var b = Baglan();
+        using var k = Komut(b, "SELECT * FROM randevular WHERE randevu_no = $p0", randevuNo);
+        return Liste(k).FirstOrDefault();
+    }
+
     // tarih verilirse o günün tüm kayıtları, verilmezse bugünden itibaren tüm kayıtlar
     public List<Randevu> Listele(string? tarih, string bugun)
     {

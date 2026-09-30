@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Randevu Sorgulama ve İptal</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="ust">
+    <div class="kap">
+      <h1><a href="/" style="text-decoration:none">Ankara Defterdarlığı Veraset İşlemleri Randevu</a></h1>
+      <p class="vd">Randevu Sorgulama ve İptal</p>
+    </div>
+  </header>
+
+  <main class="kap">
+    <a class="geri-link" href="/">&larr; Randevu alma sayfasına dön</a>
+
+    <div id="genelHata" class="uyari hata" hidden></div>
+    <div id="bilgi" class="uyari basari" hidden></div>
+
+    <form id="sorguForm" novalidate>
+      <h2 class="baslik">Randevu Sorgulama</h2>
+      <div class="satir">
+        <label for="randevuNo">Randevu Numarası ;</label>
+        <div class="alan"><input type="text" id="randevuNo" name="randevuNo" placeholder="Örn: Z8D6PSUG" maxlength="8" autocomplete="off" style="text-transform:uppercase"><small class="alan-hata"></small></div>
+      </div>
+      <div class="satir">
+        <label for="basvuranTc">Randevuyu Alanın T.C. Kimlik Numarası ;</label>
+        <div class="alan"><input type="text" id="basvuranTc" name="basvuranTc" placeholder="T.C. Kimlik Numarası" maxlength="11" inputmode="numeric" autocomplete="off"><small class="alan-hata"></small></div>
+      </div>
+      <div class="butonlar">
+        <button type="submit" class="btn mavi" id="sorgula">SORGULA</button>
+        <a class="btn sari" href="/">İPTAL</a>
+      </div>
+    </form>
+
+    <section id="sonuc" hidden>
+      <h2 class="baslik">Randevu Bilgileri</h2>
+      <table class="ozet">
+        <tbody id="ozet"></tbody>
+      </table>
+      <div class="butonlar">
+        <button type="button" class="btn sari" id="iptalEt" hidden>RANDEVUYU İPTAL ET</button>
+        <button type="button" class="btn mavi" onclick="window.print()">YAZDIR</button>
+        <button type="button" class="btn gri-btn" id="yeniSorgu">YENİ SORGULAMA</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/ortak.js"></script>
+  <script src="/js/sorgula.js"></script>
+</body>
+</html>

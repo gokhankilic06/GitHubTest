@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Veraset Randevu Sistemi</title>
+  <title>Ankara Defterdarlığı Veraset İşlemleri Randevu</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
   <header class="ust">
     <div class="kap">
-      <h1>Veraset Randevu Sistemi</h1>
+      <h1>Ankara Defterdarlığı Veraset İşlemleri Randevu</h1>
       <p class="vd" id="vergiDairesiBaslik"></p>
     </div>
   </header>
@@ -54,7 +54,7 @@
           </div>
           <div id="takvim" class="takvim" hidden></div>
           <p class="aciklama-kucuk"><span class="kare gri"></span> Gri renkle boyanan günlere randevu alınamaz.</p>
-          <p class="aciklama-kucuk"><span class="kare yesil"></span> Yeşil renkle boyanan günler randevu için uygundur (Saat <span id="acilisSaati">17:00</span>'den sonra bir sonraki gün için randevu açılır).</p>
+          <p class="aciklama-kucuk"><span class="kare yesil"></span> <span>Yeşil renkle boyanan günler randevu için uygundur (Saat <span id="acilisSaati">17:00</span>'den sonra bir sonraki gün için randevu açılır).</span></p>
         </div>
       </div>
 
@@ -147,6 +147,14 @@
       </div>
     </section>
   </main>
+
+  <section class="kap alt-kutu" aria-labelledby="sorguBaslik">
+    <div>
+      <h2 id="sorguBaslik">Randevu Sorgulama ve İptal</h2>
+      <p>Daha önce aldığınız randevunun bilgilerini görüntülemek veya randevunuzu iptal etmek için randevu numaranız ve T.C. kimlik numaranızla sorgulama yapabilirsiniz.</p>
+    </div>
+    <a class="btn mavi" href="/sorgula.html">RANDEVU SORGULA / İPTAL ET</a>
+  </section>
 
   <script src="/js/ortak.js"></script>
   <script src="/js/takvim.js"></script>

@@ -111,6 +111,11 @@ class Depo {
     return s ? satirdanRandevu(s) : null;
   }
 
+  numaraIleGetir(randevuNo) {
+    const s = this.db.prepare('SELECT * FROM randevular WHERE randevu_no = ?').get(randevuNo);
+    return s ? satirdanRandevu(s) : null;
+  }
+
   // tarih verilirse o günün tüm kayıtları, verilmezse bugünden itibaren tüm kayıtlar
   listele({ tarih, bugun }) {
     const satirlar = tarih

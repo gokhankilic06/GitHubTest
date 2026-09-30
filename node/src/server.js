@@ -111,6 +111,56 @@ function uygulamaOlustur(depo) {
     return res.status(201).json({ randevu: sonuc.randevu });
   });
 
+  // Vatandaşın randevu numarası ve kendi T.C. numarasıyla randevusunu bulması.
+  function vatandasRandevusu(govde) {
+    const g = govde && typeof govde === 'object' ? govde : {};
+    const randevuNo = typeof g.randevuNo === 'string' ? g.randevuNo.trim().toUpperCase() : '';
+    const basvuranTc = typeof g.basvuranTc === 'string' ? g.basvuranTc.trim() : '';
+    if (!/^[A-Z0-9]{8}$/.test(randevuNo) || !/^[0-9]{11}$/.test(basvuranTc)) {
+      return { durum: 400, hata: 'Randevu numarası ve T.C. Kimlik Numarası eksik veya hatalı.' };
+    }
+    const r = depo.numaraIleGetir(randevuNo);
+    if (!r || r.basvuranTc !== basvuranTc) {
+      return { durum: 404, hata: 'Girdiğiniz bilgilerle eşleşen bir randevu bulunamadı.' };
+    }
+    return { randevu: r };
+  }
+
+  // Vatandaşa gösterilen randevu özeti (T.C. ve telefon numaraları gösterilmez).
+  function vatandasOzeti(r, bugun) {
+    return {
+      randevuNo: r.randevuNo,
+      vergiDairesi: config.vergiDairesi,
+      ilce: r.ilce,
+      tarih: r.tarih,
+      saat: r.saat,
+      vefatEdenAd: r.vefatEdenAd,
+      vefatEdenSoyad: r.vefatEdenSoyad,
+      basvuranAd: r.basvuranAd,
+      basvuranSoyad: r.basvuranSoyad,
+      durum: r.durum,
+      iptalEdilebilir: r.durum === 'aktif' && r.tarih >= bugun,
+    };
+  }
+
+  app.post('/api/randevu-sorgula', (req, res) => {
+    const sonuc = vatandasRandevusu(req.body);
+    if (sonuc.hata) return res.status(sonuc.durum).json({ hata: sonuc.hata });
+    const { bugun } = takvim.pencere(config, simdi());
+    res.json({ randevu: vatandasOzeti(sonuc.randevu, bugun) });
+  });
+
+  app.post('/api/randevu-iptal', (req, res) => {
+    const sonuc = vatandasRandevusu(req.body);
+    if (sonuc.hata) return res.status(sonuc.durum).json({ hata: sonuc.hata });
+    const { bugun } = takvim.pencere(config, simdi());
+    const r = sonuc.randevu;
+    if (r.durum !== 'aktif') return res.status(409).json({ hata: 'Bu randevu zaten iptal edilmiş.' });
+    if (r.tarih < bugun) return res.status(409).json({ hata: 'Tarihi geçmiş randevular iptal edilemez.' });
+    if (!depo.iptalEt(r.id)) return res.status(409).json({ hata: 'Bu randevu zaten iptal edilmiş.' });
+    res.json({ randevu: vatandasOzeti(depo.getir(r.id), bugun) });
+  });
+
   app.get('/yonetim', yoneticiDogrula, (req, res) => {
     res.sendFile(path.join(WEB, 'yonetim.html'));
   });

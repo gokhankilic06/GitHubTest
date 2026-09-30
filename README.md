@@ -1,10 +1,10 @@
-# Veraset Randevu Sistemi
+# Ankara Defterdarlığı Veraset İşlemleri Randevu
 
 Ankara Veraset ve Harçlar Vergi Dairesi için online randevu sistemi. Aynı arayüz ve aynı API üç ayrı backend ile yazıldı: **Node.js**, **Python** ve **C#**. Hangisi kullanılırsa kullanılsın davranış aynıdır. Üçü de aynı ortak test paketinden geçer.
 
 ## Randevu akışı
 
-1. **Açıklama ve tarih:** Vatandaş açıklama metnini okur ve veraset belgesini indirir. "Okudum, taahhüt ederim" kutusunu işaretler. Vefat edenin ikamet ettiği ilçeyi seçer (Ankara'nın 25 ilçesi). Son olarak takvimden gün seçer.
+1. **Açıklama ve tarih:** Vatandaş sayfanın başındaki açıklama metnini ve gerekli belgeler listesini okur, Veraset ve İntikal Beyannamesini indirir. "Okudum, taahhüt ederim" kutusunu işaretler. Vefat edenin ikamet ettiği ilçeyi seçer (Ankara'nın 25 ilçesi). Son olarak takvimden gün seçer.
    - Yeşil günlerde randevu alınabilir. Gri günler hafta sonu, resmi tatil, tamamen dolu ya da randevu penceresinin dışındadır.
    - Aynı gün için randevu verilmez. Her gün saat 17:00'de pencerenin sonuna yeni bir gün eklenir.
 2. **Saat seçimi:** Seçilen günün boş saatleri gösterilir. Dolu saatler seçilemez.
@@ -22,6 +22,13 @@ Ankara'da tek vergi dairesi olduğu için vergi dairesi seçimi yoktur. Vergi da
 - Ad ve soyadlar Türkçe kurallarına göre büyük harfe çevrilerek kaydedilir (i → İ).
 - Her saate `slotKapasitesi` kadar randevu verilir (varsayılan 1). Aynı anda gelen iki istek aynı saati alamaz.
 - Aynı vefat eden kişi için birden fazla aktif randevu alınamaz.
+
+## Randevu sorgulama ve iptal
+
+Giriş sayfasının altındaki "Randevu Sorgulama ve İptal" bölümü `/sorgula.html` sayfasına götürür. Vatandaş burada iki bilgiyle randevusunu bulur: randevu numarası ve randevuyu alan kişinin T.C. numarası.
+- Randevunun bilgilerini ve durumunu (aktif, iptal edildi, tarihi geçmiş) görebilir.
+- Tarihi geçmemiş aktif randevusunu iptal edebilir. İptal edilen saat yeniden boşa çıkar.
+- Bu sayfada T.C. ve telefon numaraları gösterilmez. Bilgiler eşleşmezse yalnızca "bulunamadı" denir.
 
 ## Personel paneli
 
@@ -95,7 +102,7 @@ npm test               # üçünü sırayla çalıştırır
 
 ## Yapılacaklar / içerik
 
-- **Açıklama metni:** `web/public/aciklama.html` dosyasına yazılacak.
-- **Veraset belgesi:** `web/public/belgeler/veraset-beyannamesi.pdf` olarak eklenecek. Dosya yoksa indirme butonu gizlenir.
+- **Açıklama metni:** `web/public/aciklama.html` dosyasında. Beyanname indirme bağlantısı da bu metnin içinde, GİB'deki dosyayı gösteriyor.
+- **Yerel belge (isteğe bağlı):** Belgeyi kendi sunucunuzdan vermek isterseniz `web/public/belgeler/veraset-beyannamesi.pdf` olarak ekleyin. Dosya eklenince ayrıca bir "İndir" butonu çıkar.
 - **Resmi tatiller:** `config.json` içindeki `tatiller` ve `yarimGunler` listeleri her yıl güncellenmeli. 2027 dini bayramları henüz eklenmedi.
 - **Diğer ayarlar:** Mesai saatleri, randevu aralığı (15 dk), saat başına kapasite ve kaç gün ilerisine randevu verileceği `config.json` dosyasından ayarlanır.

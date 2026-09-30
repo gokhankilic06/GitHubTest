@@ -84,18 +84,23 @@ app.MapGet("/api/saatler", (string? tarih) =>
     return Results.Json(new { tarih, saatler });
 });
 
-app.MapPost("/api/randevular", async (HttpContext ctx) =>
+// İstek gövdesini JSON olarak okur; geçersizse null döner.
+static async Task<JsonElement?> JsonOku(HttpContext ctx)
 {
-    JsonElement govde;
     try
     {
         using var belge = await JsonDocument.ParseAsync(ctx.Request.Body);
-        govde = belge.RootElement.Clone();
+        return belge.RootElement.Clone();
     }
     catch (Exception e) when (e is JsonException or BadHttpRequestException)
     {
-        return Hata(400, "Geçersiz istek.");
+        return null;
     }
+}
+
+app.MapPost("/api/randevular", async (HttpContext ctx) =>
+{
+    if (await JsonOku(ctx) is not { } govde) return Hata(400, "Geçersiz istek.");
 
     var p = takvim.Pencere(Simdi());
     var buYil = int.Parse(p.Bugun[..4], CultureInfo.InvariantCulture);
@@ -112,6 +117,65 @@ app.MapPost("/api/randevular", async (HttpContext ctx) =>
         return Hata(409, cakisma.Mesaj, new Dictionary<string, string> { [cakisma.Alan] = cakisma.Mesaj });
     }
     return Results.Json(new { randevu }, statusCode: 201);
+});
+
+// Vatandaşın randevu numarası ve kendi T.C. numarasıyla randevusunu bulması.
+(Randevu? randevu, IResult? hata) VatandasRandevusu(JsonElement g)
+{
+    static string Alan(JsonElement g, string ad) =>
+        g.ValueKind == JsonValueKind.Object && g.TryGetProperty(ad, out var e) && e.ValueKind == JsonValueKind.String
+            ? e.GetString()!.Trim()
+            : "";
+
+    var randevuNo = Alan(g, "randevuNo").ToUpperInvariant();
+    var basvuranTc = Alan(g, "basvuranTc");
+    if (randevuNo.Length != 8 || !randevuNo.All(c => c is >= 'A' and <= 'Z' or >= '0' and <= '9') ||
+        basvuranTc.Length != 11 || !basvuranTc.All(c => c is >= '0' and <= '9'))
+    {
+        return (null, Hata(400, "Randevu numarası ve T.C. Kimlik Numarası eksik veya hatalı."));
+    }
+    var r = depo.NumaraIleGetir(randevuNo);
+    if (r == null || r.BasvuranTc != basvuranTc)
+    {
+        return (null, Hata(404, "Girdiğiniz bilgilerle eşleşen bir randevu bulunamadı."));
+    }
+    return (r, null);
+}
+
+// Vatandaşa gösterilen randevu özeti (T.C. ve telefon numaraları gösterilmez).
+object VatandasOzeti(Randevu r, string bugun) => new
+{
+    randevuNo = r.RandevuNo,
+    vergiDairesi = ayarlar.VergiDairesi,
+    ilce = r.Ilce,
+    tarih = r.Tarih,
+    saat = r.Saat,
+    vefatEdenAd = r.VefatEdenAd,
+    vefatEdenSoyad = r.VefatEdenSoyad,
+    basvuranAd = r.BasvuranAd,
+    basvuranSoyad = r.BasvuranSoyad,
+    durum = r.Durum,
+    iptalEdilebilir = r.Durum == "aktif" && string.CompareOrdinal(r.Tarih, bugun) >= 0,
+};
+
+app.MapPost("/api/randevu-sorgula", async (HttpContext ctx) =>
+{
+    if (await JsonOku(ctx) is not { } govde) return Hata(400, "Geçersiz istek.");
+    var (r, hata) = VatandasRandevusu(govde);
+    if (hata != null) return hata;
+    return Results.Json(new { randevu = VatandasOzeti(r!, takvim.Pencere(Simdi()).Bugun) });
+});
+
+app.MapPost("/api/randevu-iptal", async (HttpContext ctx) =>
+{
+    if (await JsonOku(ctx) is not { } govde) return Hata(400, "Geçersiz istek.");
+    var (r, hata) = VatandasRandevusu(govde);
+    if (hata != null) return hata;
+    var bugun = takvim.Pencere(Simdi()).Bugun;
+    if (r!.Durum != "aktif") return Hata(409, "Bu randevu zaten iptal edilmiş.");
+    if (string.CompareOrdinal(r.Tarih, bugun) < 0) return Hata(409, "Tarihi geçmiş randevular iptal edilemez.");
+    if (!depo.IptalEt(r.Id)) return Hata(409, "Bu randevu zaten iptal edilmiş.");
+    return Results.Json(new { randevu = VatandasOzeti(depo.Getir(r.Id)!, bugun) });
 });
 
 // Personel paneli için HTTP Basic kimlik doğrulaması.

@@ -289,9 +289,70 @@ test('yönetim: listeleme, iptal ve iptal sonrası saatin boşalması', async ()
 test('statik dosyalar ve bilinmeyen API yolu', async () => {
   const ana = await fetch(TABAN + '/');
   assert.equal(ana.status, 200);
-  assert.match(await ana.text(), /Veraset Randevu Sistemi/);
+  assert.match(await ana.text(), /Ankara Defterdarlığı Veraset İşlemleri Randevu/);
   const aciklama = await fetch(TABAN + '/aciklama.html');
   assert.equal(aciklama.status, 200);
   const yok = await istek('/api/yok');
   assert.equal(yok.durum, 404);
+});
+
+test('vatandaş: randevu sorgulama ve iptal', async () => {
+  const olustur = await istek('/api/randevular', {
+    yontem: 'POST',
+    govde: randevu({ tarih: '2026-10-23', saat: '10:30', vefatEdenTc: tcUret(77777777), basvuranTc: tcUret(88888888) }),
+  });
+  assert.equal(olustur.durum, 201);
+  const { randevuNo } = olustur.json.randevu;
+  const kimlik = { randevuNo, basvuranTc: tcUret(88888888) };
+
+  // Hatalı biçim 400, eşleşmeyen bilgi 404
+  assert.equal((await istek('/api/randevu-sorgula', { yontem: 'POST', govde: { randevuNo: 'ABC', basvuranTc: '1' } })).durum, 400);
+  assert.equal((await istek('/api/randevu-sorgula', { yontem: 'POST', govde: {} })).durum, 400);
+  const yanlisTc = await istek('/api/randevu-sorgula', { yontem: 'POST', govde: { randevuNo, basvuranTc: tcUret(22222222) } });
+  assert.equal(yanlisTc.durum, 404);
+  const yanlisNo = await istek('/api/randevu-sorgula', { yontem: 'POST', govde: { ...kimlik, randevuNo: 'AAAAAAAA' } });
+  assert.equal(yanlisNo.durum, 404);
+  assert.equal(yanlisTc.json.hata, yanlisNo.json.hata);
+
+  // Doğru bilgilerle sorgu (randevu numarası küçük harfle de girilebilir)
+  const sorgu = await istek('/api/randevu-sorgula', { yontem: 'POST', govde: { ...kimlik, randevuNo: ` ${randevuNo.toLowerCase()} ` } });
+  assert.equal(sorgu.durum, 200, JSON.stringify(sorgu.json));
+  assert.deepEqual(sorgu.json.randevu, {
+    randevuNo,
+    vergiDairesi: 'Ankara Veraset ve Harçlar Vergi Dairesi',
+    ilce: 'Çankaya',
+    tarih: '2026-10-23',
+    saat: '10:30',
+    vefatEdenAd: 'AHMET',
+    vefatEdenSoyad: 'YILMAZ',
+    basvuranAd: 'AYŞE FATMA',
+    basvuranSoyad: 'ŞİMŞEK',
+    durum: 'aktif',
+    iptalEdilebilir: true,
+  });
+
+  // Yanlış bilgiyle iptal edilemez
+  assert.equal((await istek('/api/randevu-iptal', { yontem: 'POST', govde: { randevuNo, basvuranTc: tcUret(22222222) } })).durum, 404);
+
+  const iptal = await istek('/api/randevu-iptal', { yontem: 'POST', govde: kimlik });
+  assert.equal(iptal.durum, 200, JSON.stringify(iptal.json));
+  assert.equal(iptal.json.randevu.durum, 'iptal');
+  assert.equal(iptal.json.randevu.iptalEdilebilir, false);
+
+  const tekrar = await istek('/api/randevu-iptal', { yontem: 'POST', govde: kimlik });
+  assert.equal(tekrar.durum, 409);
+  assert.ok(tekrar.json.hata);
+
+  const sonra = await istek('/api/randevu-sorgula', { yontem: 'POST', govde: kimlik });
+  assert.equal(sonra.json.randevu.durum, 'iptal');
+
+  // Saat boşa çıkar
+  const saatler = await istek('/api/saatler?tarih=2026-10-23');
+  assert.deepEqual(saatler.json.saatler.find((s) => s.saat === '10:30'), { saat: '10:30', uygun: true });
+});
+
+test('sorgulama sayfası sunulur', async () => {
+  const y = await fetch(TABAN + '/sorgula.html');
+  assert.equal(y.status, 200);
+  assert.match(await y.text(), /Randevu Sorgulama/);
 });

@@ -122,6 +122,14 @@ class Depo:
             finally:
                 b.close()
 
+    def getir(self, randevu_id: int) -> dict | None:
+        satirlar = self._sorgu("SELECT * FROM randevular WHERE id = ?", randevu_id)
+        return _satirdan_randevu(satirlar[0]) if satirlar else None
+
+    def numara_ile_getir(self, randevu_no: str) -> dict | None:
+        satirlar = self._sorgu("SELECT * FROM randevular WHERE randevu_no = ?", randevu_no)
+        return _satirdan_randevu(satirlar[0]) if satirlar else None
+
     def listele(self, tarih: str, bugun: str) -> list[dict]:
         """tarih verilirse o günün tüm kayıtları, verilmezse bugünden itibaren tüm kayıtlar"""
         if tarih:
