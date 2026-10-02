@@ -188,6 +188,20 @@ namespace AracSatisSistemi.Controllers
             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", dosyaAdi);
         }
 
+        // GET: /Satis/PeyKarti?tur=..&tarih=..&adet=.. - İhale günü katılımcılara dağıtılan,
+        // satış listesine elle işlenen pey kartı numaralarının yazdırılabilir çıktısı.
+        public IActionResult PeyKarti(SatisTuru tur, DateTime tarih, int adet = 30)
+        {
+            if (adet < 1) adet = 1;
+            if (adet > 200) adet = 200;
+
+            ViewBag.Tur = tur;
+            ViewBag.Tarih = tarih.Date;
+            ViewBag.TurAdiBuyuk = TurAdiBuyuk(tur);
+            ViewBag.Adet = adet;
+            return View();
+        }
+
         // GET: /Satis/SonucGir?dosyaId=..&tur=..&tarih=.. - Adım 3: seçilen aracın sonucunu girme formu.
         public async Task<IActionResult> SonucGir(int dosyaId, SatisTuru tur, DateTime tarih)
         {
