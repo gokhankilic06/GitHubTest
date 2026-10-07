@@ -106,6 +106,7 @@ namespace AracSatisSistemi.Models
         {
             SatisSonucu.Satildi => "Satıldı",
             SatisSonucu.AliciCikmadi => "Alıcı Çıkmadı",
+            SatisSonucu.AliciIslemYapmadi => "Alıcı İşlem Yapmadı",
             _ => SatisSonucu.ToString()
         };
     }

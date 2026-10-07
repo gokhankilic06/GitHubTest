@@ -151,6 +151,36 @@
     </div>
 }
 
+@if (Model.IkiIhaleArasiFark.HasValue)
+{
+    <div class="alert alert-warning">
+        <strong>İki İhale Arası Fark:</strong> @Model.IkiIhaleArasiFark.Value.FarkTutari.ToString("N2") TL,
+        @Model.IkiIhaleArasiFark.Value.KimdenTahsilEdilecek adlı kişiden (ihaleyi kazanıp işlem yapmadığı için)
+        tahsil edilmesi gerekmektedir (6183 sayılı Kanun Md. 85/86).
+    </div>
+}
+
+@if (Model.IptalIade != null && Model.IptalIade.AliciyaTerkSecildi)
+{
+    <div class="card p-3 mb-3">
+        <div class="form-section-title">Alıcıya Terk (6183 sayılı Kanun Md. 85/86)</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">Terk Tarihi</td><td>@(Model.IptalIade.TerkTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                <td class="etiket">Terk Edilen Kişi</td><td>@Model.IptalIade.TerkEdilenAdiSoyadi</td>
+            </tr>
+            <tr>
+                <td class="etiket">T.C. Kimlik / VKN</td><td>@Model.IptalIade.TerkEdilenKimlikNo</td>
+                <td class="etiket">İlgili Satış Türü</td><td>@Model.IptalIade.TerkEdilenSatisTuru</td>
+            </tr>
+            <tr>
+                <td class="etiket">Terk Tutarı</td><td>@(Model.IptalIade.TerkTutari?.ToString("N2") ?? "-") TL</td>
+                <td class="etiket">Açıklama</td><td>@Model.IptalIade.TerkAciklama</td>
+            </tr>
+        </table>
+    </div>
+}
+
 @if (Model.IptalIade != null && (Model.IptalIade.SatisIptaliSecildi || Model.IptalIade.SatisIadesiSecildi || Model.IptalIade.DosyaKapatildi))
 {
     <div class="card p-3 mb-3">

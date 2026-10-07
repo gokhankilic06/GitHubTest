@@ -55,5 +55,25 @@ namespace AracSatisSistemi.Models
         public DateTime? KapatmaVergiDairesiYaziTarihi { get; set; }
         [Display(Name = "Vergi Dairesi Yazı Sayısı")]
         public string? KapatmaVergiDairesiYaziSayisi { get; set; }
+
+        // ---- ALICIYA TERK (6183 sayılı Kanun Md. 85/86) ----
+        // İhaleyi kazanıp işlemini süresinde tamamlamayan alıcıya, aracın resen terk
+        // edilmesi - bkz. IptalIadeController.AliciyaTerk, Dosya.TerkEdilecekSatis.
+        [Display(Name = "Alıcıya Terk Edildi mi?")]
+        public bool AliciyaTerkSecildi { get; set; }
+        [Display(Name = "Terk Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? TerkTarihi { get; set; }
+        [Display(Name = "Terk Edilen Kişi (Adı Soyadı)")]
+        public string? TerkEdilenAdiSoyadi { get; set; }
+        [Display(Name = "Terk Edilen Kişi T.C. Kimlik / VKN")]
+        public string? TerkEdilenKimlikNo { get; set; }
+        [Display(Name = "İlgili Satış Türü")]
+        public string? TerkEdilenSatisTuru { get; set; }
+        [Display(Name = "Terk Tutarı (TL)")]
+        [System.ComponentModel.DataAnnotations.Schema.Column(TypeName = "decimal(18,2)")]
+        public decimal? TerkTutari { get; set; }
+        [Display(Name = "Açıklama")]
+        public string? TerkAciklama { get; set; }
     }
 }

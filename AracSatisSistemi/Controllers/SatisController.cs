@@ -11,25 +11,22 @@ namespace AracSatisSistemi.Controllers
         private readonly AppDbContext _db;
         public SatisController(AppDbContext db) => _db = db;
 
-        // Bir türün "bir önceki" türünü verir (sıra: 1. Satış -> 2. Satış -> Pazarlık -> 6183/86).
-        private static SatisTuru? OncekiTur(SatisTuru tur) => tur switch
+        // Her satış türünün sonuç girişine uygun olması için dosyanın Asama'sının (bkz.
+        // Dosya.Asama - tüm dallanma mantığının tek kaynağı) hangi değerde olması gerektiği.
+        private static readonly Dictionary<SatisTuru, Dosya.SurecAsamasi> BeklenenAsama = new()
         {
-            SatisTuru.IkinciSatis => SatisTuru.BirinciSatis,
-            SatisTuru.Pazarlik => SatisTuru.IkinciSatis,
-            SatisTuru.Madde6183_86 => SatisTuru.Pazarlik,
-            _ => null
+            [SatisTuru.BirinciSatis] = Dosya.SurecAsamasi.BirinciSatisBekliyor,
+            [SatisTuru.IkinciSatis] = Dosya.SurecAsamasi.IkinciSatisBekliyor,
+            [SatisTuru.Pazarlik] = Dosya.SurecAsamasi.PazarlikBekliyor,
+            [SatisTuru.Madde6183_86] = Dosya.SurecAsamasi.Madde6183_86Bekliyor
         };
 
         // Belleğe alınmış (Satislar dahil) bir dosyanın, verilen tür için şu an sonuç
-        // girilmeye uygun olup olmadığını kontrol eder: bu tür için henüz sonuç girilmemiş
-        // olmalı ve (1. Satış hariç) bir önceki türün sonucu "Alıcı Çıkmadı" olmalı.
+        // girilmeye uygun olup olmadığını kontrol eder.
         private static bool TurGecerliMi(Dosya dosya, SatisTuru tur)
         {
             if (dosya.Satislar.Any(s => s.SatisTuru == tur)) return false;
-            var onceki = OncekiTur(tur);
-            if (onceki == null) return true;
-            var oncekiKayit = dosya.Satislar.FirstOrDefault(s => s.SatisTuru == onceki);
-            return oncekiKayit != null && oncekiKayit.SatisSonucu == SatisSonucu.AliciCikmadi;
+            return BeklenenAsama.TryGetValue(tur, out var beklenen) && dosya.Asama == beklenen;
         }
 
         // Bir dosya için şu an sonuç girilmeye uygun olan (varsa) türü ve önerilen tarihi bulur.
@@ -59,31 +56,27 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> Listele(SatisTuru tur, DateTime tarih)
         {
             var tarihGunu = tarih.Date;
-            IQueryable<Dosya> sorgu = _db.Dosyalar.Include(d => d.Satislar);
 
-            sorgu = tur switch
+            // Dallanma mantığı (Dosya.Asama) SQL'e çevrilemediğinden, aktif dosyalar belleğe
+            // alınıp orada süzülür (veri hacmi bu iş için küçüktür - tek bir tapu/icra dairesi).
+            var aktifDosyalar = await _db.Dosyalar.Include(d => d.Satislar)
+                .Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti)
+                .ToListAsync();
+
+            List<Dosya> bekleyenler;
+            if (BeklenenAsama.TryGetValue(tur, out var beklenen))
             {
-                SatisTuru.BirinciSatis => sorgu
-                    .Where(d => d.Satis1Tarihi.Date == tarihGunu)
-                    .Where(d => !d.Satislar.Any(s => s.SatisTuru == SatisTuru.BirinciSatis)),
-
-                SatisTuru.IkinciSatis => sorgu
-                    .Where(d => d.Satis2Tarihi.Date == tarihGunu)
-                    .Where(d => d.Satislar.Any(s => s.SatisTuru == SatisTuru.BirinciSatis && s.SatisSonucu == SatisSonucu.AliciCikmadi))
-                    .Where(d => !d.Satislar.Any(s => s.SatisTuru == SatisTuru.IkinciSatis)),
-
-                SatisTuru.Pazarlik => sorgu
-                    .Where(d => d.Satislar.Any(s => s.SatisTuru == SatisTuru.IkinciSatis && s.SatisSonucu == SatisSonucu.AliciCikmadi))
-                    .Where(d => !d.Satislar.Any(s => s.SatisTuru == SatisTuru.Pazarlik)),
-
-                SatisTuru.Madde6183_86 => sorgu
-                    .Where(d => d.Satislar.Any(s => s.SatisTuru == SatisTuru.Pazarlik && s.SatisSonucu == SatisSonucu.AliciCikmadi))
-                    .Where(d => !d.Satislar.Any(s => s.SatisTuru == SatisTuru.Madde6183_86)),
-
-                _ => sorgu.Where(d => false)
-            };
-
-            var bekleyenler = await sorgu.OrderBy(d => d.DosyaNo).ToListAsync();
+                bekleyenler = aktifDosyalar.Where(d => d.Asama == beklenen).ToList();
+                // 1. ve 2. Satış planlanan ihale tarihiyle eşleşmeli; Pazarlık ve 6183/86 Tek
+                // Satış tarihten bağımsız olarak o ana kadar bekleyen tüm dosyaları gösterir.
+                if (tur == SatisTuru.BirinciSatis) bekleyenler = bekleyenler.Where(d => d.Satis1Tarihi.Date == tarihGunu).ToList();
+                if (tur == SatisTuru.IkinciSatis) bekleyenler = bekleyenler.Where(d => d.Satis2Tarihi.Date == tarihGunu).ToList();
+            }
+            else
+            {
+                bekleyenler = new List<Dosya>();
+            }
+            bekleyenler = bekleyenler.OrderBy(d => d.DosyaNo).ToList();
 
             // Bu tür/tarih için daha önce (bu oturumda veya önceden) girilmiş sonuçlar - geri bildirim amaçlı.
             var sonuclananlar = await _db.Satislar

@@ -78,7 +78,8 @@ namespace AracSatisSistemi.Controllers
                 sorgu = sorgu.Where(x => x.d.Durum == DosyaDurumu.Kayitli || x.d.Durum == DosyaDurumu.SatisaCikti);
             else if (durum == "pasif")
                 sorgu = sorgu.Where(x => x.d.Durum == DosyaDurumu.Satildi || x.d.Durum == DosyaDurumu.IptalEdildi
-                    || x.d.Durum == DosyaDurumu.IadeEdildi || x.d.Durum == DosyaDurumu.Kapandi);
+                    || x.d.Durum == DosyaDurumu.IadeEdildi || x.d.Durum == DosyaDurumu.Kapandi
+                    || x.d.Durum == DosyaDurumu.AliciyaTerkEdildi);
 
             var liste = await sorgu
                 .OrderByDescending(x => x.d.DosyaNo)

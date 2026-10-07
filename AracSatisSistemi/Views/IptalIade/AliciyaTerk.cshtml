@@ -1,0 +1,54 @@
+@model IptalIade
+@{
+    ViewData["Title"] = "Alıcıya Terk";
+    var dosya = (Dosya)ViewBag.Dosya;
+    var ilgiliSatis = (Satis)ViewBag.IlgiliSatis;
+}
+<h3>Alıcıya Terk - Dosya No: @dosya.DosyaNo</h3>
+<p class="text-muted">6183 sayılı Kanun Madde 85/86 uyarınca, ihaleyi kazanıp işlemini süresinde tamamlamayan alıcıya aracın resen terk edilmesi.</p>
+
+<div class="card p-3 mb-3">
+    <div class="form-section-title">İlgili Satış Özeti</div>
+    <div class="row g-3">
+        <div class="col-md-3"><strong>Dosya No:</strong> @dosya.DosyaNo</div>
+        <div class="col-md-3"><strong>Plaka:</strong> @dosya.Plaka</div>
+        <div class="col-md-3"><strong>Borçlu:</strong> @dosya.AdiSoyadiUnvani</div>
+        <div class="col-md-3"><strong>Satış Türü:</strong> @ilgiliSatis.SatisTuruGorunen</div>
+        <div class="col-md-3"><strong>Satış Tarihi:</strong> @ilgiliSatis.SatisTarihi.ToString("dd.MM.yyyy")</div>
+        <div class="col-md-3"><strong>Kazanan Alıcı:</strong> @(ilgiliSatis.AliciAdiSoyadi ?? "-")</div>
+        <div class="col-md-3"><strong>İhale Bedeli:</strong> @(ilgiliSatis.SatisBedeli?.ToString("N2") ?? "-") TL</div>
+    </div>
+</div>
+
+<form asp-action="AliciyaTerk" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="DosyaId" value="@dosya.Id" />
+
+    <div class="form-section-title">Alıcıya Terk Bilgileri</div>
+    <div class="row g-3">
+        <div class="col-md-3"><label class="form-label" asp-for="TerkTarihi"></label><input class="form-control" asp-for="TerkTarihi" type="date" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="TerkEdilenAdiSoyadi"></label><input class="form-control" asp-for="TerkEdilenAdiSoyadi" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="TerkEdilenKimlikNo"></label><input class="form-control" asp-for="TerkEdilenKimlikNo" /></div>
+        <div class="col-md-3"><label class="form-label" asp-for="TerkEdilenSatisTuru"></label><input class="form-control" asp-for="TerkEdilenSatisTuru" readonly /></div>
+        <div class="col-md-3">
+            <label class="form-label" asp-for="TerkTutari"></label>
+            <div class="input-group">
+                <input class="form-control" asp-for="TerkTutari" type="number" step="0.01" min="0" />
+                <span class="input-group-text">TL</span>
+            </div>
+        </div>
+        <div class="col-md-9"><label class="form-label" asp-for="TerkAciklama"></label><textarea class="form-control" asp-for="TerkAciklama" rows="2" placeholder="6183 sayılı Kanun Md. 85/86 gereği..."></textarea></div>
+    </div>
+
+    <div class="alert alert-warning mt-3">
+        Bu işlem kaydedildiğinde dosya <strong>Pasif</strong> duruma geçecek ve "Alıcıya Terk Edildi" olarak işaretlenecektir.
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('@dosya.DosyaNo nolu dosyayı Alıcıya Terk olarak kaydetmek istediğinizden emin misiniz?');">
+            <i class="bi bi-exclamation-octagon"></i> Alıcıya Terk İşlemini Kaydet
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>

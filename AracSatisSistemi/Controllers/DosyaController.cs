@@ -29,7 +29,8 @@ namespace AracSatisSistemi.Controllers
             else if (durumFiltre == "pasif")
             {
                 sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
-                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi);
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi
+                    || d.Durum == DosyaDurumu.AliciyaTerkEdildi);
             }
 
             ViewBag.Arama = arama;

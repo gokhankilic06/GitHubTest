@@ -6,8 +6,8 @@ namespace AracSatisSistemi.Data
     // İhaleyi kazanan alıcı, satış tarihinden sonraki 3 iş günü (hafta sonu ve resmi
     // tatiller hariç) içinde idareye gelip "Alıcı Ödeme Bilgileri" işlemini
     // tamamlamazsa (VerilenSure hâlâ boşsa), o satış sonucu otomatik olarak
-    // "Alıcı Çıkmadı"ya döner; dosya böylece bir sonraki satış aşamasının
-    // (1.Satış -> 2.Satış -> Pazarlık -> 6183/86) listesinde otomatik olarak yer alır.
+    // "Alıcı İşlem Yapmadı"ya döner; dosya böylece bir sonraki aşamanın (Dosya.Asama)
+    // listesinde otomatik olarak yer alır.
     public static class OtomatikSurecIsleyici
     {
         public static async Task AliciGelmeyenSatislariGuncelleAsync(AppDbContext db)
@@ -29,7 +29,7 @@ namespace AracSatisSistemi.Data
                 var sonGun = IhaleTarihHesaplayici.IsGunuEkle(satis.SatisTarihi, 3, resmiTatiller);
                 if (bugun <= sonGun) continue;
 
-                satis.SatisSonucu = SatisSonucu.AliciCikmadi;
+                satis.SatisSonucu = SatisSonucu.AliciIslemYapmadi;
                 satis.SatisBedeli = null;
                 satis.Dosya!.Durum = DosyaDurumu.SatisaCikti;
                 degisti = true;

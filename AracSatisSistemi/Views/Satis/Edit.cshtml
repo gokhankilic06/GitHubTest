@@ -30,6 +30,7 @@
             <select class="form-select" asp-for="SatisSonucu" id="satisSonucu">
                 <option value="1">Satıldı</option>
                 <option value="2">Alıcı Çıkmadı</option>
+                <option value="3">Alıcı İşlem Yapmadı</option>
             </select>
         </div>
         <div class="col-md-3" id="satisBedeliAlani">
@@ -62,8 +63,11 @@
         const sonucSelect = document.getElementById('satisSonucu');
         const bedelAlani = document.getElementById('satisBedeliAlani');
         function bedelAlaniniAyarla() {
-            const satildi = sonucSelect.value === '1';
-            bedelAlani.style.display = satildi ? '' : 'none';
+            // "Satıldı" ve "Alıcı İşlem Yapmadı" durumlarında bedel alanı görünür kalır
+            // (ikincisinde kazanılan ama tamamlanmayan ihale bedeli kayıtlı kalmalı -
+            // bkz. Dosya.IkiIhaleArasiFark hesaplaması).
+            const bedelliMi = sonucSelect.value === '1' || sonucSelect.value === '3';
+            bedelAlani.style.display = bedelliMi ? '' : 'none';
         }
         sonucSelect.addEventListener('change', bedelAlaniniAyarla);
         bedelAlaniniAyarla();

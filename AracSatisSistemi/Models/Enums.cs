@@ -17,7 +17,13 @@ namespace AracSatisSistemi.Models
         [System.ComponentModel.Description("Satıldı")]
         Satildi = 1,
         [System.ComponentModel.Description("Alıcı Çıkmadı")]
-        AliciCikmadi = 2
+        AliciCikmadi = 2,
+        // İhaleyi kazanan alıcı belirlenmiş (ihale sonucu "Satıldı" girilmiş) ama alıcı
+        // verilen 3 iş günü içinde işlemlerini tamamlamamış (bkz. OtomatikSurecIsleyici /
+        // IptalIadeController.AliciSuresindeGitmedi). "Alıcı Çıkmadı" (hiç teklif/bakılan
+        // olmaması) ile karıştırılmamalı: burada bir kazanan vardı, sadece işlemi tamamlamadı.
+        [System.ComponentModel.Description("Alıcı İşlem Yapmadı")]
+        AliciIslemYapmadi = 3
     }
 
     public enum DosyaDurumu
@@ -27,7 +33,10 @@ namespace AracSatisSistemi.Models
         Satildi = 2,
         IptalEdildi = 3,
         IadeEdildi = 4,
-        Kapandi = 5
+        Kapandi = 5,
+        // 6183 sayılı Kanun Madde 85/86 uyarınca: ihaleyi kazanıp işlemini tamamlamayan
+        // alıcıya aracın resen (idarece) terk edilmesi - bkz. IptalIadeController.AliciyaTerk.
+        AliciyaTerkEdildi = 6
     }
 
     // Otopark ücret tarifesindeki 4 araç kategorisi.

@@ -134,9 +134,137 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Damga Vergisi Tutarı (TL)")]
         public decimal DamgaVergisiTutari => Math.Round(MuhammenBedel * DamgaVergisiOrani / 1000m, 2);
 
-        // Aktif bir dosyanın süreçte tam olarak hangi aşamada olduğunu gösterir (ör. 2. Satışta
-        // "Alıcı Çıkmadı" sonucu girilince otomatik olarak "Pazarlık Bekliyor" olur). Satislar
-        // navigasyon koleksiyonunun yüklenmiş (Include) olması gerekir.
+        // Satış sürecinin dört sabit aşaması + "Alıcıya Terk" (6183 sayılı Kanun Md. 85/86)
+        // terminal sonucu. Hangi aşamanın bekleniyor olduğu Satislar geçmişinden (Asama
+        // özelliği) hesaplanır; SatisController ve IptalIadeController bu tek kaynağı kullanır.
+        public enum SurecAsamasi
+        {
+            BirinciSatisBekliyor,
+            IkinciSatisBekliyor,
+            PazarlikBekliyor,
+            Madde6183_86Bekliyor,
+            AliciyaTerkBekliyor,
+            // Hem Pazarlık hem (modellenmemiş bir yol yüzünden) başka aşama kalmadığında;
+            // pratikte oluşması beklenmez ama güvenlik amaçlı bir "dur" durumu olarak tutulur.
+            SurecTamamlandi
+        }
+
+        // Aktif bir dosyanın süreçte tam olarak hangi aşamada olduğunu belirler. İki temel dal
+        // vardır: (1) bir aşamada HİÇ alıcı çıkmazsa ("Alıcı Çıkmadı") bir sonraki PLANLI
+        // aşamaya (1.Satış->2.Satış->Pazarlık) geçilir; (2) bir aşamayı kazanan alıcı işlemini
+        // TAMAMLAMAZSA ("Alıcı İşlem Yapmadı") hemen ardından TEK BİR yeniden-satış denemesi
+        // yapılır (2.Satış'ın kendisi ya da 6183/86 Tek Satış) - bu deneme de alıcı bulamazsa
+        // (sonucu ne olursa olsun) süreç "Alıcıya Terk" ile sonuçlanır; Pazarlık'a hiç girilmez.
+        // Satislar navigasyon koleksiyonunun yüklenmiş (Include) olması gerekir.
+        [NotMapped]
+        public SurecAsamasi Asama
+        {
+            get
+            {
+                var birinci = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.BirinciSatis);
+                if (birinci == null) return SurecAsamasi.BirinciSatisBekliyor;
+
+                var ikinci = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.IkinciSatis);
+                if (ikinci == null) return SurecAsamasi.IkinciSatisBekliyor;
+
+                if (birinci.SatisSonucu == SatisSonucu.AliciIslemYapmadi)
+                {
+                    // 2. Satış, 1. Satışı kazanıp kaçan alıcı yüzünden yapılan yeniden-satış
+                    // denemesidir: burada da hiç alıcı çıkmazsa doğrudan Alıcıya Terk'e gidilir.
+                    if (ikinci.SatisSonucu == SatisSonucu.AliciCikmadi) return SurecAsamasi.AliciyaTerkBekliyor;
+
+                    if (ikinci.SatisSonucu == SatisSonucu.AliciIslemYapmadi)
+                    {
+                        var tek = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.Madde6183_86);
+                        return tek == null ? SurecAsamasi.Madde6183_86Bekliyor : SurecAsamasi.AliciyaTerkBekliyor;
+                    }
+
+                    return SurecAsamasi.SurecTamamlandi; // ikinci == Satildi ise bu noktaya hiç gelinmez (Durum=Satildi olur)
+                }
+
+                if (ikinci.SatisSonucu == SatisSonucu.AliciCikmadi)
+                {
+                    // Her iki planlı ihalede de hiç alıcı çıkmadı - gerçek "satılamadı", Pazarlık'a girilir.
+                    var pazarlik = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.Pazarlik);
+                    if (pazarlik == null) return SurecAsamasi.PazarlikBekliyor;
+
+                    if (pazarlik.SatisSonucu == SatisSonucu.AliciCikmadi) return SurecAsamasi.SurecTamamlandi;
+
+                    if (pazarlik.SatisSonucu == SatisSonucu.AliciIslemYapmadi)
+                    {
+                        var tek = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.Madde6183_86);
+                        return tek == null ? SurecAsamasi.Madde6183_86Bekliyor : SurecAsamasi.AliciyaTerkBekliyor;
+                    }
+
+                    return SurecAsamasi.SurecTamamlandi;
+                }
+
+                // ikinci == AliciIslemYapmadi: 2. Satışı kazanıp kaçan alıcı yüzünden 6183/86
+                // Tek Satış ile bir kez daha denenir; o da alıcı bulamazsa Alıcıya Terk olunur.
+                var tekSatis = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.Madde6183_86);
+                return tekSatis == null ? SurecAsamasi.Madde6183_86Bekliyor : SurecAsamasi.AliciyaTerkBekliyor;
+            }
+        }
+
+        // "Alıcıya Terk" aşamasındayken, 6183 sayılı Kanun Md. 85/86 uyarınca aracın resen
+        // terk edileceği kişi: en son "kazanıp işlem yapmadığı" tespit edilen satış kaydı.
+        [NotMapped]
+        public Satis? TerkEdilecekSatis
+        {
+            get
+            {
+                if (Asama != SurecAsamasi.AliciyaTerkBekliyor) return null;
+
+                var siralama = new[] { SatisTuru.Madde6183_86, SatisTuru.Pazarlik, SatisTuru.IkinciSatis, SatisTuru.BirinciSatis };
+                foreach (var tur in siralama)
+                {
+                    var kayit = Satislar.FirstOrDefault(s => s.SatisTuru == tur);
+                    if (kayit?.SatisSonucu == SatisSonucu.AliciIslemYapmadi) return kayit;
+                }
+                return null;
+            }
+        }
+
+        // İki ihale arası fark: bir aşamayı kazanıp işlem yapmayan alıcıdan sonra yapılan
+        // yeniden-satış denemesi GERÇEKTEN satılırsa (yeni bir alıcı bulunursa) ama bu
+        // yeni bedel öncekinden DÜŞÜKSE, aradaki fark önceki (işlem yapmayan) alıcıdan
+        // tahsil edilir (6183 sayılı Kanun Md. 85/86). Dosya bu durumda normal şekilde
+        // "Satıldı" olarak kapanır; bu alan sadece ek bir tahsilat uyarısı amaçlıdır.
+        [NotMapped]
+        public (string KimdenTahsilEdilecek, decimal FarkTutari)? IkiIhaleArasiFark
+        {
+            get
+            {
+                var siralama = new[] { SatisTuru.BirinciSatis, SatisTuru.IkinciSatis, SatisTuru.Pazarlik, SatisTuru.Madde6183_86 };
+                Satis? islemYapmayan = null;
+                foreach (var tur in siralama)
+                {
+                    var kayit = Satislar.FirstOrDefault(s => s.SatisTuru == tur);
+                    if (kayit == null) break;
+
+                    if (kayit.SatisSonucu == SatisSonucu.AliciIslemYapmadi)
+                    {
+                        islemYapmayan = kayit;
+                        continue;
+                    }
+
+                    if (kayit.SatisSonucu == SatisSonucu.Satildi)
+                    {
+                        if (islemYapmayan?.SatisBedeli.HasValue == true && kayit.SatisBedeli.HasValue
+                            && kayit.SatisBedeli.Value < islemYapmayan.SatisBedeli.Value)
+                        {
+                            return (islemYapmayan.AliciAdiSoyadi ?? "-", islemYapmayan.SatisBedeli.Value - kayit.SatisBedeli.Value);
+                        }
+                        return null;
+                    }
+
+                    islemYapmayan = null; // AliciCikmadi - zincir kırılır, fark senaryosu oluşmaz.
+                }
+                return null;
+            }
+        }
+
+        // Yukarıdaki Asama'nın ekranlarda gösterilen Türkçe karşılığı.
         [NotMapped]
         public string AsamaGorunen
         {
@@ -146,24 +274,17 @@ namespace AracSatisSistemi.Models
                 if (Durum == DosyaDurumu.IptalEdildi) return "İptal Edildi";
                 if (Durum == DosyaDurumu.IadeEdildi) return "İade Edildi";
                 if (Durum == DosyaDurumu.Kapandi) return "Kapandı";
+                if (Durum == DosyaDurumu.AliciyaTerkEdildi) return "Alıcıya Terk Edildi";
 
-                var siralama = new[] { SatisTuru.BirinciSatis, SatisTuru.IkinciSatis, SatisTuru.Pazarlik, SatisTuru.Madde6183_86 };
-                foreach (var tur in siralama)
+                return Asama switch
                 {
-                    var mevcut = Satislar.FirstOrDefault(s => s.SatisTuru == tur);
-                    if (mevcut == null)
-                    {
-                        return tur switch
-                        {
-                            SatisTuru.BirinciSatis => "1. Satış Bekliyor",
-                            SatisTuru.IkinciSatis => "2. Satış Bekliyor",
-                            SatisTuru.Pazarlik => "Pazarlık Bekliyor",
-                            SatisTuru.Madde6183_86 => "6183/86 Bekliyor",
-                            _ => tur.ToString()
-                        };
-                    }
-                }
-                return "Süreç Tamamlandı (Satılamadı)";
+                    SurecAsamasi.BirinciSatisBekliyor => "1. Satış Bekliyor",
+                    SurecAsamasi.IkinciSatisBekliyor => "2. Satış Bekliyor",
+                    SurecAsamasi.PazarlikBekliyor => "Pazarlık Bekliyor",
+                    SurecAsamasi.Madde6183_86Bekliyor => "6183/86 Bekliyor (Tek Satış)",
+                    SurecAsamasi.AliciyaTerkBekliyor => "Alıcıya Terk Bekliyor",
+                    _ => "Süreç Tamamlandı (Satılamadı)"
+                };
             }
         }
 
@@ -177,6 +298,7 @@ namespace AracSatisSistemi.Models
             DosyaDurumu.IptalEdildi => "İptal Edildi",
             DosyaDurumu.IadeEdildi => "İade Edildi",
             DosyaDurumu.Kapandi => "Kapandı",
+            DosyaDurumu.AliciyaTerkEdildi => "Alıcıya Terk Edildi",
             _ => Durum.ToString()
         };
 

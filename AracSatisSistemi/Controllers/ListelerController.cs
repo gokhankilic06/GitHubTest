@@ -31,7 +31,8 @@ namespace AracSatisSistemi.Controllers
             else if (durumFiltre == "pasif")
             {
                 dosyaSorgu = dosyaSorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
-                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi);
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi
+                    || d.Durum == DosyaDurumu.AliciyaTerkEdildi);
             }
             ViewBag.AracDurumListesi = await dosyaSorgu.OrderByDescending(d => d.KayitTarihi).ToListAsync();
 
@@ -58,7 +59,8 @@ namespace AracSatisSistemi.Controllers
             else if (durumFiltre == "pasif")
             {
                 dosyaSorgu = dosyaSorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
-                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi);
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi
+                    || d.Durum == DosyaDurumu.AliciyaTerkEdildi);
             }
             var aracListesi = await dosyaSorgu.OrderByDescending(d => d.KayitTarihi).ToListAsync();
 
