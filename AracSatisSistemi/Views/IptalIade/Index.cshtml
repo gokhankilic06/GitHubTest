@@ -2,6 +2,8 @@
     ViewData["Title"] = "İade / İptal / Kapama";
     var aktifDosyalar = (List<Dosya>)ViewBag.AktifDosyalar;
     var satilmisDosyalar = (List<Dosya>)ViewBag.SatilmisDosyalar;
+    var sonGunler = (Dictionary<int, DateTime>)ViewBag.SonGunler;
+    var bugun = DateTime.Today;
 }
 <h3>İade / İptal / Kapama</h3>
 
@@ -58,6 +60,7 @@
                     <th>Satış Tarihi</th>
                     <th>Alıcı</th>
                     <th>Satış Bedeli (TL)</th>
+                    <th>Vergi Dairesi Süresi</th>
                     <th></th>
                 </tr>
             </thead>
@@ -65,6 +68,8 @@
                 @foreach (var d in satilmisDosyalar)
                 {
                     var satis = d.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+                    var sonGunVar = sonGunler.TryGetValue(d.Id, out var sonGun);
+                    var suresiDoldu = sonGunVar && bugun > sonGun;
                     <tr>
                         <td>@d.DosyaNo</td>
                         <td>@d.Plaka</td>
@@ -72,12 +77,34 @@
                         <td>@satis?.SatisTarihi.ToString("dd.MM.yyyy")</td>
                         <td>@satis?.AliciAdiSoyadi</td>
                         <td>@(satis?.SatisBedeli?.ToString("N2") ?? "-")</td>
-                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Islem" asp-route-dosyaId="@d.Id">İşlem Yap</a></td>
+                        <td>
+                            @if (sonGunVar)
+                            {
+                                <span>@sonGun.ToString("dd.MM.yyyy")</span>
+                                @if (suresiDoldu)
+                                {
+                                    <span class="badge bg-danger ms-1">Süre Doldu</span>
+                                }
+                            }
+                        </td>
+                        <td class="d-flex gap-1">
+                            <a class="btn btn-sm btn-outline-primary" asp-action="Islem" asp-route-dosyaId="@d.Id">İşlem Yap</a>
+                            @if (suresiDoldu)
+                            {
+                                <form asp-action="AliciSuresindeGitmedi" method="post" onsubmit="return confirm('@d.DosyaNo nolu dosyada alıcının ilgili vergi dairesine süresinde gitmediğini (kendi sorgu sisteminizden) teyit ettiniz mi? Onaylarsanız bu satış \'Alıcı Çıkmadı\'ya çevrilip dosya bir sonraki satış aşamasına alınacaktır.');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="dosyaId" value="@d.Id" />
+                                    <button class="btn btn-sm btn-outline-danger" title="Alıcı, ilgili vergi dairesine süresinde gitmedi">
+                                        <i class="bi bi-exclamation-triangle"></i> Vergi Dairesine Gitmedi
+                                    </button>
+                                </form>
+                            }
+                        </td>
                     </tr>
                 }
                 @if (!satilmisDosyalar.Any())
                 {
-                    <tr><td colspan="7" class="text-center text-muted">Satılmış dosya bulunmuyor.</td></tr>
+                    <tr><td colspan="8" class="text-center text-muted">Satılmış dosya bulunmuyor.</td></tr>
                 }
             </tbody>
         </table>

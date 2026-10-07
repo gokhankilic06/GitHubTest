@@ -18,13 +18,58 @@ namespace AracSatisSistemi.Controllers
                 .OrderByDescending(d => d.KayitTarihi)
                 .ToListAsync();
 
-            ViewBag.SatilmisDosyalar = await _db.Dosyalar
+            var satilmisDosyalar = await _db.Dosyalar
                 .Include(d => d.Satislar)
                 .Where(d => d.Durum == DosyaDurumu.Satildi)
                 .OrderByDescending(d => d.KayitTarihi)
                 .ToListAsync();
+            ViewBag.SatilmisDosyalar = satilmisDosyalar;
+
+            // Alıcının (bize gelip "Alıcı Ödeme Bilgileri" kaydını yaptırdıktan sonra)
+            // ilgili vergi dairesindeki işlemlerini tamamlaması için verilen 3 iş günlük
+            // sürenin son günü - bu bilgi süresi geçmiş ama henüz kapatılmamış dosyaları
+            // ekranda işaretleyip memura hatırlatmak için kullanılır (bkz. AliciSuresindeGitmedi).
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            var sonGunler = new Dictionary<int, DateTime>();
+            foreach (var d in satilmisDosyalar)
+            {
+                var satis = d.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+                if (satis != null)
+                {
+                    sonGunler[d.Id] = IhaleTarihHesaplayici.IsGunuEkle(satis.SatisTarihi, 3, resmiTatiller);
+                }
+            }
+            ViewBag.SonGunler = sonGunler;
 
             return View();
+        }
+
+        // POST: /IptalIade/AliciSuresindeGitmedi - Alıcı bize gelip "Alıcı Ödeme Bilgileri"ni
+        // kaydettirmiş (dosya bu yüzden Pasif/Satıldı durumda) ama memur, kendi sorgulama
+        // sisteminden alıcının ilgili vergi dairesindeki işlemlerini 3 iş günü içinde
+        // tamamlamadığını tespit etmiştir. Bu buton o tespite dayanarak satışı "Alıcı
+        // Çıkmadı"ya çevirir; dosya böylece bir sonraki satış aşamasının listesinde
+        // (ör. 2. Satış) otomatik olarak yer alır.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AliciSuresindeGitmedi(int dosyaId)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.Satislar).FirstOrDefaultAsync(d => d.Id == dosyaId);
+            if (dosya == null) return NotFound();
+
+            var satis = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+            if (satis == null)
+            {
+                TempData["Hata"] = "Bu dosya için \"Satıldı\" sonuçlanmış bir satış kaydı bulunamadı.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            satis.SatisSonucu = SatisSonucu.AliciCikmadi;
+            satis.SatisBedeli = null;
+            dosya.Durum = DosyaDurumu.SatisaCikti;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"{dosya.DosyaNo} nolu dosya, alıcı süresinde ilgili vergi dairesine gitmediği için bir sonraki satış aşamasına alındı.";
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: /IptalIade/Kapat - Aktif bir dosyayı doğrudan (onay sonrası) kapatır.

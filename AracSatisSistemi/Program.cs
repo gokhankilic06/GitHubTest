@@ -63,6 +63,17 @@ if (!app.Environment.IsDevelopment())
 app.UseRequestLocalization();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// İhaleyi kazanan alıcı, satış tarihinden sonraki 3 iş günü içinde idareye hiç
+// gelmediyse (Alıcı Ödeme Bilgileri hiç girilmediyse), her istekte otomatik olarak
+// "Alıcı Çıkmadı"ya çevrilip dosya bir sonraki satış aşamasına alınır.
+app.Use(async (context, next) =>
+{
+    var db = context.RequestServices.GetRequiredService<AppDbContext>();
+    await OtomatikSurecIsleyici.AliciGelmeyenSatislariGuncelleAsync(db);
+    await next();
+});
+
 app.UseRouting();
 app.UseAuthorization();
 
