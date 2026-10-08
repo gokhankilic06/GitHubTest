@@ -16,9 +16,14 @@ namespace AracSatisSistemi.Controllers
         {
             ViewBag.Memurlar = await _db.Memurlar.OrderBy(m => m.AdSoyad).ToListAsync();
 
-            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            // Komisyon oturumu açılabilecek tarihler artık Yıllık Satış Takvimi'nden gelir
+            // (bkz. SatisTakvimiController) - idarenin resmen belirlediği ihale günleri.
             var bugun = DateTime.Today;
-            ViewBag.SatisGunleri = IhaleTarihHesaplayici.YilinSatisGunleri(bugun, bugun.AddYears(1), resmiTatiller);
+            ViewBag.SatisGunleri = await _db.SatisTarihleri
+                .Where(t => t.Tarih >= bugun)
+                .OrderBy(t => t.Tarih)
+                .Select(t => t.Tarih)
+                .ToListAsync();
         }
 
         // GET: /Komisyon - liste + yeni kayıt formu

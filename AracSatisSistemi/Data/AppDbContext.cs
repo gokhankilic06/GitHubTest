@@ -23,6 +23,7 @@ namespace AracSatisSistemi.Data
         public DbSet<AliciKaydi> AliciKayitlari => Set<AliciKaydi>();
         public DbSet<Memur> Memurlar => Set<Memur>();
         public DbSet<KomisyonOturumu> KomisyonOturumlari => Set<KomisyonOturumu>();
+        public DbSet<SatisTarihi> SatisTarihleri => Set<SatisTarihi>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -44,6 +45,10 @@ namespace AracSatisSistemi.Data
 
             modelBuilder.Entity<AliciKaydi>()
                 .HasIndex(a => a.VergiNumarasi)
+                .IsUnique();
+
+            modelBuilder.Entity<SatisTarihi>()
+                .HasIndex(s => s.Tarih)
                 .IsUnique();
         }
     }

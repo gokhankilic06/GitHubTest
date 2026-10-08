@@ -19,6 +19,11 @@
     </div>
 </div>
 
+@if (ViewBag.SatisTakvimiUyarisi != null)
+{
+    <div class="alert alert-warning no-print">@ViewBag.SatisTakvimiUyarisi</div>
+}
+
 <form asp-controller="Dosya" asp-action="Create" method="post" id="kayitFormu">
     @Html.AntiForgeryToken()
 

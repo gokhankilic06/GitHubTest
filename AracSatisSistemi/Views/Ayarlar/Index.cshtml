@@ -29,6 +29,12 @@
 <h3>Güncellemeler</h3>
 
 <div class="card p-3">
+    <div class="form-section-title">Satış Takvimi</div>
+    <p class="text-muted small mb-2">Yıllık 1. ve 2. Satış (ihale) tarihlerini buradan değil, ayrı <a asp-controller="SatisTakvimi" asp-action="Index">Satış Takvimi</a> ekranından ekleyip yönetirsiniz.</p>
+    <a class="btn btn-outline-primary" asp-controller="SatisTakvimi" asp-action="Index"><i class="bi bi-calendar-week"></i> Satış Takvimine Git</a>
+</div>
+
+<div class="card p-3 mt-3">
     <div class="form-section-title">Komisyon Bilgileri (Varsayılan)</div>
     <p class="text-muted small">Yeni bir dosya kaydedildiğinde İhale Tutanağı'nda görünecek varsayılan komisyon. Belirli bir satış tarihi/saati için farklı bir komisyon atamak isterseniz <a asp-controller="Komisyon" asp-action="Index">Komisyon İşlemleri</a> ekranını kullanın.</p>
     <form asp-action="KomisyonGuncelle" method="post" class="row g-3">

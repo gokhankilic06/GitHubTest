@@ -130,6 +130,18 @@ namespace AracSatisSistemi.Models
         public string? Telefon { get; set; }
     }
 
+    // Yıllık Satış Takvimi: idarenin önceden belirleyip vergi dairelerine yazıyla
+    // bildirdiği resmi ihale (satış) günleri. Yeni bir dosya kaydedildiğinde 1. Satış
+    // tarihi bu listedeki ilk gelecek tarih, 2. Satış tarihi ise ondan sonraki tarih
+    // olarak otomatik önerilir (bkz. DosyaController.Create, KomisyonController).
+    public class SatisTarihi
+    {
+        public int Id { get; set; }
+        [Display(Name = "Satış Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime Tarih { get; set; }
+    }
+
     // Resmi tatil günleri: ihale (satış) tarihi hesaplanırken bu günler atlanır.
     // Sabit tarihli milli/resmi bayramlar başlangıçta otomatik yüklenir; Ramazan/Kurban
     // Bayramı gibi dini bayramlar her yıl değiştiğinden Güncellemeler ekranından elle

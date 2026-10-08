@@ -1,6 +1,8 @@
 namespace AracSatisSistemi.Data
 {
-    // İhale (satış) tarihleri her hafta Çarşamba günü olacak şekilde otomatik hesaplanır.
+    // Haftalık Çarşamba tabanlı yardımcı hesaplamalar. 1./2. Satış tarihleri artık
+    // SatisTarihiController üzerinden elle yönetilen Yıllık Satış Takvimi'nden geldiğinden,
+    // buradaki Çarşamba üretimi yalnızca o takvime hızlı toplu öneri eklemek için kullanılır.
     public static class IhaleTarihHesaplayici
     {
         // Verilen tarihten itibaren (o tarih dahil) ilk Çarşamba'yı bulur; resmi tatile
@@ -16,15 +18,6 @@ namespace AracSatisSistemi.Data
                 tarih = tarih.AddDays(7);
             }
             return tarih;
-        }
-
-        // 1. Satış: kayıt tarihinden sonraki ilk (tatil olmayan) Çarşamba.
-        // 2. Satış: 1. Satıştan bir sonraki (tatil olmayan) Çarşamba.
-        public static (DateTime satis1, DateTime satis2) PlanliSatisTarihleriHesapla(DateTime kayitTarihi, ICollection<DateTime> resmiTatiller)
-        {
-            var satis1 = SonrakiCarsamba(kayitTarihi, resmiTatiller);
-            var satis2 = SonrakiCarsamba(satis1.AddDays(1), resmiTatiller);
-            return (satis1, satis2);
         }
 
         // Bir tarih hafta sonu (Cumartesi/Pazar) veya resmi tatil ise iş günü sayılmaz.
@@ -47,10 +40,8 @@ namespace AracSatisSistemi.Data
             return tarih;
         }
 
-        // "Yıllık toplu satış tarihi" listesi ayrıca elle girilmez: sistem zaten her hafta
-        // Çarşamba satış yapıldığını ve resmi tatilleri bildiğinden, verilen tarih aralığındaki
-        // (resmi tatile denk gelenler hariç) tüm Çarşambaları otomatik üretir. Komisyon İşlemleri
-        // ekranındaki Satış Tarihi seçim listesi buradan gelir.
+        // Verilen tarih aralığındaki (resmi tatile denk gelenler hariç) tüm Çarşambaları
+        // üretir - Satış Takvimi ekranında "Toplu Ekle" için hızlı öneri listesi olarak kullanılır.
         public static List<DateTime> YilinSatisGunleri(DateTime baslangic, DateTime bitis, ICollection<DateTime> resmiTatiller)
         {
             var gunler = new List<DateTime>();

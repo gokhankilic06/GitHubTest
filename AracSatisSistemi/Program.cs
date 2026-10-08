@@ -29,6 +29,17 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     SeedData.Initialize(db);
+
+    // EnsureCreated() yalnızca veritabanı hiç yoksa şemayı oluşturur; daha önceki bir
+    // sürümden kalma, dosyaları kayıtlı mevcut bir AracSatis.db'de modele sonradan
+    // eklenen tablolar otomatik oluşmaz. Bu yüzden yeni eklenen tablo burada elle
+    // (varsa dokunmadan) garanti altına alınır ki mevcut kayıtlar kaybolmadan yeni
+    // özellik çalışsın.
+    db.Database.ExecuteSqlRaw(@"CREATE TABLE IF NOT EXISTS ""SatisTarihleri"" (
+        ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_SatisTarihleri"" PRIMARY KEY AUTOINCREMENT,
+        ""Tarih"" TEXT NOT NULL
+    );");
+    db.Database.ExecuteSqlRaw(@"CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SatisTarihleri_Tarih"" ON ""SatisTarihleri"" (""Tarih"");");
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.

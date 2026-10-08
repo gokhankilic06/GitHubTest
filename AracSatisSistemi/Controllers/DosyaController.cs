@@ -55,8 +55,25 @@ namespace AracSatisSistemi.Controllers
         {
             await DoldurListeler();
             var komisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
-            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
-            var (satis1, satis2) = IhaleTarihHesaplayici.PlanliSatisTarihleriHesapla(DateTime.Now, resmiTatiller);
+
+            // 1. ve 2. Satış tarihleri artık "Yıllık Satış Takvimi"nden (idarenin önceden
+            // belirleyip vergi dairelerine bildirdiği resmi ihale günleri) önerilir: bugünden
+            // sonraki ilk iki takvim tarihi. Takvimde yeterli tarih yoksa memur uyarılır ve
+            // tarihleri formdan elle seçebilir.
+            var bugun = DateTime.Today;
+            var sonrakiTarihler = await _db.SatisTarihleri
+                .Where(t => t.Tarih >= bugun)
+                .OrderBy(t => t.Tarih)
+                .Take(2)
+                .Select(t => t.Tarih)
+                .ToListAsync();
+
+            if (sonrakiTarihler.Count < 2)
+            {
+                ViewBag.SatisTakvimiUyarisi = "Yıllık Satış Takvimi'nde bugünden sonraki yeterli tarih bulunamadı. " +
+                    "Lütfen önce \"Güncellemeler > Satış Takvimi\" ekranından tarihleri girin; bu dosya için 1. ve 2. Satış tarihlerini şimdilik elle seçmeniz gerekebilir.";
+            }
+
             var dosya = new Dosya
             {
                 ModelYili = DateTime.Now.Year,
@@ -65,8 +82,8 @@ namespace AracSatisSistemi.Controllers
                 KomisyonUye2 = komisyon?.Uye2,
                 KomisyonUye3 = komisyon?.Uye3,
                 KomisyonUye4 = komisyon?.Uye4,
-                Satis1Tarihi = satis1,
-                Satis2Tarihi = satis2
+                Satis1Tarihi = sonrakiTarihler.Count > 0 ? sonrakiTarihler[0] : bugun,
+                Satis2Tarihi = sonrakiTarihler.Count > 1 ? sonrakiTarihler[1] : bugun
             };
             return View(dosya);
         }
