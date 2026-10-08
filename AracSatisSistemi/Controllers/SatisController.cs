@@ -207,15 +207,28 @@ namespace AracSatisSistemi.Controllers
                 return RedirectToAction(nameof(Listele), new { tur, tarih });
             }
 
-            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
             var satis = new Satis
             {
                 DosyaId = dosyaId,
                 SatisTuru = tur,
                 SatisTarihi = tarih.Date,
                 OtoparkaGirisTarihi = dosya.OtoparkaGirisTarihi,
-                GunlukOtoparkUcreti = genelAyar?.GunlukOtoparkUcreti ?? 0m
+                GunlukOtoparkUcreti = genelAyar.GunlukOtoparkUcreti,
+                CekiciBedeli = dosya.CekiciVar ? genelAyar.CekiciUcretiSabit : null
             };
+
+            // Otopark Ücreti Hesaplama önizlemesi (Alıcı Ödeme Bilgileri ekranındaki ile
+            // aynı mantık): araç cinsinin otopark kategorisine göre kademeli tarife.
+            var aracCinsi = await _db.AracCinsleri.FirstOrDefaultAsync(c => c.Ad == dosya.AracCinsi);
+            var kategori = aracCinsi?.OtoparkKategorisi ?? OtoparkAracKategorisi.KucukArac;
+            var (ilkDonemUcret, ikinciDonemUcret) = genelAyar.OtoparkTarifesi(kategori);
+            ViewBag.OtoparkKategoriAdi = aracCinsi != null
+                ? kategori.Gorunen()
+                : $"{kategori.Gorunen()} (varsayılan - \"{dosya.AracCinsi}\" cinsi tanımlı değil)";
+            ViewBag.OtoparkIlkDonemUcret = ilkDonemUcret;
+            ViewBag.OtoparkIkinciDonemUcret = ikinciDonemUcret;
+
             ViewBag.Dosya = dosya;
             return View(satis);
         }
