@@ -196,6 +196,13 @@ namespace AracSatisSistemi.Models
                         return tek == null ? SurecAsamasi.Madde6183_86Bekliyor : SurecAsamasi.AliciyaTerkBekliyor;
                     }
 
+                    return SurecAsamasi.SurecTamamlandi; // pazarlik == Satildi ise bu noktaya hiç gelinmez (Durum=Satildi olur)
+                }
+
+                if (ikinci.SatisSonucu != SatisSonucu.AliciIslemYapmadi)
+                {
+                    // ikinci == Satildi ise bu noktaya hiç gelinmez (Durum=Satildi olur); yine de
+                    // savunma amaçlı - yanlışlıkla "Bekliyor" etiketi üretmemek için burada durulur.
                     return SurecAsamasi.SurecTamamlandi;
                 }
 
@@ -261,6 +268,24 @@ namespace AracSatisSistemi.Models
                     islemYapmayan = null; // AliciCikmadi - zincir kırılır, fark senaryosu oluşmaz.
                 }
                 return null;
+            }
+        }
+
+        // Aşama rozetinin (badge) ekranlarda kullanılan rengi - tüm listelerde/detay
+        // sayfasında tek, tutarlı bir görünüm için tek noktadan hesaplanır.
+        [NotMapped]
+        public string AsamaRozetSinifi
+        {
+            get
+            {
+                if (!Aktif) return "bg-secondary";
+                return Asama switch
+                {
+                    SurecAsamasi.AliciyaTerkBekliyor => "bg-danger",
+                    SurecAsamasi.PazarlikBekliyor => "bg-warning text-dark",
+                    SurecAsamasi.Madde6183_86Bekliyor => "bg-warning text-dark",
+                    _ => "bg-info text-dark"
+                };
             }
         }
 

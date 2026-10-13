@@ -47,10 +47,6 @@ namespace AracSatisSistemi.Models
         [DataType(DataType.Date)]
         public DateTime? OtoparkaGirisTarihi { get; set; }
 
-        [Display(Name = "Otopark Günlük Ücreti (TL)")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal GunlukOtoparkUcreti { get; set; }
-
         // ---- ALICI ÖDEME BİLGİLERİ (Satış Bedeli girildikten sonra ayrıca doldurulur) ----
         [Display(Name = "Satın Alan Vekili")]
         public string? AliciVekili { get; set; }
@@ -85,10 +81,6 @@ namespace AracSatisSistemi.Models
         public int OtoparkGunSayisi => OtoparkaGirisTarihi.HasValue
             ? Math.Max((SatisTarihi.Date - OtoparkaGirisTarihi.Value.Date).Days, 0)
             : 0;
-
-        [NotMapped]
-        [Display(Name = "Otopark Ücreti (TL)")]
-        public decimal OtoparkUcretiToplam => OtoparkGunSayisi * GunlukOtoparkUcreti;
 
         // Ekranda / yazdırmada gösterilen Türkçe metinler.
         [NotMapped]

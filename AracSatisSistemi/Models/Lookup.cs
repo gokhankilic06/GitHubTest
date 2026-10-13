@@ -70,11 +70,6 @@ namespace AracSatisSistemi.Models
     {
         public int Id { get; set; }
 
-        // Eski tekli (kategori ayrımı olmayan) günlük otopark ücreti - geriye dönük uyumluluk
-        // için korunuyor; yeni hesaplamalar kategoriye göre aşağıdaki tarifeleri kullanır.
-        [Display(Name = "Günlük Otopark Ücreti (TL)")]
-        public decimal GunlukOtoparkUcreti { get; set; }
-
         // ---- KADEMELİ OTOPARK ÜCRET TARİFESİ (araç kategorisi + süreye göre) ----
         // İlk 180 gün (6 ay) "6 Aya Kadar" tarifesi, sonraki günler "6 Aydan Sonra"
         // (genelde ilkin yarısı) tarifesi üzerinden hesaplanır.

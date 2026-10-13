@@ -1,7 +1,10 @@
+@using AracSatisSistemi.Data
 @model Dosya
 @{
     ViewData["Title"] = "Dosya Detayı";
     var dosyaNoTemiz = Model.DosyaNo.Replace("/", "_");
+    var genelAyar = (GenelAyar)ViewBag.GenelAyar;
+    var otoparkKategoriSozlugu = (Dictionary<string, OtoparkAracKategorisi>)ViewBag.OtoparkKategoriSozlugu;
 }
 <div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h3>Dosya No: @Model.DosyaNo <span class="badge bg-secondary">@Model.DurumGorunenAd</span></h3>
@@ -42,7 +45,7 @@
         </div>
         <div class="kimlik-kutu">
             <span class="kimlik-etiket">Aşama:</span>
-            <span class="badge @(Model.Aktif ? "bg-info text-dark" : "bg-secondary")">@Model.AsamaGorunen</span>
+            <span class="badge @Model.AsamaRozetSinifi">@Model.AsamaGorunen</span>
         </div>
     </div>
 </div>
@@ -142,7 +145,7 @@
                     <td>@s.SonucGorunen</td>
                     <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
                     <td>@s.Vade.ToString("dd.MM.yyyy")</td>
-                    <td>@s.OtoparkUcretiToplam.ToString("N2")</td>
+                    <td>@OtoparkHesaplayici.GercekOtoparkUcreti(s, Model.AracCinsi, otoparkKategoriSozlugu, genelAyar).ToString("N2")</td>
                     <td class="no-print"><a class="btn btn-sm btn-outline-primary" asp-controller="Satis" asp-action="Edit" asp-route-id="@s.Id">Düzenle</a></td>
                 </tr>
             }

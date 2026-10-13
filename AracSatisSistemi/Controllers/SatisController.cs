@@ -214,7 +214,6 @@ namespace AracSatisSistemi.Controllers
                 SatisTuru = tur,
                 SatisTarihi = tarih.Date,
                 OtoparkaGirisTarihi = dosya.OtoparkaGirisTarihi,
-                GunlukOtoparkUcreti = genelAyar.GunlukOtoparkUcreti,
                 CekiciBedeli = dosya.CekiciVar ? genelAyar.CekiciUcretiSabit : null
             };
 
@@ -321,7 +320,6 @@ namespace AracSatisSistemi.Controllers
             satis.Adres = guncel.Adres;
             satis.MTV = guncel.MTV;
             satis.OtoparkaGirisTarihi = guncel.OtoparkaGirisTarihi;
-            satis.GunlukOtoparkUcreti = guncel.GunlukOtoparkUcreti;
 
             if (satis.Dosya != null)
             {

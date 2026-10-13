@@ -87,7 +87,6 @@
     <form asp-action="TarifeGuncelle" method="post">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@genelAyar?.Id" />
-        <input type="hidden" name="GunlukOtoparkUcreti" value="@genelAyar?.GunlukOtoparkUcreti" />
         <div class="table-responsive">
             <table class="table table-bordered align-middle text-center">
                 <thead class="table-light">

@@ -64,8 +64,10 @@ namespace AracSatisSistemi.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // SatisBedeli BİLEREK silinmiyor: kazanılmış ama tamamlanmamış bir ihalenin bedeli,
+            // İki İhale Arası Fark hesabı ve (süreç 6183/86'da da satılamazsa) Alıcıya Terk
+            // formunun otomatik dolması için saklanması gerekir.
             satis.SatisSonucu = SatisSonucu.AliciIslemYapmadi;
-            satis.SatisBedeli = null;
             dosya.Durum = DosyaDurumu.SatisaCikti;
 
             await _db.SaveChangesAsync();

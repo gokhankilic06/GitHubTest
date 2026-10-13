@@ -58,7 +58,6 @@ namespace AracSatisSistemi.Controllers
             if (kayit == null) { kayit = form; _db.GenelAyarlar.Add(kayit); }
             else
             {
-                kayit.GunlukOtoparkUcreti = form.GunlukOtoparkUcreti;
                 kayit.KucukArac6AyaKadar = form.KucukArac6AyaKadar;
                 kayit.KucukArac6AydanSonra = form.KucukArac6AydanSonra;
                 kayit.MinibusKamyonet6AyaKadar = form.MinibusKamyonet6AyaKadar;
@@ -244,6 +243,11 @@ namespace AracSatisSistemi.Controllers
             var satislar = await _db.Satislar.AsNoTracking().Include(s => s.Dosya).ToListAsync();
             var iptalIadeler = await _db.IptalIadeler.AsNoTracking().Include(i => i.Dosya).ToListAsync();
 
+            // Satışlardaki "Otopark Ücreti" sütunu, diğer ekranlarla (Alıcı Ödeme Bilgileri vb.)
+            // aynı kademeli hesaplamayı göstersin diye tarife ve kategori sözlüğü yükleniyor.
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
+            var otoparkKategoriSozlugu = await _db.AracCinsleri.ToDictionaryAsync(c => c.Ad, c => c.OtoparkKategorisi);
+
             using var wb = new ClosedXML.Excel.XLWorkbook();
 
             var wsDosya = wb.Worksheets.Add("Dosyalar");
@@ -284,7 +288,7 @@ namespace AracSatisSistemi.Controllers
                 wsSatis.Cell(r, 5).Value = s.SatisBedeli;
                 wsSatis.Cell(r, 6).Value = s.AliciAdiSoyadi;
                 wsSatis.Cell(r, 7).Value = s.Vade;
-                wsSatis.Cell(r, 8).Value = s.OtoparkUcretiToplam;
+                wsSatis.Cell(r, 8).Value = OtoparkHesaplayici.GercekOtoparkUcreti(s, s.Dosya?.AracCinsi, otoparkKategoriSozlugu, genelAyar);
                 r++;
             }
             wsSatis.Columns().AdjustToContents();
@@ -351,7 +355,9 @@ namespace AracSatisSistemi.Controllers
                 var dosyalar = await _db.Dosyalar.AsNoTracking().ToListAsync();
                 var satislar = await _db.Satislar.AsNoTracking().Include(s => s.Dosya).ToListAsync();
                 var iptalIadeler = await _db.IptalIadeler.AsNoTracking().Include(i => i.Dosya).ToListAsync();
-                AccdbTablolariniDoldur(accdbYolu, dosyalar, satislar, iptalIadeler);
+                var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
+                var otoparkKategoriSozlugu = await _db.AracCinsleri.ToDictionaryAsync(c => c.Ad, c => c.OtoparkKategorisi);
+                AccdbTablolariniDoldur(accdbYolu, dosyalar, satislar, iptalIadeler, genelAyar, otoparkKategoriSozlugu);
             }
             catch (Exception ex)
             {
@@ -387,7 +393,8 @@ namespace AracSatisSistemi.Controllers
         }
 
         [System.Runtime.Versioning.SupportedOSPlatform("windows")]
-        private static void AccdbTablolariniDoldur(string yol, List<Dosya> dosyalar, List<Satis> satislar, List<IptalIade> iptalIadeler)
+        private static void AccdbTablolariniDoldur(string yol, List<Dosya> dosyalar, List<Satis> satislar, List<IptalIade> iptalIadeler,
+            GenelAyar genelAyar, Dictionary<string, OtoparkAracKategorisi> otoparkKategoriSozlugu)
         {
             string baglantiDizesi = $"Provider=Microsoft.ACE.OLEDB.12.0;Data Source={yol};";
             using var conn = new System.Data.OleDb.OleDbConnection(baglantiDizesi);
@@ -448,7 +455,7 @@ namespace AracSatisSistemi.Controllers
                 cmd.Parameters.AddWithValue("?", (object?)s.SatisBedeli ?? DBNull.Value);
                 cmd.Parameters.AddWithValue("?", (object?)s.AliciAdiSoyadi ?? "");
                 cmd.Parameters.AddWithValue("?", s.Vade);
-                cmd.Parameters.AddWithValue("?", s.OtoparkUcretiToplam);
+                cmd.Parameters.AddWithValue("?", OtoparkHesaplayici.GercekOtoparkUcreti(s, s.Dosya?.AracCinsi, otoparkKategoriSozlugu, genelAyar));
                 cmd.ExecuteNonQuery();
             }
 

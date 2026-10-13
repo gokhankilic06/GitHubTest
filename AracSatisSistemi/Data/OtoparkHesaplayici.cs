@@ -28,5 +28,18 @@ namespace AracSatisSistemi.Data
         // Otopark ücreti + çekici ücretinin (varsa) tam sayıya yuvarlanmış toplamı.
         public static decimal SonucHesapla(decimal otoparkUcreti, decimal cekiciUcreti)
             => Math.Round(otoparkUcreti + cekiciUcreti, 0, MidpointRounding.AwayFromZero);
+
+        // Bir Satış kaydının GERÇEK (kademeli, araç kategorisine göre) otopark ücreti.
+        // Alıcı Ödeme Bilgileri / Satış Sonucu Gir / Yazışma ekranlarındaki hesaplamayla
+        // tutarlı tek sonuç üretmesi için Excel/Access yedekleme ve Dosya Detayı gibi
+        // raporlama noktalarında da Satis.OtoparkUcretiToplam (eski, düz günlük ücretli
+        // hesaplama) yerine bu metot kullanılmalıdır.
+        public static decimal GercekOtoparkUcreti(Satis satis, string? aracCinsi, IReadOnlyDictionary<string, OtoparkAracKategorisi> kategoriSozlugu, GenelAyar tarife)
+        {
+            var kategori = aracCinsi != null && kategoriSozlugu.TryGetValue(aracCinsi, out var k)
+                ? k
+                : OtoparkAracKategorisi.KucukArac;
+            return OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, tarife);
+        }
     }
 }

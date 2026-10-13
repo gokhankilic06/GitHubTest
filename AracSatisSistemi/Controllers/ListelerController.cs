@@ -97,9 +97,9 @@ namespace AracSatisSistemi.Controllers
             foreach (var s in satisListesi)
             {
                 ws2.Cell(r, 1).Value = s.Dosya?.DosyaNo;
-                ws2.Cell(r, 2).Value = s.SatisTuru.ToString();
+                ws2.Cell(r, 2).Value = s.SatisTuruGorunen;
                 ws2.Cell(r, 3).Value = s.SatisTarihi;
-                ws2.Cell(r, 4).Value = s.SatisSonucu.ToString();
+                ws2.Cell(r, 4).Value = s.SonucGorunen;
                 ws2.Cell(r, 5).Value = s.SatisBedeli;
                 ws2.Cell(r, 6).Value = s.AliciAdiSoyadi;
                 r++;

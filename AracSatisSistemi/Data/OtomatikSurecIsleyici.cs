@@ -29,8 +29,11 @@ namespace AracSatisSistemi.Data
                 var sonGun = IhaleTarihHesaplayici.IsGunuEkle(satis.SatisTarihi, 3, resmiTatiller);
                 if (bugun <= sonGun) continue;
 
+                // SatisBedeli BİLEREK silinmiyor: "Alıcı İşlem Yapmadı" (AliciCikmadi'den farklı
+                // olarak) kazanılmış ama tamamlanmamış bir ihaleyi ifade eder; bu bedel hem İki
+                // İhale Arası Fark hesabında (Dosya.IkiIhaleArasiFark) hem de süreç 6183/86'da da
+                // satılamazsa Alıcıya Terk formunda (Dosya.TerkEdilecekSatis) kullanılır.
                 satis.SatisSonucu = SatisSonucu.AliciIslemYapmadi;
-                satis.SatisBedeli = null;
                 satis.Dosya!.Durum = DosyaDurumu.SatisaCikti;
                 degisti = true;
             }

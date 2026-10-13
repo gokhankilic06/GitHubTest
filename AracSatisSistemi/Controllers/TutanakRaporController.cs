@@ -53,6 +53,7 @@ namespace AracSatisSistemi.Controllers
             {
                 AracSatisSistemi.Models.SatisSonucu.Satildi => "Satıldı",
                 AracSatisSistemi.Models.SatisSonucu.AliciCikmadi => "Alıcı Çıkmadı",
+                AracSatisSistemi.Models.SatisSonucu.AliciIslemYapmadi => "Alıcı İşlem Yapmadı",
                 _ => "-"
             };
         }

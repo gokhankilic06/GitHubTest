@@ -94,7 +94,6 @@ namespace AracSatisSistemi.Data
                 // değiştirilebilir.
                 context.GenelAyarlar.Add(new GenelAyar
                 {
-                    GunlukOtoparkUcreti = 0m,
                     KucukArac6AyaKadar = 83.00m,
                     KucukArac6AydanSonra = 41.50m,
                     MinibusKamyonet6AyaKadar = 91.50m,

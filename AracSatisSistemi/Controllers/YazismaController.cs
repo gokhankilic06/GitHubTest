@@ -97,7 +97,7 @@ namespace AracSatisSistemi.Controllers
 
             decimal satisBedeli = satis?.SatisBedeli ?? 0m;
             decimal kdvTutari = Math.Round(satisBedeli * dosya.KdvOrani / 100m, 2);
-            decimal dvTutari = Math.Round(satisBedeli * 5.69m / 1000m, 2);
+            decimal dvTutari = Math.Round(satisBedeli * dosya.DamgaVergisiOrani / 1000m, 2);
             decimal toplamTutar = satisBedeli + kdvTutari + dvTutari;
             decimal otoparkTutari = satis != null
                 ? OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar)

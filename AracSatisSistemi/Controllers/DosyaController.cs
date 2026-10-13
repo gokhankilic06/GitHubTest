@@ -47,6 +47,13 @@ namespace AracSatisSistemi.Controllers
                 .Include(d => d.IptalIade)
                 .FirstOrDefaultAsync(d => d.Id == id);
             if (dosya == null) return NotFound();
+
+            // Satış Bilgileri tablosundaki "Otopark Ücreti" sütunu, Alıcı Ödeme Bilgileri /
+            // Satış Sonucu Gir ekranlarındakiyle AYNI kademeli (araç kategorisine göre)
+            // hesaplamayı göstermeli - bkz. OtoparkHesaplayici.GercekOtoparkUcreti.
+            ViewBag.GenelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
+            ViewBag.OtoparkKategoriSozlugu = await _db.AracCinsleri.ToDictionaryAsync(c => c.Ad, c => c.OtoparkKategorisi);
+
             return View(dosya);
         }
 
