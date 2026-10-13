@@ -5,14 +5,15 @@
     var dosya = ViewBag.Dosya as Dosya;
     var satis = ViewBag.Satis as Satis;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
+    var dosyaNoTemiz = dosya?.DosyaNo.Replace("/", "_") ?? "Yazisma";
     string Para(object? deger) => deger is decimal d ? d.ToString("N2", trTR) + " TL" : "-";
 }
-<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
     <h3>Yazışma</h3>
     <span class="text-muted small" id="yazismaSaat"></span>
 </div>
 
-<div class="card p-3 mb-3">
+<div class="card p-3 mb-3 no-print">
     <form method="get" class="row g-2 align-items-end">
         <div class="col-md-4">
             <label class="form-label">Dosya Ara</label>
@@ -50,43 +51,70 @@
 
 @if (dosya != null)
 {
-    <div class="card p-3 mb-3">
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="row g-3">
-                    <div class="col-12"><label class="form-label">Dosya No</label><input class="form-control fw-bold" value="@dosya.DosyaNo" readonly /></div>
-                    <div class="col-12"><label class="form-label">Vergi Dairesi Adı</label><input class="form-control" value="@dosya.VergiDairesiAdi" readonly /></div>
-                    <div class="col-12"><label class="form-label">Borçlu Adı/Soyadı</label><input class="form-control" value="@dosya.AdiSoyadiUnvani" readonly /></div>
-                    <div class="col-12"><label class="form-label">Alıcı Adı/Soyadı</label><input class="form-control" value="@(satis?.AliciAdiSoyadi ?? "-")" readonly /></div>
-                    <div class="col-12"><label class="form-label">Plaka</label><input class="form-control" value="@dosya.Plaka" readonly /></div>
-                    <div class="col-12"><label class="form-label">Satış Türü</label><input class="form-control" value="@(satis?.SatisTuruGorunen ?? "-")" readonly /></div>
-                    <div class="col-12"><label class="form-label">Satış Tarihi</label><input class="form-control" value="@(satis?.SatisTarihi.ToString("dd.MM.yyyy") ?? "-")" readonly /></div>
-                    <div class="col-12"><label class="form-label">Muhammen Bedeli</label><input class="form-control" value="@Para(dosya.MuhammenBedel)" readonly /></div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="row g-3">
-                    <div class="col-12"><label class="form-label">Satış Bedeli</label><input class="form-control fw-bold" value="@Para(ViewBag.SatisBedeli)" readonly /></div>
-                    <div class="col-12"><label class="form-label">KDV Oranı</label><input class="form-control" value="%@dosya.KdvOrani" readonly /></div>
-                    <div class="col-12"><label class="form-label">KDV Tutarı</label><input class="form-control" value="@Para(ViewBag.KdvTutari)" readonly /></div>
-                    <div class="col-12"><label class="form-label">DV Oranı</label><input class="form-control" value="%0,569" readonly /></div>
-                    <div class="col-12"><label class="form-label">DV Tutarı</label><input class="form-control" value="@Para(ViewBag.DvTutari)" readonly /></div>
-                    <div class="col-12"><label class="form-label fw-bold">Toplam Tutar</label><input class="form-control fw-bold" value="@Para(ViewBag.ToplamTutar)" readonly /></div>
-                    <div class="col-12"><label class="form-label">Otopark Tutarı</label><input class="form-control" value="@Para(ViewBag.OtoparkTutari)" readonly /></div>
-                    <div class="col-12"><label class="form-label">MTV Tutarı</label><input class="form-control" value="@Para(ViewBag.MtvTutari)" readonly /></div>
-                    <div class="col-12"><label class="form-label fw-bold">Kalan Tutar</label><input class="form-control fw-bold" value="@Para(ViewBag.KalanTutar)" readonly /></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="d-flex flex-wrap gap-2">
+    <div class="d-flex flex-wrap gap-2 mb-3 no-print">
         <a class="btn btn-outline-secondary" asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id"><i class="bi bi-arrow-left"></i> Geri</a>
         <a class="btn btn-outline-dark" asp-action="VergiDairesiYazisiIndir" asp-route-dosyaNo="@dosya.DosyaNo">
             <i class="bi bi-envelope"></i> @dosya.VergiDairesiAdi
         </a>
         <a class="btn btn-outline-dark" asp-action="UstYaziIndir" asp-route-dosyaNo="@dosya.DosyaNo"><i class="bi bi-file-earmark-word"></i> Üst Yazı</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
         <a class="btn btn-outline-danger ms-auto" asp-controller="Home" asp-action="Index"><i class="bi bi-x-circle"></i> Çıkış</a>
+    </div>
+
+    <div id="yazdirAlani">
+        <div class="letterhead mb-3 pb-2 d-flex align-items-start">
+            <div style="width:90px;"></div>
+            <div class="text-center flex-grow-1">
+                <h4 class="mb-0 fw-bold text-nowrap">ANKARA DEFTERDARLIĞI</h4>
+                <div class="text-muted">Yazışma Bilgi Formu</div>
+            </div>
+            <div class="text-end small text-muted" style="width:90px;">@DateTime.Now.ToString("dd.MM.yyyy")</div>
+        </div>
+
+        <div class="card p-3 mb-3">
+            <div class="d-flex flex-wrap gap-3">
+                <div class="kimlik-kutu">
+                    <span class="kimlik-etiket">Dosya No:</span>
+                    <span class="kimlik-deger">@dosya.DosyaNo</span>
+                </div>
+                <div class="kimlik-kutu">
+                    <span class="kimlik-etiket">Plaka:</span>
+                    <span class="kimlik-deger">@dosya.Plaka</span>
+                </div>
+                <div class="kimlik-kutu">
+                    <span class="kimlik-etiket">Satış Türü:</span>
+                    <span class="badge bg-info text-dark">@(satis?.SatisTuruGorunen ?? "-")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card p-3 h-100">
+                    <div class="form-section-title">Borçlu / Alıcı Bilgileri</div>
+                    <table class="detay-tablo">
+                        <tr><td class="etiket">Vergi Dairesi Adı</td><td colspan="3">@dosya.VergiDairesiAdi</td></tr>
+                        <tr><td class="etiket">Borçlu Adı/Soyadı</td><td colspan="3">@dosya.AdiSoyadiUnvani</td></tr>
+                        <tr><td class="etiket">Alıcı Adı/Soyadı</td><td colspan="3">@(satis?.AliciAdiSoyadi ?? "-")</td></tr>
+                        <tr><td class="etiket">Satış Tarihi</td><td colspan="3">@(satis?.SatisTarihi.ToString("dd.MM.yyyy") ?? "-")</td></tr>
+                        <tr><td class="etiket">Muhammen Bedeli</td><td colspan="3">@Para(dosya.MuhammenBedel)</td></tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 h-100">
+                    <div class="form-section-title">Mali Özet</div>
+                    <table class="detay-tablo">
+                        <tr><td class="etiket">Satış Bedeli</td><td class="fw-bold">@Para(ViewBag.SatisBedeli)</td><td class="etiket">KDV Oranı</td><td>%@dosya.KdvOrani</td></tr>
+                        <tr><td class="etiket">KDV Tutarı</td><td>@Para(ViewBag.KdvTutari)</td><td class="etiket">DV Oranı</td><td>%0,569</td></tr>
+                        <tr><td class="etiket">DV Tutarı</td><td>@Para(ViewBag.DvTutari)</td><td class="etiket fw-bold">Toplam Tutar</td><td class="fw-bold">@Para(ViewBag.ToplamTutar)</td></tr>
+                        <tr><td class="etiket">Otopark Tutarı</td><td>@Para(ViewBag.OtoparkTutari)</td><td class="etiket">MTV Tutarı</td><td>@Para(ViewBag.MtvTutari)</td></tr>
+                        <tr><td class="etiket fw-bold">Kalan Tutar</td><td class="fw-bold" colspan="3">@Para(ViewBag.KalanTutar)</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 }
 else
@@ -105,5 +133,33 @@ else
         }
         saatiGoster();
         setInterval(saatiGoster, 1000);
+
+        // Yakalamadan önce ".no-print" öğelerini geçici gizler, canvas'ı üretir, sonra geri gösterir.
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('yazdirAlani');
+            if (!alan) return;
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const genislik = 210;
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                devamEt(pdf);
+            });
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('Yazisma_@(dosyaNoTemiz).pdf'));
+        }
+
+        // Tarayıcının kendi yazdırma üstbilgi/altbilgisini (tarih, sayfa adı vb.) tamamen
+        // atlamak için önce temiz bir PDF üretilip yeni sekmede açılıyor ve o PDF'in kendi
+        // yazdırma penceresi otomatik tetikleniyor.
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
     </script>
 }
