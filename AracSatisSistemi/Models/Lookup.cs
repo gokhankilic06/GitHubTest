@@ -93,8 +93,15 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Motor - 6 Aydan Sonra (TL/gün)")]
         public decimal Motor6AydanSonra { get; set; }
 
-        [Display(Name = "Çekici Ücreti (TL, sabit)")]
-        public decimal CekiciUcretiSabit { get; set; }
+        // ---- ÇEKİCİ ÜCRETİ (araç kategorisine göre, otopark tarifesi gibi kademeli değil sabit) ----
+        [Display(Name = "Küçük Araç - Çekici Ücreti (TL)")]
+        public decimal KucukAracCekiciUcreti { get; set; }
+        [Display(Name = "Minibüs/Kamyonet - Çekici Ücreti (TL)")]
+        public decimal MinibusKamyonetCekiciUcreti { get; set; }
+        [Display(Name = "Büyük Araç/Kamyon/Tır - Çekici Ücreti (TL)")]
+        public decimal BuyukAracCekiciUcreti { get; set; }
+        [Display(Name = "Motor - Çekici Ücreti (TL)")]
+        public decimal MotorCekiciUcreti { get; set; }
 
         // Kategoriye göre (6 aya kadar, 6 aydan sonra) günlük ücret çiftini döner.
         public (decimal IlkDonem, decimal IkinciDonem) OtoparkTarifesi(OtoparkAracKategorisi kategori) => kategori switch
@@ -104,6 +111,16 @@ namespace AracSatisSistemi.Models
             OtoparkAracKategorisi.BuyukArac => (BuyukArac6AyaKadar, BuyukArac6AydanSonra),
             OtoparkAracKategorisi.Motor => (Motor6AyaKadar, Motor6AydanSonra),
             _ => (0m, 0m)
+        };
+
+        // Kategoriye göre sabit çekici ücreti.
+        public decimal CekiciUcreti(OtoparkAracKategorisi kategori) => kategori switch
+        {
+            OtoparkAracKategorisi.KucukArac => KucukAracCekiciUcreti,
+            OtoparkAracKategorisi.MinibusKamyonet => MinibusKamyonetCekiciUcreti,
+            OtoparkAracKategorisi.BuyukArac => BuyukAracCekiciUcreti,
+            OtoparkAracKategorisi.Motor => MotorCekiciUcreti,
+            _ => 0m
         };
     }
 

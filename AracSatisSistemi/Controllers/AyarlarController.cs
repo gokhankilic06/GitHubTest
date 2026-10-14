@@ -66,7 +66,10 @@ namespace AracSatisSistemi.Controllers
                 kayit.BuyukArac6AydanSonra = form.BuyukArac6AydanSonra;
                 kayit.Motor6AyaKadar = form.Motor6AyaKadar;
                 kayit.Motor6AydanSonra = form.Motor6AydanSonra;
-                kayit.CekiciUcretiSabit = form.CekiciUcretiSabit;
+                kayit.KucukAracCekiciUcreti = form.KucukAracCekiciUcreti;
+                kayit.MinibusKamyonetCekiciUcreti = form.MinibusKamyonetCekiciUcreti;
+                kayit.BuyukAracCekiciUcreti = form.BuyukAracCekiciUcreti;
+                kayit.MotorCekiciUcreti = form.MotorCekiciUcreti;
             }
             await _db.SaveChangesAsync();
             TempData["Basari"] = "Otopark ücret tarifesi güncellendi.";

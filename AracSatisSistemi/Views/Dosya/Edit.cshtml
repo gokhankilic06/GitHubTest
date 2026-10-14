@@ -168,6 +168,14 @@
             <label class="form-label" asp-for="OtoparkaGirisTarihi"></label>
             <input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" />
         </div>
+        <div class="col-md-3">
+            <label class="form-label">Otopark Ücreti (6 Aya Kadar / 6 Aydan Sonra, TL/gün)</label>
+            <input class="form-control" id="otoparkUcretiOnizleme" readonly />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Çekici Ücreti (TL)</label>
+            <input class="form-control" id="cekiciUcretiOnizleme" readonly />
+        </div>
 
         <div class="col-md-3">
             <label class="form-label" asp-for="MuhammenBedel"></label>
@@ -327,5 +335,27 @@
         }
         bedelInput.addEventListener('input', hesapla);
         hesapla();
+
+        // Otopark + Çekici Ücreti önizlemesi: seçilen araç cinsinin otopark kategorisine
+        // göre (Güncellemeler ekranından yönetilen) güncel tarife otomatik gösterilir.
+        const cinsKategoriMap = @Html.Raw(ViewBag.CinsKategoriJson);
+        const tarifeMap = @Html.Raw(ViewBag.TarifeJson);
+        const cinsSelect = document.querySelector('select[name="AracCinsi"]');
+        const cekiciSelect = document.querySelector('select[name="CekiciVar"]');
+        const otoparkOut = document.getElementById('otoparkUcretiOnizleme');
+        const cekiciOut = document.getElementById('cekiciUcretiOnizleme');
+        function paraGoster(d) {
+            return d.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' TL';
+        }
+        function otoparkCekiciOnizle() {
+            const kategori = cinsKategoriMap[cinsSelect.value] ?? 1;
+            const tarife = tarifeMap[kategori];
+            if (!tarife) { otoparkOut.value = ''; cekiciOut.value = ''; return; }
+            otoparkOut.value = paraGoster(tarife.Ilk) + ' / ' + paraGoster(tarife.Ikinci);
+            cekiciOut.value = cekiciSelect.value === 'true' ? paraGoster(tarife.Cekici) : '-';
+        }
+        cinsSelect.addEventListener('change', otoparkCekiciOnizle);
+        cekiciSelect.addEventListener('change', otoparkCekiciOnizle);
+        otoparkCekiciOnizle();
     </script>
 }

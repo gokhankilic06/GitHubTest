@@ -81,6 +81,7 @@ namespace AracSatisSistemi.Controllers
                     .ToListAsync());
 
             ViewBag.GenelAyar = genelAyar;
+            ViewBag.OtoparkKategori = kategori;
         }
 
         // GET: /AliciOdeme/Gir?satisId=..
@@ -104,7 +105,8 @@ namespace AracSatisSistemi.Controllers
             if (satis.CekiciBedeli == null && satis.Dosya!.CekiciVar)
             {
                 var genelAyar = (GenelAyar)ViewBag.GenelAyar;
-                satis.CekiciBedeli = genelAyar.CekiciUcretiSabit;
+                var kategori = (OtoparkAracKategorisi)ViewBag.OtoparkKategori;
+                satis.CekiciBedeli = genelAyar.CekiciUcreti(kategori);
                 ViewBag.OtoparkToplamHesaplanan = OtoparkHesaplayici.SonucHesapla((decimal)ViewBag.OtoparkUcretiHesaplanan, satis.CekiciBedeli.Value);
             }
 

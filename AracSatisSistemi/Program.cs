@@ -11,7 +11,12 @@ CultureInfo.DefaultThreadCurrentUICulture = trKultur;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    // bkz. InvariantDecimalModelBinder: tr-TR kültüründe formdan gelen "99.99" gibi
+    // noktalı decimal değerlerin yanlış (9999 gibi) ayrıştırılmasını önler.
+    options.ModelBinderProviders.Insert(0, new InvariantDecimalModelBinderProvider());
+});
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     options.DefaultRequestCulture = new RequestCulture(trKultur, trKultur);
@@ -40,6 +45,15 @@ using (var scope = app.Services.CreateScope())
         ""Tarih"" TEXT NOT NULL
     );");
     db.Database.ExecuteSqlRaw(@"CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SatisTarihleri_Tarih"" ON ""SatisTarihleri"" (""Tarih"");");
+
+    // Çekici ücreti artık (otopark tarifesi gibi) araç kategorisine göre 4 ayrı sütunda
+    // tutuluyor (eski tek "CekiciUcretiSabit" sütunu yerine). SQLite'ta "ADD COLUMN IF NOT
+    // EXISTS" olmadığından her biri ayrı ayrı denenip zaten varsa oluşan hata yutulur.
+    foreach (var sutun in new[] { "KucukAracCekiciUcreti", "MinibusKamyonetCekiciUcreti", "BuyukAracCekiciUcreti", "MotorCekiciUcreti" })
+    {
+        try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""GenelAyarlar"" ADD COLUMN """ + sutun + @""" decimal(18,2) NOT NULL DEFAULT 0;"); }
+        catch { /* sütun zaten varsa göz ardı edilir */ }
+    }
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.

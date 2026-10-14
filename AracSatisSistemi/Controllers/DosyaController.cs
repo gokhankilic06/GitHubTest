@@ -248,6 +248,19 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Sehirler = vergiDaireleri.Select(v => v.Sehir).Distinct().OrderBy(s => s).ToList();
             ViewBag.VergiDaireleriJson = System.Text.Json.JsonSerializer.Serialize(
                 vergiDaireleri.Select(v => new { v.Id, v.Ad, v.Sehir }));
+
+            // Kayıt / Düzenle ekranındaki otopark + çekici ücreti önizlemesi: araç cinsi
+            // seçilince hangi kategorinin (ve o kategorinin güncel tarifesinin) uygulanacağını
+            // gösterir. Tarifeler "Güncellemeler" ekranından değiştirildiğinde buraya otomatik yansır.
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
+            ViewBag.CinsKategoriJson = System.Text.Json.JsonSerializer.Serialize(
+                ((List<AracCinsi>)ViewBag.Cinsler).ToDictionary(c => c.Ad, c => (int)c.OtoparkKategorisi));
+            ViewBag.TarifeJson = System.Text.Json.JsonSerializer.Serialize(
+                Enum.GetValues<OtoparkAracKategorisi>().ToDictionary(k => (int)k, k =>
+                {
+                    var (ilk, ikinci) = genelAyar.OtoparkTarifesi(k);
+                    return new { Ilk = ilk, Ikinci = ikinci, Cekici = genelAyar.CekiciUcreti(k) };
+                }));
         }
     }
 }

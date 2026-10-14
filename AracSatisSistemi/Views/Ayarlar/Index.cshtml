@@ -77,12 +77,15 @@
 </div>
 
 <div class="card p-3">
-    <div class="form-section-title">Otopark Ücret Tarifesi (Kademeli)</div>
+    <div class="form-section-title">Otopark ve Çekici Ücret Tarifesi (Araç Kategorisine Göre)</div>
     <p class="text-muted small">
-        Alıcı Ödeme Bilgileri ekranındaki otopark ücreti, araç kategorisine göre burada belirlenen
-        günlük ücretler üzerinden hesaplanır: ilk 6 ay (180 gün) "6 Aya Kadar" ücreti, 180 günden
-        sonrası "6 Aydan Sonra" ücreti üzerinden. Her araç cinsinin hangi kategoride sayılacağını
-        aşağıdaki "Araç Cinsleri" bölümünden ayarlayabilirsiniz.
+        Kayıt İşlemleri, Satış Sonucu Gir ve Alıcı Ödeme Bilgileri ekranlarındaki otopark ve çekici
+        ücreti, araç kategorisine göre burada belirlenen tutarlar üzerinden otomatik hesaplanır:
+        otopark ücretinde ilk 6 ay (180 gün) "6 Aya Kadar" günlük ücreti, 180 günden sonrası "6 Aydan
+        Sonra" günlük ücreti; çekici ücretinde ise kategoriye göre sabit bir tutar kullanılır. Her
+        araç cinsinin hangi kategoride sayılacağını aşağıdaki "Araç Cinsleri" bölümünden
+        ayarlayabilirsiniz. Buradaki tutarları değiştirip "Tarifeyi Güncelle" ile kaydettiğinizde,
+        yeni girilecek/güncellenecek kayıtlarda otomatik olarak yeni tutarlar kullanılır.
     </p>
     <form asp-action="TarifeGuncelle" method="post">
         @Html.AntiForgeryToken()
@@ -113,14 +116,15 @@
                         <td><input class="form-control" name="BuyukArac6AydanSonra" type="number" step="0.01" value="@genelAyar?.BuyukArac6AydanSonra" /></td>
                         <td><input class="form-control" name="Motor6AydanSonra" type="number" step="0.01" value="@genelAyar?.Motor6AydanSonra" /></td>
                     </tr>
+                    <tr>
+                        <td class="fw-semibold table-light">Çekici Ücreti (TL, sabit)</td>
+                        <td><input class="form-control" name="KucukAracCekiciUcreti" type="number" step="0.01" value="@genelAyar?.KucukAracCekiciUcreti" /></td>
+                        <td><input class="form-control" name="MinibusKamyonetCekiciUcreti" type="number" step="0.01" value="@genelAyar?.MinibusKamyonetCekiciUcreti" /></td>
+                        <td><input class="form-control" name="BuyukAracCekiciUcreti" type="number" step="0.01" value="@genelAyar?.BuyukAracCekiciUcreti" /></td>
+                        <td><input class="form-control" name="MotorCekiciUcreti" type="number" step="0.01" value="@genelAyar?.MotorCekiciUcreti" /></td>
+                    </tr>
                 </tbody>
             </table>
-        </div>
-        <div class="row g-3">
-            <div class="col-md-3">
-                <label class="form-label">Çekici Ücreti (TL, sabit)</label>
-                <input class="form-control" name="CekiciUcretiSabit" type="number" step="0.01" value="@genelAyar?.CekiciUcretiSabit" />
-            </div>
         </div>
         <div class="mt-3"><button class="btn btn-primary">Tarifeyi Güncelle</button></div>
     </form>
