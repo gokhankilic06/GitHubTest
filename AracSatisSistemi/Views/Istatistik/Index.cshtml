@@ -1,0 +1,273 @@
+@model AracSatisSistemi.Controllers.IstatistikController.IstatistikModeli
+@{
+    ViewData["Title"] = "İstatistik";
+    var yillar = (List<int>)ViewBag.Yillar;
+    var vergiDaireleri = (List<string>)ViewBag.VergiDaireleriListesi;
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
+    string Para(decimal d) => d.ToString("N2", trTR) + " TL";
+    var excelUrl = Url.Action("ExcelIndir", "Istatistik", new
+    {
+        yil = ViewBag.Yil, ay = ViewBag.Ay, baslangic = ViewBag.Baslangic, bitis = ViewBag.Bitis,
+        satisTuru = ViewBag.SatisTuru, satisSonucu = ViewBag.SatisSonucu, durum = ViewBag.Durum, vergiDairesi = ViewBag.VergiDairesi
+    });
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+    <h3>İstatistik</h3>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer"></i> Yazdır</button>
+        <a class="btn btn-outline-success" href="@excelUrl">
+            <i class="bi bi-file-earmark-excel"></i> Excel İndir
+        </a>
+    </div>
+</div>
+
+<div class="card p-3 mb-4 no-print">
+    <div class="form-section-title">Filtreler</div>
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-md-2">
+            <label class="form-label">Yıl</label>
+            <select class="form-select" name="yil">
+                <option value="">Tümü</option>
+                @foreach (var y in yillar)
+                {
+                    <option value="@y" selected="@(ViewBag.Yil != null && (int)ViewBag.Yil == y)">@y</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Ay</label>
+            <select class="form-select" name="ay">
+                <option value="">Tümü</option>
+                @for (int a = 1; a <= 12; a++)
+                {
+                    <option value="@a" selected="@(ViewBag.Ay != null && (int)ViewBag.Ay == a)">@trTR.DateTimeFormat.GetMonthName(a)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Satış Tarihi (Başlangıç)</label>
+            <input type="date" class="form-control" name="baslangic" value="@ViewBag.Baslangic" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Satış Tarihi (Bitiş)</label>
+            <input type="date" class="form-control" name="bitis" value="@ViewBag.Bitis" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Satış Türü</label>
+            <select class="form-select" name="satisTuru">
+                <option value="">Tümü</option>
+                <option value="1" selected="@(ViewBag.SatisTuru?.ToString() == "BirinciSatis")">1. Satış</option>
+                <option value="2" selected="@(ViewBag.SatisTuru?.ToString() == "IkinciSatis")">2. Satış</option>
+                <option value="3" selected="@(ViewBag.SatisTuru?.ToString() == "Pazarlik")">Pazarlık</option>
+                <option value="4" selected="@(ViewBag.SatisTuru?.ToString() == "Madde6183_86")">6183/86 Mad.</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Satış Sonucu</label>
+            <select class="form-select" name="satisSonucu">
+                <option value="">Tümü</option>
+                <option value="1" selected="@(ViewBag.SatisSonucu?.ToString() == "Satildi")">Satıldı</option>
+                <option value="2" selected="@(ViewBag.SatisSonucu?.ToString() == "AliciCikmadi")">Alıcı Çıkmadı</option>
+                <option value="3" selected="@(ViewBag.SatisSonucu?.ToString() == "AliciIslemYapmadi")">Alıcı İşlem Yapmadı</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Dosya Durumu</label>
+            <select class="form-select" name="durum">
+                <option value="">Tümü</option>
+                <option value="0" selected="@(ViewBag.Durum?.ToString() == "Kayitli")">Aktif (Kayıtlı)</option>
+                <option value="1" selected="@(ViewBag.Durum?.ToString() == "SatisaCikti")">Satışta</option>
+                <option value="2" selected="@(ViewBag.Durum?.ToString() == "Satildi")">Satıldı</option>
+                <option value="3" selected="@(ViewBag.Durum?.ToString() == "IptalEdildi")">İptal Edildi</option>
+                <option value="4" selected="@(ViewBag.Durum?.ToString() == "IadeEdildi")">İade Edildi</option>
+                <option value="5" selected="@(ViewBag.Durum?.ToString() == "Kapandi")">Kapandı</option>
+                <option value="6" selected="@(ViewBag.Durum?.ToString() == "AliciyaTerkEdildi")">Alıcıya Terk Edildi</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Vergi Dairesi</label>
+            <select class="form-select" name="vergiDairesi">
+                <option value="">Tümü</option>
+                @foreach (var vd in vergiDaireleri)
+                {
+                    <option value="@vd" selected="@(ViewBag.VergiDairesi == vd)">@vd</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrele</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Temizle</a>
+        </div>
+    </form>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Dosya</div>
+            <div class="fs-4 fw-bold">@Model.ToplamDosyaSayisi</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Satış Kaydı</div>
+            <div class="fs-4 fw-bold">@Model.ToplamSatisKaydiSayisi</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Satıldı</div>
+            <div class="fs-4 fw-bold text-success">@Model.SatilanSayisi</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Alıcı Çıkmadı / İşlem Yapmadı</div>
+            <div class="fs-4 fw-bold text-warning">@Model.AliciCikmadiSayisi / @Model.AliciIslemYapmadiSayisi</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Satış Bedeli</div>
+            <div class="fs-5 fw-bold">@Para(Model.ToplamSatisBedeli)</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Ortalama Satış Bedeli</div>
+            <div class="fs-5 fw-bold">@Para(Model.OrtalamaSatisBedeli)</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam KDV + Damga Vergisi</div>
+            <div class="fs-5 fw-bold">@Para(Model.ToplamKdv + Model.ToplamDv)</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Otopark + MTV</div>
+            <div class="fs-5 fw-bold">@Para(Model.ToplamOtopark + Model.ToplamMtv)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Yıla Göre Kırılım</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>Yıl</th><th>Dosya</th><th>Satış</th><th>Satılan</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.YilKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@k.SatilanSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.YilKirilimi.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Satış Türüne Göre Kırılım</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>Satış Türü</th><th>Dosya</th><th>Satış</th><th>Satılan</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.SatisTuruKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@k.SatilanSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.SatisTuruKirilimi.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Sonuca Göre Kırılım</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>Sonuç</th><th>Dosya</th><th>Satış</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.SonucKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.SonucKirilimi.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Vergi Dairesine Göre Kırılım</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>Vergi Dairesi</th><th>Dosya</th><th>Satış</th><th>Satılan</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.VergiDairesiKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@k.SatilanSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.VergiDairesiKirilimi.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-3">
+    <div class="form-section-title">Filtrelenmiş Kayıt Listesi (@Model.Satirlar.Count)</div>
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya No</th><th>Plaka</th><th>Cinsi/Markası</th><th>Adı Soyadı/Ünvanı</th>
+                    <th>Vergi Dairesi</th><th>Durum</th><th>Satış Türü</th><th>Satış Tarihi</th>
+                    <th>Sonuç</th><th>Satış Bedeli</th><th>Toplam Tutar</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Satirlar)
+                {
+                    <tr>
+                        <td><a asp-controller="Dosya" asp-action="Details" asp-route-id="@s.DosyaId">@s.DosyaNo</a></td>
+                        <td>@s.Plaka</td>
+                        <td>@s.AracCinsi / @s.AracMarkasi</td>
+                        <td>@s.AdiSoyadiUnvani</td>
+                        <td>@s.VergiDairesiAdi</td>
+                        <td>@s.DurumGorunen</td>
+                        <td>@s.SatisTuruGorunen</td>
+                        <td>@(s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                        <td>@s.SonucGorunen</td>
+                        <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
+                        <td>@(s.SatisBedeli.HasValue ? s.ToplamTutar.ToString("N2") : "-")</td>
+                    </tr>
+                }
+                @if (!Model.Satirlar.Any())
+                {
+                    <tr><td colspan="11" class="text-center text-muted">Filtreye uyan kayıt bulunamadı.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
