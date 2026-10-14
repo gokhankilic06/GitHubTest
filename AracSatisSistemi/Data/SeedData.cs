@@ -103,8 +103,8 @@ namespace AracSatisSistemi.Data
                     Motor6AyaKadar = 41.50m,
                     Motor6AydanSonra = 20.75m,
                     KucukAracCekiciUcreti = 2000.00m,
-                    MinibusKamyonetCekiciUcreti = 2500.00m,
-                    BuyukAracCekiciUcreti = 3500.00m,
+                    MinibusKamyonetCekiciUcreti = 3000.00m,
+                    BuyukAracCekiciUcreti = 5000.00m,
                     MotorCekiciUcreti = 1000.00m
                 });
             }

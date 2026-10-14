@@ -54,6 +54,21 @@ using (var scope = app.Services.CreateScope())
         try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""GenelAyarlar"" ADD COLUMN """ + sutun + @""" decimal(18,2) NOT NULL DEFAULT 0;"); }
         catch { /* sütun zaten varsa göz ardı edilir */ }
     }
+
+    // Yukarıdaki ALTER TABLE ile sütunlar 0 TL olarak eklenmiş olabilir (henüz hiç
+    // "Güncellemeler" ekranından değiştirilmemiş kayıtlar için); bu durumda araç
+    // kategorisine göre makul varsayılan çekici ücretleri otomatik doldurulur. Kullanıcı
+    // zaten bir değer girdiyse (0 değilse) dokunulmaz; bu yüzden her başlangıçta
+    // çalıştırmak güvenlidir.
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"UPDATE ""GenelAyarlar"" SET
+            ""KucukAracCekiciUcreti"" = CASE WHEN ""KucukAracCekiciUcreti"" = 0 THEN 2000 ELSE ""KucukAracCekiciUcreti"" END,
+            ""MinibusKamyonetCekiciUcreti"" = CASE WHEN ""MinibusKamyonetCekiciUcreti"" = 0 THEN 3000 ELSE ""MinibusKamyonetCekiciUcreti"" END,
+            ""BuyukAracCekiciUcreti"" = CASE WHEN ""BuyukAracCekiciUcreti"" = 0 THEN 5000 ELSE ""BuyukAracCekiciUcreti"" END,
+            ""MotorCekiciUcreti"" = CASE WHEN ""MotorCekiciUcreti"" = 0 THEN 1000 ELSE ""MotorCekiciUcreti"" END;");
+    }
+    catch { /* tablo/sütunlar bir şekilde yoksa sessizce geçilir */ }
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.
