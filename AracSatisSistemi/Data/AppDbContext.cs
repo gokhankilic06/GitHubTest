@@ -12,6 +12,7 @@ namespace AracSatisSistemi.Data
         public DbSet<IptalIade> IptalIadeler => Set<IptalIade>();
 
         public DbSet<AracMarkasi> AracMarkalari => Set<AracMarkasi>();
+        public DbSet<AracModeli> AracModelleri => Set<AracModeli>();
         public DbSet<AracCinsi> AracCinsleri => Set<AracCinsi>();
         public DbSet<VergiDairesiKaydi> VergiDaireleri => Set<VergiDairesiKaydi>();
         public DbSet<OtoparkKaydi> Otoparklar => Set<OtoparkKaydi>();

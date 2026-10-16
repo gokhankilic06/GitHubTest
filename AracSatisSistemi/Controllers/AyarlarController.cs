@@ -15,6 +15,7 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Komisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
             ViewBag.GenelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
             ViewBag.Markalar = await _db.AracMarkalari.OrderBy(a => a.Ad).ToListAsync();
+            ViewBag.AracModelleri = await _db.AracModelleri.OrderBy(a => a.MarkaAdi).ThenBy(a => a.Ad).ToListAsync();
             ViewBag.Cinsler = await _db.AracCinsleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.VergiDaireleri = await _db.VergiDaireleri.OrderBy(a => a.Sehir).ThenBy(a => a.Ad).ToListAsync();
             ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
@@ -89,6 +90,25 @@ namespace AracSatisSistemi.Controllers
         {
             var kayit = await _db.AracMarkalari.FindAsync(id);
             if (kayit != null) { _db.AracMarkalari.Remove(kayit); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ModelEkle(string marka, string ad)
+        {
+            if (!string.IsNullOrWhiteSpace(marka) && !string.IsNullOrWhiteSpace(ad))
+            {
+                _db.AracModelleri.Add(new AracModeli { MarkaAdi = marka.Trim(), Ad = ad.Trim() });
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ModelSil(int id)
+        {
+            var kayit = await _db.AracModelleri.FindAsync(id);
+            if (kayit != null) { _db.AracModelleri.Remove(kayit); await _db.SaveChangesAsync(); }
             return RedirectToAction(nameof(Index));
         }
 

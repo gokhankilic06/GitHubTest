@@ -47,6 +47,12 @@ using (var scope = app.Services.CreateScope())
     );");
     db.Database.ExecuteSqlRaw(@"CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SatisTarihleri_Tarih"" ON ""SatisTarihleri"" (""Tarih"");");
 
+    db.Database.ExecuteSqlRaw(@"CREATE TABLE IF NOT EXISTS ""AracModelleri"" (
+        ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_AracModelleri"" PRIMARY KEY AUTOINCREMENT,
+        ""MarkaAdi"" TEXT NOT NULL,
+        ""Ad"" TEXT NOT NULL
+    );");
+
     // Çekici ücreti artık (otopark tarifesi gibi) araç kategorisine göre 4 ayrı sütunda
     // tutuluyor (eski tek "CekiciUcretiSabit" sütunu yerine). SQLite'ta "ADD COLUMN IF NOT
     // EXISTS" olmadığından her biri ayrı ayrı denenip zaten varsa oluşan hata yutulur.

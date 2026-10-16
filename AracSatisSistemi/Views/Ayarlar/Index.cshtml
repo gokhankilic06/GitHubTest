@@ -3,6 +3,7 @@
     var komisyon = (AracSatisSistemi.Models.KomisyonAyari)ViewBag.Komisyon;
     var genelAyar = (AracSatisSistemi.Models.GenelAyar)ViewBag.GenelAyar;
     var markalar = (List<AracSatisSistemi.Models.AracMarkasi>)ViewBag.Markalar;
+    var aracModelleri = (List<AracSatisSistemi.Models.AracModeli>)ViewBag.AracModelleri;
     var cinsler = (List<AracSatisSistemi.Models.AracCinsi>)ViewBag.Cinsler;
     var vergiDaireleri = (List<AracSatisSistemi.Models.VergiDairesiKaydi>)ViewBag.VergiDaireleri;
     var otoparklar = (List<AracSatisSistemi.Models.OtoparkKaydi>)ViewBag.Otoparklar;
@@ -35,23 +36,8 @@
 </div>
 
 <div class="card p-3 mt-3">
-    <div class="form-section-title">Komisyon Bilgileri (Varsayılan)</div>
-    <p class="text-muted small">Yeni bir dosya kaydedildiğinde İhale Tutanağı'nda görünecek varsayılan komisyon. Belirli bir satış tarihi/saati için farklı bir komisyon atamak isterseniz <a asp-controller="Komisyon" asp-action="Index">Komisyon İşlemleri</a> ekranını kullanın.</p>
-    <form asp-action="KomisyonGuncelle" method="post" class="row g-3">
-        @Html.AntiForgeryToken()
-        <input type="hidden" name="Id" value="@komisyon?.Id" />
-        <div class="col-md-4"><label class="form-label">Başkan</label><select class="form-select" name="Baskan">@Html.Raw(MemurSecenekleri(komisyon?.Baskan))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 1</label><select class="form-select" name="Uye1">@Html.Raw(MemurSecenekleri(komisyon?.Uye1))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 2</label><select class="form-select" name="Uye2">@Html.Raw(MemurSecenekleri(komisyon?.Uye2))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 3</label><select class="form-select" name="Uye3">@Html.Raw(MemurSecenekleri(komisyon?.Uye3))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 4</label><select class="form-select" name="Uye4">@Html.Raw(MemurSecenekleri(komisyon?.Uye4))</select></div>
-        <div class="col-12"><button class="btn btn-primary">Komisyonu Güncelle</button></div>
-    </form>
-</div>
-
-<div class="card p-3 mt-3">
-    <div class="form-section-title">Komisyon Üyesi Olabilecek Memurlar</div>
-    <p class="text-muted small mb-2">Bu listeye eklenen isimler yukarıdaki "Komisyon Bilgileri" ve Komisyon İşlemleri ekranındaki başkan/üye seçim listelerinde görünür.</p>
+    <div class="form-section-title">1. Komisyon Üyesi Olabilecek Memurlar</div>
+    <p class="text-muted small mb-2">Önce buraya komisyon başkanı/üyesi olabilecek memurların adını soyadını ekleyin; aşağıdaki "Komisyon Bilgileri" seçim listeleri ancak burada en az bir isim varsa doldurulabilir.</p>
     <form asp-action="MemurEkle" method="post" class="d-flex gap-2 mb-2">
         @Html.AntiForgeryToken()
         <input class="form-control" name="adSoyad" placeholder="Adı Soyadı" required />
@@ -74,6 +60,25 @@
             <li class="list-group-item text-muted text-center">Henüz memur eklenmedi.</li>
         }
     </ul>
+</div>
+
+<div class="card p-3 mt-3">
+    <div class="form-section-title">2. Komisyon Bilgileri (Varsayılan)</div>
+    <p class="text-muted small">Yeni bir dosya kaydedildiğinde İhale Tutanağı'nda görünecek varsayılan komisyon. Belirli bir satış tarihi/saati için farklı bir komisyon atamak isterseniz <a asp-controller="Komisyon" asp-action="Index">Komisyon İşlemleri</a> ekranını kullanın.</p>
+    @if (!memurlar.Any())
+    {
+        <div class="alert alert-warning">Aşağıdaki seçim listeleri boş görünüyor çünkü henüz "Komisyon Üyesi Olabilecek Memurlar" listesine (yukarıdaki 1. bölüm) hiç isim eklenmedi. Önce oraya en az bir isim ekleyin, sonra buradan seçim yapabilirsiniz.</div>
+    }
+    <form asp-action="KomisyonGuncelle" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="Id" value="@komisyon?.Id" />
+        <div class="col-md-4"><label class="form-label">Başkan</label><select class="form-select" name="Baskan">@Html.Raw(MemurSecenekleri(komisyon?.Baskan))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 1</label><select class="form-select" name="Uye1">@Html.Raw(MemurSecenekleri(komisyon?.Uye1))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 2</label><select class="form-select" name="Uye2">@Html.Raw(MemurSecenekleri(komisyon?.Uye2))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 3</label><select class="form-select" name="Uye3">@Html.Raw(MemurSecenekleri(komisyon?.Uye3))</select></div>
+        <div class="col-md-2"><label class="form-label">Üye 4</label><select class="form-select" name="Uye4">@Html.Raw(MemurSecenekleri(komisyon?.Uye4))</select></div>
+        <div class="col-12"><button class="btn btn-primary">Komisyonu Güncelle</button></div>
+    </form>
 </div>
 
 <div class="card p-3">
@@ -150,6 +155,52 @@
                             <button class="btn btn-sm btn-outline-danger">Sil</button>
                         </form>
                     </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-3">
+            <div class="form-section-title">Araç Modelleri (Marka Bazlı)</div>
+            <p class="text-muted small mb-2">Kayıt İşlemleri ekranında bir marka seçildiğinde o markanın modelleri açılır listede gösterilir; listede olmayan bir model için "Diğer (elle yaz)" seçeneği kullanılır.</p>
+            <form asp-action="ModelEkle" method="post" class="row g-2 mb-2">
+                @Html.AntiForgeryToken()
+                <div class="col-5">
+                    <select class="form-select" name="marka" required>
+                        <option value="">-- Marka Seçiniz --</option>
+                        @foreach (var m in markalar)
+                        {
+                            <option value="@m.Ad">@m.Ad</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-5"><input class="form-control" name="ad" placeholder="Yeni model (ör. Golf)" required /></div>
+                <div class="col-2"><button class="btn btn-success w-100">Ekle</button></div>
+            </form>
+            <ul class="list-group">
+                @foreach (var grup in aracModelleri.GroupBy(x => x.MarkaAdi))
+                {
+                    <li class="list-group-item">
+                        <div class="fw-semibold mb-1">@grup.Key</div>
+                        <div class="d-flex flex-wrap gap-1">
+                            @foreach (var md in grup)
+                            {
+                                <span class="badge bg-light text-dark border d-flex align-items-center gap-1 p-2">
+                                    @md.Ad
+                                    <form asp-action="ModelSil" method="post" onsubmit="return confirm('Silinsin mi?');" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@md.Id" />
+                                        <button class="btn btn-sm p-0 border-0 text-danger" style="line-height:1;" title="Sil">&times;</button>
+                                    </form>
+                                </span>
+                            }
+                        </div>
+                    </li>
+                }
+                @if (!aracModelleri.Any())
+                {
+                    <li class="list-group-item text-muted text-center">Henüz model eklenmedi.</li>
                 }
             </ul>
         </div>

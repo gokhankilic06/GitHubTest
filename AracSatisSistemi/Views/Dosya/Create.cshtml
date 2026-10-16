@@ -113,7 +113,10 @@
         </div>
         <div class="col-md-3">
             <label class="form-label" asp-for="AracTipi"></label>
-            <input class="form-control" asp-for="AracTipi" placeholder="Manuel giriş" />
+            <select class="form-select" id="aracTipiSelect" name="AracTipi" disabled>
+                <option value="">-- Önce marka seçiniz --</option>
+            </select>
+            <input class="form-control d-none" id="aracTipiManuel" name="AracTipi" placeholder="Model adı (elle yazın)" disabled />
         </div>
         <div class="col-md-3">
             <label class="form-label" asp-for="ModelYili"></label>
@@ -317,5 +320,76 @@
         }
         bedelInput.addEventListener('input', hesapla);
         hesapla();
+
+        // Araç Tipi: seçilen markaya göre kademeli model listesi ("Güncellemeler" ekranından
+        // yönetilir); listede olmayan bir model için "Diğer (elle yaz)" seçilince metin
+        // kutusuna geçilir. Her iki alan da aynı "AracTipi" adını taşır, yalnızca o an
+        // görünen/etkin olan (disabled olmayan) değer forma gönderilir.
+        const aracModelleriMap = @Html.Raw(ViewBag.AracModelleriJson);
+        const markaSelect = document.querySelector('select[name="AracMarkasi"]');
+        const tipiSelect = document.getElementById('aracTipiSelect');
+        const tipiManuel = document.getElementById('aracTipiManuel');
+
+        function tipiSecenekleriDoldur(marka, secili) {
+            const modeller = aracModelleriMap[marka] || [];
+            tipiSelect.innerHTML = '';
+            const bos = document.createElement('option');
+            bos.value = '';
+            bos.textContent = modeller.length ? '-- Seçiniz --' : '-- Bu markada kayıtlı model yok --';
+            tipiSelect.appendChild(bos);
+            modeller.forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m;
+                opt.textContent = m;
+                if (m === secili) opt.selected = true;
+                tipiSelect.appendChild(opt);
+            });
+            const diger = document.createElement('option');
+            diger.value = '__DIGER__';
+            diger.textContent = 'Diğer (elle yaz)';
+            tipiSelect.appendChild(diger);
+        }
+
+        function manuelModunaGec(mevcutDeger) {
+            tipiSelect.classList.add('d-none');
+            tipiSelect.disabled = true;
+            tipiManuel.classList.remove('d-none');
+            tipiManuel.disabled = false;
+            tipiManuel.value = mevcutDeger || '';
+        }
+
+        function secimModunaGec(marka, secili) {
+            tipiSecenekleriDoldur(marka, secili);
+            tipiSelect.classList.remove('d-none');
+            tipiSelect.disabled = false;
+            tipiManuel.classList.add('d-none');
+            tipiManuel.disabled = true;
+        }
+
+        function aracTipiniAyarla(mevcutDeger) {
+            const marka = markaSelect.value;
+            if (!marka) {
+                tipiSelect.innerHTML = '<option value="">-- Önce marka seçiniz --</option>';
+                tipiSelect.classList.remove('d-none');
+                tipiSelect.disabled = true;
+                tipiManuel.classList.add('d-none');
+                tipiManuel.disabled = true;
+                return;
+            }
+            const modeller = aracModelleriMap[marka] || [];
+            if (mevcutDeger && !modeller.includes(mevcutDeger)) {
+                tipiSecenekleriDoldur(marka, null);
+                manuelModunaGec(mevcutDeger);
+            } else {
+                secimModunaGec(marka, mevcutDeger);
+            }
+        }
+
+        markaSelect.addEventListener('change', () => aracTipiniAyarla(null));
+        tipiSelect.addEventListener('change', () => {
+            if (tipiSelect.value === '__DIGER__') manuelModunaGec('');
+        });
+
+        aracTipiniAyarla(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AracTipi)));
     </script>
 }

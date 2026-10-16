@@ -248,6 +248,12 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Sehirler = vergiDaireleri.Select(v => v.Sehir).Distinct().OrderBy(s => s).ToList();
             ViewBag.VergiDaireleriJson = System.Text.Json.JsonSerializer.Serialize(
                 vergiDaireleri.Select(v => new { v.Id, v.Ad, v.Sehir }));
+
+            // "Araç Tipi" alanı - seçilen markaya göre kademeli (cascading) model listesi;
+            // listede olmayan bir model için "Diğer (elle yaz)" seçeneği kullanılır.
+            var aracModelleri = await _db.AracModelleri.OrderBy(m => m.Ad).ToListAsync();
+            ViewBag.AracModelleriJson = System.Text.Json.JsonSerializer.Serialize(
+                aracModelleri.GroupBy(m => m.MarkaAdi).ToDictionary(g => g.Key, g => g.Select(m => m.Ad).ToList()));
         }
     }
 }

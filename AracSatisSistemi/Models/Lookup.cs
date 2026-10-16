@@ -12,6 +12,17 @@ namespace AracSatisSistemi.Models
         [Required] public string Ad { get; set; } = string.Empty;
     }
 
+    // Bir markaya bağlı model/tip adı (ör. Volkswagen -> Golf, Tiguan). "Güncellemeler"
+    // ekranından marka bazında eklenip çıkarılır; Kayıt İşlemleri ekranında araç markası
+    // seçilince o markanın modelleri açılır listede gösterilir ("Diğer" seçilirse elle
+    // yazılabilir - bkz. Dosya.AracTipi, hâlâ serbest metin olarak saklanır).
+    public class AracModeli
+    {
+        public int Id { get; set; }
+        [Required, Display(Name = "Markası")] public string MarkaAdi { get; set; } = string.Empty;
+        [Required, Display(Name = "Modeli")] public string Ad { get; set; } = string.Empty;
+    }
+
     public class AracCinsi
     {
         public int Id { get; set; }
