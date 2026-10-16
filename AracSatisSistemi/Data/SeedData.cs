@@ -17,6 +17,7 @@ namespace AracSatisSistemi.Data
                     ("Otomobil", OtoparkAracKategorisi.KucukArac),
                     ("Kamyonet", OtoparkAracKategorisi.MinibusKamyonet),
                     ("Kamyon", OtoparkAracKategorisi.BuyukArac),
+                    ("Tır", OtoparkAracKategorisi.BuyukArac),
                     ("Minibüs", OtoparkAracKategorisi.MinibusKamyonet),
                     ("Midibüs", OtoparkAracKategorisi.BuyukArac),
                     ("Otobüs", OtoparkAracKategorisi.BuyukArac),
@@ -103,9 +104,9 @@ namespace AracSatisSistemi.Data
                     Motor6AyaKadar = 41.50m,
                     Motor6AydanSonra = 20.75m,
                     KucukAracCekiciUcreti = 2000.00m,
-                    MinibusKamyonetCekiciUcreti = 3000.00m,
+                    MinibusKamyonetCekiciUcreti = 2000.00m,
                     BuyukAracCekiciUcreti = 5000.00m,
-                    MotorCekiciUcreti = 1000.00m
+                    MotorCekiciUcreti = 2000.00m
                 });
             }
 

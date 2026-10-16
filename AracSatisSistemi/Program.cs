@@ -2,6 +2,7 @@ using System.Globalization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
+using AracSatisSistemi.Models;
 
 // Uygulama tamamen Türkçe (tarih/sayı biçimleri: 300.000,00 gibi) olduğundan varsayılan
 // kültür sunucunun işletim sistemi ayarından bağımsız olarak sabit tr-TR yapılır.
@@ -57,18 +58,29 @@ using (var scope = app.Services.CreateScope())
 
     // Yukarıdaki ALTER TABLE ile sütunlar 0 TL olarak eklenmiş olabilir (henüz hiç
     // "Güncellemeler" ekranından değiştirilmemiş kayıtlar için); bu durumda araç
-    // kategorisine göre makul varsayılan çekici ücretleri otomatik doldurulur. Kullanıcı
-    // zaten bir değer girdiyse (0 değilse) dokunulmaz; bu yüzden her başlangıçta
-    // çalıştırmak güvenlidir.
+    // kategorisine göre makul varsayılan çekici ücretleri otomatik doldurulur: büyük
+    // araç (kamyon/tır) 5.000 TL, diğer tüm kategoriler (küçük araç, minibüs/kamyonet,
+    // motor) 2.000 TL. Kullanıcı Güncellemeler ekranından kendi değerini girdiyse (0 veya
+    // daha önceki geçici varsayılanlardan biri değilse) dokunulmaz; bu yüzden her
+    // başlangıçta çalıştırmak güvenlidir.
     try
     {
         db.Database.ExecuteSqlRaw(@"UPDATE ""GenelAyarlar"" SET
             ""KucukAracCekiciUcreti"" = CASE WHEN ""KucukAracCekiciUcreti"" = 0 THEN 2000 ELSE ""KucukAracCekiciUcreti"" END,
-            ""MinibusKamyonetCekiciUcreti"" = CASE WHEN ""MinibusKamyonetCekiciUcreti"" = 0 THEN 3000 ELSE ""MinibusKamyonetCekiciUcreti"" END,
+            ""MinibusKamyonetCekiciUcreti"" = CASE WHEN ""MinibusKamyonetCekiciUcreti"" IN (0, 3000) THEN 2000 ELSE ""MinibusKamyonetCekiciUcreti"" END,
             ""BuyukAracCekiciUcreti"" = CASE WHEN ""BuyukAracCekiciUcreti"" = 0 THEN 5000 ELSE ""BuyukAracCekiciUcreti"" END,
-            ""MotorCekiciUcreti"" = CASE WHEN ""MotorCekiciUcreti"" = 0 THEN 1000 ELSE ""MotorCekiciUcreti"" END;");
+            ""MotorCekiciUcreti"" = CASE WHEN ""MotorCekiciUcreti"" IN (0, 1000) THEN 2000 ELSE ""MotorCekiciUcreti"" END;");
     }
     catch { /* tablo/sütunlar bir şekilde yoksa sessizce geçilir */ }
+
+    // "Tır" (büyük araç kategorisi), mevcut veritabanlarının Araç Cinsleri listesinde
+    // henüz olmayabilir (yalnızca ilk kurulumda seed ile eklenir); burada adı geçmiyorsa
+    // eklenir. Kullanıcı bunu "Güncellemeler" ekranından daha sonra silebilir/değiştirebilir.
+    if (!db.AracCinsleri.Any(c => c.Ad == "Tır"))
+    {
+        db.AracCinsleri.Add(new AracCinsi { Ad = "Tır", OtoparkKategorisi = OtoparkAracKategorisi.BuyukArac });
+        db.SaveChanges();
+    }
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.
