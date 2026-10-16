@@ -58,7 +58,6 @@
                 </div>
             </div>
 
-            <div class="col-md-3" id="aliciTcknAlani"><label class="form-label" asp-for="AliciTCKN"></label><input class="form-control" asp-for="AliciTCKN" maxlength="11" /></div>
             <div class="col-md-3" id="aliciVknAlani"><label class="form-label" asp-for="AliciVKN"></label><input class="form-control" asp-for="AliciVKN" maxlength="10" /></div>
             <div class="col-md-3" id="aliciAdiAlani"><label class="form-label" asp-for="AliciAdiSoyadi"></label><input class="form-control" asp-for="AliciAdiSoyadi" /></div>
             <div class="col-md-3" id="adresAlani"><label class="form-label" asp-for="Adres"></label><input class="form-control" asp-for="Adres" /></div>
@@ -67,32 +66,14 @@
                 <label class="form-label">Vade (Satış tarihinden itibaren 3 gün)</label>
                 <input class="form-control" value="@Model.SatisTarihi.AddDays(3).ToString("dd.MM.yyyy")" readonly />
             </div>
-            <div class="col-md-3" id="mtvAlani"><label class="form-label" asp-for="MTV"></label><input class="form-control" asp-for="MTV" type="number" step="0.01" /></div>
-            <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi"></label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" id="otoparkaGirisTarihi" /></div>
-            <div class="col-md-3">
-                <label class="form-label" asp-for="CekiciBedeli"></label>
-                <div class="input-group">
-                    <input class="form-control" asp-for="CekiciBedeli" type="number" step="0.01" min="0" id="cekiciBedeli" />
-                    <span class="input-group-text">TL</span>
-                </div>
-            </div>
         </div>
     </div>
 
-    <div class="card p-3 mt-3" id="otoparkHesapKarti">
-        <div class="form-section-title">Otopark Ücreti Hesaplama</div>
-        <p class="text-muted small">
-            Araç kategorisi (<strong>@ViewBag.OtoparkKategoriAdi</strong>) ve otoparkta kalınan gün sayısına göre
-            kademeli tarife üzerinden otomatik hesaplanır (ilk 6 ay "6 Aya Kadar", sonrası "6 Aydan Sonra" günlük
-            ücreti). Bu bir önizlemedir; kesin tutar Alıcı Ödeme Bilgileri ekranında da aynı şekilde hesaplanır.
-        </p>
-        <div class="row g-3">
-            <div class="col-md-3"><label class="form-label">Otoparkta Kalınan Gün</label><input class="form-control" id="otoparkGunSayisiGoster" readonly /></div>
-            <div class="col-md-3"><label class="form-label">Hesaplanan Otopark Ücreti (TL)</label><input class="form-control" id="otoparkUcretiGoster" readonly /></div>
-            <div class="col-md-3"><label class="form-label">Çekici Ücreti (TL)</label><input class="form-control" id="cekiciUcretiGoster" readonly /></div>
-            <div class="col-md-3"><label class="form-label fw-bold">Toplam (TL)</label><input class="form-control fw-bold" id="toplamGoster" readonly /></div>
-        </div>
-    </div>
+    <p class="text-muted small mt-3">
+        Alıcı TCKN, MTV, otoparka giriş tarihi, çekici bedeli ve otopark ücreti hesaplaması artık bu ekranda
+        değil; satış "Satıldı" olarak kaydedildikten sonra <strong>Alıcı Ödeme Bilgileri</strong> ekranında
+        girilip hesaplanıyor.
+    </p>
 
     <div class="mt-4">
         <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Kaydet</button>
@@ -103,7 +84,7 @@
 @section Scripts {
     <script>
         const sonucSelect = document.getElementById('satisSonucu');
-        const satildiyaOzelAlanlar = ['satisBedeliAlani', 'aliciTcknAlani', 'aliciVknAlani', 'aliciAdiAlani', 'adresAlani', 'mtvAlani', 'otoparkHesapKarti'];
+        const satildiyaOzelAlanlar = ['satisBedeliAlani', 'aliciVknAlani', 'aliciAdiAlani', 'adresAlani'];
         function bedelAlaniniAyarla() {
             const satildi = sonucSelect.value === '1';
             satildiyaOzelAlanlar.forEach(id => {
@@ -112,42 +93,5 @@
         }
         sonucSelect.addEventListener('change', bedelAlaniniAyarla);
         bedelAlaniniAyarla();
-
-        // Otopark ücreti hesaplama - Alıcı Ödeme Bilgileri ekranındaki ile aynı mantık
-        // (OtoparkHesaplayici) burada JS ile anlık önizleme olarak gösterilir.
-        const ALTI_AY_GUN = 180;
-        const ilkDonemUcret = @Html.Raw(((decimal)ViewBag.OtoparkIlkDonemUcret).ToString(System.Globalization.CultureInfo.InvariantCulture));
-        const ikinciDonemUcret = @Html.Raw(((decimal)ViewBag.OtoparkIkinciDonemUcret).ToString(System.Globalization.CultureInfo.InvariantCulture));
-        const satisTarihi = new Date('@Model.SatisTarihi.ToString("yyyy-MM-dd")');
-
-        function paraGoster(deger) {
-            return deger.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        }
-
-        function otoparkHesapla() {
-            const girisInput = document.getElementById('otoparkaGirisTarihi').value;
-            let gunSayisi = 0;
-            if (girisInput) {
-                const giris = new Date(girisInput);
-                gunSayisi = Math.max(Math.round((satisTarihi - giris) / (1000 * 60 * 60 * 24)), 0);
-            }
-            let otoparkUcreti;
-            if (gunSayisi <= ALTI_AY_GUN) {
-                otoparkUcreti = gunSayisi * ilkDonemUcret;
-            } else {
-                otoparkUcreti = ALTI_AY_GUN * ilkDonemUcret + (gunSayisi - ALTI_AY_GUN) * ikinciDonemUcret;
-            }
-            const cekiciBedeli = parseFloat(document.getElementById('cekiciBedeli').value) || 0;
-            const toplam = Math.round(otoparkUcreti + cekiciBedeli);
-
-            document.getElementById('otoparkGunSayisiGoster').value = gunSayisi;
-            document.getElementById('otoparkUcretiGoster').value = paraGoster(otoparkUcreti);
-            document.getElementById('cekiciUcretiGoster').value = paraGoster(cekiciBedeli);
-            document.getElementById('toplamGoster').value = paraGoster(toplam);
-        }
-
-        document.getElementById('otoparkaGirisTarihi').addEventListener('input', otoparkHesapla);
-        document.getElementById('cekiciBedeli').addEventListener('input', otoparkHesapla);
-        otoparkHesapla();
     </script>
 }

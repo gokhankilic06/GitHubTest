@@ -98,6 +98,13 @@ namespace AracSatisSistemi.Controllers
                 satis.VerilenSure = IhaleTarihHesaplayici.IsGunuEkle(satis.SatisTarihi, 3, resmiTatiller);
             }
 
+            // Otoparka Giriş Tarihi henüz girilmemişse, dosya kaydındaki (Kayıt İşlemleri
+            // ekranında girilen) tarih öneri olarak doldurulur; kullanıcı gerekirse değiştirebilir.
+            if (satis.OtoparkaGirisTarihi == null)
+            {
+                satis.OtoparkaGirisTarihi = satis.Dosya!.OtoparkaGirisTarihi;
+            }
+
             await ViewBagHazirla(satis);
 
             // Çekici bedeli henüz girilmemişse ve dosyada "Çekici Var" işaretliyse, sabit çekici
@@ -160,6 +167,7 @@ namespace AracSatisSistemi.Controllers
             satis.FaturayiKesenOtopark = form.FaturayiKesenOtopark;
             satis.OtoparkaGirisTarihi = form.OtoparkaGirisTarihi;
             satis.CekiciBedeli = form.CekiciBedeli;
+            satis.MTV = form.MTV;
 
             // Bu alıcı daha önce kayıtlı değilse (yeni vergi numarasıysa) alıcı listesine eklenir;
             // sonraki satışlarda "Kayıtlı Alıcılardan Seç" ile tekrar seçilebilsin.

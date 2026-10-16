@@ -180,13 +180,24 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Details), new { id = dosya.Id });
         }
 
-        // 2. Satış İhale Tutanağı - yazdırılabilir resmi belge.
+        // İhale Tutanağı - yazdırılabilir resmi belge.
         public async Task<IActionResult> IhaleTutanagi(int id)
         {
             var dosya = await _db.Dosyalar
                 .Include(d => d.Satislar)
                 .FirstOrDefaultAsync(d => d.Id == id);
             if (dosya == null) return NotFound();
+
+            // İhale saati, aynı satış türü/tarihi için kaydedilmiş bir Komisyon İşlemleri
+            // oturumundan (varsa) eşleştirilerek bulunur (bkz. TutanakRaporController - aynı mantık).
+            var satis = dosya.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
+            if (satis != null)
+            {
+                var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
+                    k.SatisTuru == satis.SatisTuru && k.SatisTarihi.Date == satis.SatisTarihi.Date);
+                ViewBag.SatisSaati = oturum?.SatisSaati;
+            }
+
             return View(dosya);
         }
 

@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "İhale Tutanağı";
     var satis = Model.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
+    var satisSaati = (TimeSpan?)ViewBag.SatisSaati;
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
 }
 <div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h3>İhale Tutanağı - Dosya No: @Model.DosyaNo</h3>
@@ -13,86 +15,71 @@
 </div>
 
 <div id="tutanakAlani">
-    <div class="text-center mb-3 pb-2 border-bottom">
+    <div class="text-center mb-2 pb-2 border-bottom">
         <h3 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h3>
         <h5 class="text-muted mb-0">İhale Tutanağı</h5>
     </div>
 
-    <div class="card p-3">
-        <div class="row">
-            <div class="col-md-4"><strong>Dosya No:</strong> @Model.DosyaNo</div>
-            <div class="col-md-4"><strong>Tutanak Tarihi:</strong> @DateTime.Now.ToString("dd.MM.yyyy")</div>
-            <div class="col-md-4"><strong>Vergi Dairesi:</strong> @Model.VergiDairesiAdi</div>
-        </div>
+    <div class="text-center fw-bold mb-2" style="font-size:1rem;">Dosya No: @Model.DosyaNo</div>
 
-        <div class="form-section-title">Borçlu Mükellef</div>
-        <div class="row">
-            <div class="col-md-4"><strong>Adı Soyadı/Unvanı:</strong> @Model.AdiSoyadiUnvani</div>
-            <div class="col-md-4"><strong>TCKN:</strong> @Model.TCKimlikNumarasi</div>
-            <div class="col-md-4"><strong>VKN:</strong> @Model.VergiKimlikNumarasi</div>
-        </div>
+    <table class="tutanak-tablo">
+        <tr><td class="baslik" colspan="4">ALACAKLI VERGİ DAİRESİ / BORÇLU MÜKELLEFİN BİLGİLERİ</td></tr>
+        <tr><td class="etiket">Alacaklı Vergi Dairesi</td><td colspan="3">@Model.AlacakliVergiDairesi</td></tr>
+        <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td colspan="3">@Model.AdiSoyadiUnvani</td></tr>
+        <tr><td class="etiket">Vergi Kimlik No</td><td>@Model.VergiKimlikNumarasi</td><td class="etiket">T.C. Kimlik No</td><td>@Model.TCKimlikNumarasi</td></tr>
+        <tr><td class="etiket">Vergi Dairesi Adı</td><td colspan="3">@Model.VergiDairesiAdi</td></tr>
+    </table>
 
-        <div class="form-section-title">Satışa Konu Araç</div>
-        <div class="row">
-            <div class="col-md-3"><strong>Plaka:</strong> @Model.Plaka</div>
-            <div class="col-md-3"><strong>Markası:</strong> @Model.AracMarkasi</div>
-            <div class="col-md-3"><strong>Cinsi:</strong> @Model.AracCinsi</div>
-            <div class="col-md-3"><strong>Model Yılı:</strong> @Model.ModelYili</div>
-            <div class="col-md-3"><strong>Renk:</strong> @Model.Renk</div>
-            <div class="col-md-3"><strong>Muhammen Bedel:</strong> @Model.MuhammenBedel.ToString("N2") TL</div>
-        </div>
+    <table class="tutanak-tablo mt-2">
+        <tr><td class="baslik" colspan="2">ARAÇ DETAYI</td><td class="baslik text-end" colspan="2">Plaka: <strong>@Model.Plaka</strong></td></tr>
+        <tr><td class="etiket">Cinsi</td><td>@Model.AracCinsi</td><td class="etiket">Tipi</td><td>@Model.AracTipi</td></tr>
+        <tr><td class="etiket">Markası</td><td>@Model.AracMarkasi</td><td class="etiket">Model Yılı</td><td>@Model.ModelYili</td></tr>
+        <tr><td class="etiket">Renk</td><td>@Model.Renk</td><td class="etiket">Muhammen Bedel</td><td>@Model.MuhammenBedel.ToString("N2", trTR) TL</td></tr>
+    </table>
 
-        <div class="form-section-title">İhale / Satış Sonucu</div>
-        @if (satis != null)
-        {
-            <div class="row">
-                <div class="col-md-3"><strong>Satış Türü:</strong> @satis.SatisTuru</div>
-                <div class="col-md-3"><strong>Satış Tarihi:</strong> @satis.SatisTarihi.ToString("dd.MM.yyyy")</div>
-                <div class="col-md-3"><strong>Sonuç:</strong> @satis.SatisSonucu</div>
-                <div class="col-md-3"><strong>Satış Bedeli:</strong> @(satis.SatisBedeli?.ToString("N2") ?? "-") TL</div>
-                <div class="col-md-4"><strong>Alıcı Adı Soyadı:</strong> @satis.AliciAdiSoyadi</div>
-                <div class="col-md-4"><strong>Alıcı TCKN:</strong> @satis.AliciTCKN</div>
-                <div class="col-md-4"><strong>Alıcı VKN:</strong> @satis.AliciVKN</div>
-                <div class="col-md-6"><strong>Adres:</strong> @satis.Adres</div>
-                <div class="col-md-3"><strong>Vade:</strong> @satis.Vade.ToString("dd.MM.yyyy")</div>
-            </div>
-        }
-        else
-        {
-            <p class="text-muted">Bu dosya için henüz satış kaydı girilmemiştir.</p>
-        }
+    <table class="tutanak-tablo mt-2">
+        <tr><td class="baslik" colspan="4">İHALE BİLGİLERİNİ GİR</td></tr>
+        <tr><td class="etiket">Satış Türü</td><td colspan="3">@(satis?.SatisTuruGorunen ?? "-")</td></tr>
+        <tr><td class="etiket">İhale Tarihi / Saati</td><td colspan="3">@(satis?.SatisTarihi.ToString("dd.MM.yyyy") ?? "-") @(satisSaati.HasValue ? satisSaati.Value.ToString(@"hh\:mm") : "")</td></tr>
+        <tr><td class="etiket">Verilen Süre</td><td colspan="3">3 Gün</td></tr>
+    </table>
 
-        <div class="form-section-title">Yukarıda bilgileri yazılı araç, ilgili mevzuat hükümlerine göre açık artırma (ihale) usulüyle satışa çıkarılmış olup, işbu tutanak komisyon üyeleri tarafından tanzim ve imza edilmiştir.</div>
+    @* ---- Bu bölümün altına eklenecek katılımcı/pey tablosu kullanıcıdan bekleniyor;
+         o gelene kadar diğer tutanaklarla (bkz. TutanakRapor) aynı standart tablo
+         geçici olarak kullanılıyor. ---- *@
+    <p class="tutanak-paragraf mt-2">
+        Yukarıda detay bilgileri bulunan hacizli menkul malın, yapılan ihaleye iştirak eden kişilerden en yüksek
+        bedeli teklif eden, aşağıda adı soyadı ve imzası bulunan şahsa ihale edildiğine ilişkin tutanaktır.
+    </p>
+    <table class="tutanak-tablo">
+        <tr class="baslik">
+            <td>Adı ve Soyadı (Ünvanı)</td>
+            <td>TC Kimlik No / Vergi Kimlik No</td>
+            <td>İrtibat Adresi</td>
+            <td>Satış Bedeli</td>
+            <td>İmzası</td>
+        </tr>
+        <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+    </table>
 
-        <div class="row mt-4 text-center">
-            <div class="col-md-4 mt-4">
-                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
-                    @Model.KomisyonBaskani<br /><span class="text-muted small">Komisyon Başkanı</span>
-                </div>
-            </div>
-            <div class="col-md-2 mt-4">
-                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
-                    @Model.KomisyonUye1<br /><span class="text-muted small">Üye</span>
-                </div>
-            </div>
-            <div class="col-md-2 mt-4">
-                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
-                    @Model.KomisyonUye2<br /><span class="text-muted small">Üye</span>
-                </div>
-            </div>
-            <div class="col-md-2 mt-4">
-                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
-                    @Model.KomisyonUye3<br /><span class="text-muted small">Üye</span>
-                </div>
-            </div>
-            <div class="col-md-2 mt-4">
-                <div style="border-top:1px solid #333; margin-top:3rem; padding-top:.25rem;">
-                    @Model.KomisyonUye4<br /><span class="text-muted small">Üye</span>
-                </div>
-            </div>
-        </div>
+    <div class="text-center mt-3 mb-2 fw-bold">SATIŞ KOMİSYONU</div>
+    <div class="row text-center">
+        <div class="col-3"><div class="imza-cizgi">@Model.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
+        <div class="col-3"><div class="imza-cizgi">@Model.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
+        <div class="col-3"><div class="imza-cizgi">@Model.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+        <div class="col-3"><div class="imza-cizgi">@Model.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
     </div>
 </div>
+
+<style>
+    .tutanak-tablo { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .tutanak-tablo td { border: 1px solid #333; padding: 5px 8px; vertical-align: middle; }
+    .tutanak-tablo td.etiket { font-weight: 600; background: #f8f9fa; width: 22%; }
+    .tutanak-tablo td.baslik { font-weight: 700; background: #eaeaea; }
+    .tutanak-paragraf { font-size: 0.85rem; }
+    .imza-cizgi { border-top: 1px solid #333; margin-top: 3rem; padding-top: .25rem; min-height: 1.2rem; }
+</style>
 
 @section Scripts {
     <script>
