@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "İhale Tutanağı";
+}
+<h3>İhale Tutanağı</h3>
+<p class="text-muted">İhale öncesi yazdırılacak İhale Tutanağı'na ulaşmak için dosya numarasını yazın.</p>
+
+<form asp-action="IhaleTutanagiBul" method="post" class="row g-2">
+    @Html.AntiForgeryToken()
+    <div class="col-md-4">
+        <input class="form-control" name="dosyaNo" placeholder="Dosya No (ör. 2026/0001)" value="@ViewBag.DosyaNo" required />
+    </div>
+    <div class="col-auto">
+        <button class="btn btn-primary" type="submit">Dosyayı Getir</button>
+    </div>
+</form>

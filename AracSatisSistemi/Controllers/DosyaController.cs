@@ -180,6 +180,26 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Details), new { id = dosya.Id });
         }
 
+        // GET: /Dosya/IhaleTutanagiAra - Dosya No ile İhale Tutanağı'na erişim (Kayıt İşlemleri
+        // ile Satış Sonuçlarını Gir arasındaki adım: ihaleden önce tutanağı yazdırmak için).
+        public IActionResult IhaleTutanagiAra(string? dosyaNo)
+        {
+            ViewBag.DosyaNo = dosyaNo;
+            return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> IhaleTutanagiBul(string dosyaNo)
+        {
+            var dosya = await _db.Dosyalar.FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            if (dosya == null)
+            {
+                TempData["Hata"] = "Bu dosya numarasına ait kayıt bulunamadı.";
+                return RedirectToAction(nameof(IhaleTutanagiAra), new { dosyaNo });
+            }
+            return RedirectToAction(nameof(IhaleTutanagi), new { id = dosya.Id });
+        }
+
         // İhale Tutanağı - yazdırılabilir resmi belge.
         public async Task<IActionResult> IhaleTutanagi(int id)
         {
