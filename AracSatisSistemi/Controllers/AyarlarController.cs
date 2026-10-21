@@ -29,13 +29,12 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> KomisyonGuncelle(KomisyonAyari form)
         {
             // Seçmeli listede boş bırakılan bir alan model binding tarafından null'a
-            // dönüştürülür (ConvertEmptyStringToNull); Baskan/Uye1-4 NOT NULL olduğundan
+            // dönüştürülür (ConvertEmptyStringToNull); Baskan/Uye1-3 NOT NULL olduğundan
             // burada boş string'e çevrilir.
             form.Baskan ??= string.Empty;
             form.Uye1 ??= string.Empty;
             form.Uye2 ??= string.Empty;
             form.Uye3 ??= string.Empty;
-            form.Uye4 ??= string.Empty;
 
             var kayit = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
             if (kayit == null) { kayit = form; _db.KomisyonAyarlari.Add(kayit); }
@@ -45,7 +44,6 @@ namespace AracSatisSistemi.Controllers
                 kayit.Uye1 = form.Uye1;
                 kayit.Uye2 = form.Uye2;
                 kayit.Uye3 = form.Uye3;
-                kayit.Uye4 = form.Uye4;
             }
             await _db.SaveChangesAsync();
             TempData["Basari"] = "Komisyon bilgileri güncellendi.";

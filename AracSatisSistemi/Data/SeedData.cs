@@ -83,8 +83,7 @@ namespace AracSatisSistemi.Data
                     Baskan = "Komisyon Başkanı (güncelleyin)",
                     Uye1 = "Üye 1 (güncelleyin)",
                     Uye2 = "Üye 2 (güncelleyin)",
-                    Uye3 = "Üye 3 (güncelleyin)",
-                    Uye4 = "Üye 4 (güncelleyin)"
+                    Uye3 = "Üye 3 (güncelleyin)"
                 });
             }
 

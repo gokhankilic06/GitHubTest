@@ -63,7 +63,6 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Üye 1")] public string Uye1 { get; set; } = string.Empty;
         [Display(Name = "Üye 2")] public string Uye2 { get; set; } = string.Empty;
         [Display(Name = "Üye 3")] public string Uye3 { get; set; } = string.Empty;
-        [Display(Name = "Üye 4")] public string Uye4 { get; set; } = string.Empty;
     }
 
     // Komisyon başkanlığı/üyeliği yapabilecek memurların listesi. Güncellemeler ekranından

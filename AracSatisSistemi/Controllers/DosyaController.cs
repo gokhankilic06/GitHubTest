@@ -88,7 +88,6 @@ namespace AracSatisSistemi.Controllers
                 KomisyonUye1 = komisyon?.Uye1,
                 KomisyonUye2 = komisyon?.Uye2,
                 KomisyonUye3 = komisyon?.Uye3,
-                KomisyonUye4 = komisyon?.Uye4,
                 Satis1Tarihi = sonrakiTarihler.Count > 0 ? sonrakiTarihler[0] : bugun,
                 Satis2Tarihi = sonrakiTarihler.Count > 1 ? sonrakiTarihler[1] : bugun
             };
@@ -171,7 +170,6 @@ namespace AracSatisSistemi.Controllers
             dosya.KomisyonUye1 = guncel.KomisyonUye1;
             dosya.KomisyonUye2 = guncel.KomisyonUye2;
             dosya.KomisyonUye3 = guncel.KomisyonUye3;
-            dosya.KomisyonUye4 = guncel.KomisyonUye4;
             dosya.Satis1Tarihi = guncel.Satis1Tarihi;
             dosya.Satis2Tarihi = guncel.Satis2Tarihi;
 

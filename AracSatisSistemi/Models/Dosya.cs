@@ -98,8 +98,6 @@ namespace AracSatisSistemi.Models
         public string? KomisyonUye2 { get; set; }
         [Display(Name = "Komisyon Üyesi 3")]
         public string? KomisyonUye3 { get; set; }
-        [Display(Name = "Komisyon Üyesi 4")]
-        public string? KomisyonUye4 { get; set; }
 
         public DosyaDurumu Durum { get; set; } = DosyaDurumu.Kayitli;
 

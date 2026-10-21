@@ -72,11 +72,10 @@
     <form asp-action="KomisyonGuncelle" method="post" class="row g-3">
         @Html.AntiForgeryToken()
         <input type="hidden" name="Id" value="@komisyon?.Id" />
-        <div class="col-md-4"><label class="form-label">Başkan</label><select class="form-select" name="Baskan">@Html.Raw(MemurSecenekleri(komisyon?.Baskan))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 1</label><select class="form-select" name="Uye1">@Html.Raw(MemurSecenekleri(komisyon?.Uye1))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 2</label><select class="form-select" name="Uye2">@Html.Raw(MemurSecenekleri(komisyon?.Uye2))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 3</label><select class="form-select" name="Uye3">@Html.Raw(MemurSecenekleri(komisyon?.Uye3))</select></div>
-        <div class="col-md-2"><label class="form-label">Üye 4</label><select class="form-select" name="Uye4">@Html.Raw(MemurSecenekleri(komisyon?.Uye4))</select></div>
+        <div class="col-md-3"><label class="form-label">Başkan</label><select class="form-select" name="Baskan">@Html.Raw(MemurSecenekleri(komisyon?.Baskan))</select></div>
+        <div class="col-md-3"><label class="form-label">Üye 1</label><select class="form-select" name="Uye1">@Html.Raw(MemurSecenekleri(komisyon?.Uye1))</select></div>
+        <div class="col-md-3"><label class="form-label">Üye 2</label><select class="form-select" name="Uye2">@Html.Raw(MemurSecenekleri(komisyon?.Uye2))</select></div>
+        <div class="col-md-3"><label class="form-label">Üye 3</label><select class="form-select" name="Uye3">@Html.Raw(MemurSecenekleri(komisyon?.Uye3))</select></div>
         <div class="col-12"><button class="btn btn-primary">Komisyonu Güncelle</button></div>
     </form>
 </div>
