@@ -24,6 +24,10 @@ namespace AracSatisSistemi.Controllers
                 .OrderBy(t => t.Tarih)
                 .Select(t => t.Tarih)
                 .ToListAsync();
+
+            // Yeni oturum formunda, aynı kişiler genelde her oturumda görev aldığı için
+            // "Güncellemeler" ekranındaki varsayılan Komisyon Bilgileri öneri olarak doldurulur.
+            ViewBag.VarsayilanKomisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
         }
 
         // GET: /Komisyon - liste + yeni kayıt formu

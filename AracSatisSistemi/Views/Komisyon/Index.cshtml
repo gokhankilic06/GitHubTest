@@ -3,6 +3,7 @@
     ViewData["Title"] = "Komisyon İşlemleri";
     var memurlar = (List<Memur>)ViewBag.Memurlar;
     var satisGunleri = (List<DateTime>)ViewBag.SatisGunleri;
+    var varsayilanKomisyon = (KomisyonAyari?)ViewBag.VarsayilanKomisyon;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
 }
 <h3>Komisyon İşlemleri</h3>
@@ -14,7 +15,7 @@
         @Html.AntiForgeryToken()
         <div class="col-md-3">
             <label class="form-label">Satış Türü</label>
-            <select class="form-select" name="SatisTuru" required>
+            <select class="form-select" name="SatisTuru" id="satisTuruSecim" required>
                 <option value="">-- Seçiniz --</option>
                 <option value="1">1. Satış</option>
                 <option value="2">2. Satış</option>
@@ -31,12 +32,12 @@
                     <option value="@gun.ToString("yyyy-MM-dd")">@gun.ToString("dd.MM.yyyy (dddd)", trTR)</option>
                 }
             </select>
-            <div class="form-text">Liste, her haftanın Çarşamba günlerinden (resmi tatiller hariç) otomatik oluşturulur.</div>
+            <div class="form-text">Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir.</div>
         </div>
         <div class="col-md-2">
             <label class="form-label">Satış Saati</label>
-            <input class="form-control" name="SatisSaati" type="time" required />
-            <div class="form-text">Aynı gün birden fazla Pazarlık/6183-86 oturumunu ayırt etmek için.</div>
+            <input class="form-control" name="SatisSaati" type="time" id="satisSaatiGirisi" value="10:00" required />
+            <div class="form-text" id="saatAciklama">1. ve 2. Satış için saat sabit 10:00'dır.</div>
         </div>
         <div class="col-md-4">
             <label class="form-label">Komisyon Başkanı</label>
@@ -44,7 +45,7 @@
                 <option value="">-- Seçiniz --</option>
                 @foreach (var m in memurlar)
                 {
-                    <option value="@m.AdSoyad">@m.AdSoyad</option>
+                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Baskan)">@m.AdSoyad</option>
                 }
             </select>
         </div>
@@ -54,7 +55,7 @@
                 <option value="">-- Seçiniz --</option>
                 @foreach (var m in memurlar)
                 {
-                    <option value="@m.AdSoyad">@m.AdSoyad</option>
+                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Uye1)">@m.AdSoyad</option>
                 }
             </select>
         </div>
@@ -64,7 +65,7 @@
                 <option value="">-- Seçiniz --</option>
                 @foreach (var m in memurlar)
                 {
-                    <option value="@m.AdSoyad">@m.AdSoyad</option>
+                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Uye2)">@m.AdSoyad</option>
                 }
             </select>
         </div>
@@ -74,7 +75,7 @@
                 <option value="">-- Seçiniz --</option>
                 @foreach (var m in memurlar)
                 {
-                    <option value="@m.AdSoyad">@m.AdSoyad</option>
+                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Uye3)">@m.AdSoyad</option>
                 }
             </select>
         </div>
@@ -139,3 +140,26 @@
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // 1. ve 2. Satış için ihale saati her zaman sabit 10:00'dır; bu durumda alan salt
+        // okunur yapılır. Pazarlık/6183-86'da aynı gün birden fazla oturum olabileceğinden
+        // saat elle girilebilir kalır.
+        const satisTuruSecim = document.getElementById('satisTuruSecim');
+        const satisSaatiGirisi = document.getElementById('satisSaatiGirisi');
+        const saatAciklama = document.getElementById('saatAciklama');
+        function saatModunuAyarla() {
+            const sabitSaatli = satisTuruSecim.value === '1' || satisTuruSecim.value === '2';
+            satisSaatiGirisi.readOnly = sabitSaatli;
+            if (sabitSaatli) {
+                satisSaatiGirisi.value = '10:00';
+                saatAciklama.textContent = "1. ve 2. Satış için saat sabit 10:00'dır.";
+            } else {
+                saatAciklama.textContent = 'Aynı gün birden fazla Pazarlık/6183-86 oturumunu ayırt etmek için.';
+            }
+        }
+        satisTuruSecim.addEventListener('change', saatModunuAyarla);
+        saatModunuAyarla();
+    </script>
+}
