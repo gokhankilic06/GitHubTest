@@ -103,6 +103,38 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
+    // Yukarıdaki ilk toplu liste girildikten sonra, markaların kendi resmi Türkiye
+    // sitelerinden (Renault, Volkswagen, Fiat, Toyota, Hyundai, Opel, Peugeot, Citroën,
+    // Dacia, Mercedes-Benz, BMW) doğrulanan ve o ilk listede eksik olan güncel modeller.
+    // Yukarıdaki gibi "tablo boşsa" değil, her model tek tek "zaten yoksa" eklenir ki daha
+    // önce doldurulmuş (ve kullanıcı tarafından düzenlenmiş) listelere de güvenle uygulanabilsin.
+    {
+        var yeniModeller = new (string Marka, string[] Modeller)[]
+        {
+            ("Renault", new[] { "Koleos", "Rafale", "Scenic E-Tech", "Renault 5 E-Tech", "Megane E-Tech", "Trafic", "Trafic Panelvan", "Trafic Combi", "Master", "Master Kamyonet" }),
+            ("Volkswagen", new[] { "Tayron", "ID.4", "ID.7", "California", "Caravelle" }),
+            ("Fiat", new[] { "600", "500e Armani", "Scudo" }),
+            ("Toyota", new[] { "Yaris Cross", "Corolla Cross", "Land Cruiser Prado" }),
+            ("Hyundai", new[] { "i30", "Staria", "Inster", "Ioniq 5", "Ioniq 6", "Ioniq 9" }),
+            ("Opel", new[] { "Frontera", "Grandland", "Movano", "Zafira" }),
+            ("Peugeot", new[] { "408", "5008", "Rifter" }),
+            ("Citroen", new[] { "C3 Aircross", "C5 Aircross", "C4 X", "Ami" }),
+            ("Dacia", new[] { "Sandero Stepway", "Jogger" }),
+            ("Mercedes-Benz", new[] { "S Serisi", "GLA", "GLC", "GLE" }),
+            ("BMW", new[] { "7 Serisi", "X6", "i4", "iX" }),
+        };
+        var mevcutlar = db.AracModelleri.Select(m => m.MarkaAdi + "|" + m.Ad).ToHashSet();
+        var eklenecekler = yeniModeller
+            .SelectMany(m => m.Modeller.Select(ad => new AracModeli { MarkaAdi = m.Marka, Ad = ad }))
+            .Where(m => !mevcutlar.Contains(m.MarkaAdi + "|" + m.Ad))
+            .ToList();
+        if (eklenecekler.Count > 0)
+        {
+            db.AracModelleri.AddRange(eklenecekler);
+            db.SaveChanges();
+        }
+    }
+
     // Çekici ücreti artık (otopark tarifesi gibi) araç kategorisine göre 4 ayrı sütunda
     // tutuluyor (eski tek "CekiciUcretiSabit" sütunu yerine). SQLite'ta "ADD COLUMN IF NOT
     // EXISTS" olmadığından her biri ayrı ayrı denenip zaten varsa oluşan hata yutulur.
