@@ -35,8 +35,7 @@ namespace AracSatisSistemi.Data
             {
                 // NOT: Bu liste düzenlenebilir bir başlangıç listesidir. Tam ve güncel marka
                 // listesi için Güncellemeler ekranından https://www.tsb.org.tr/tr/kasko-deger-listesi
-                // adresindeki liste referans alınarak eklenmelidir (bu ortamda internet erişimi
-                // olmadığından otomatik çekim yapılamamıştır).
+                // adresindeki liste referans alınarak eklenmelidir.
                 var markalar = new[]
                 {
                     "Renault", "Fiat", "Ford", "Volkswagen", "Toyota", "Hyundai", "Opel",

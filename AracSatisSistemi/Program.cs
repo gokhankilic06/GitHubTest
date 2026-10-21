@@ -53,6 +53,56 @@ using (var scope = app.Services.CreateScope())
         ""Ad"" TEXT NOT NULL
     );");
 
+    // Tablo az önce oluşturulmuş olabileceğinden (yukarıdaki CREATE TABLE ile), başlangıç
+    // model listesi burada - tablo garantiye alındıktan SONRA - doldurulur. Yalnızca tablo
+    // tamamen boşsa (daha önce hiç çalıştırılmadıysa veya kullanıcı henüz hiç model
+    // eklemediyse) bir kerelik doldurulur; kullanıcı sonradan sildiği modeller tekrar eklenmez.
+    if (!db.AracModelleri.Any())
+    {
+        var modeller = new (string Marka, string[] Modeller)[]
+        {
+            ("Renault", new[] { "Clio", "Megane", "Symbol", "Fluence", "Taliant", "Duster", "Captur", "Kadjar", "Austral", "Talisman", "Laguna", "Kangoo" }),
+            ("Fiat", new[] { "Egea", "Tipo", "Linea", "Albea", "Palio", "Doblo", "Fiorino", "Ducato", "Panda", "500" }),
+            ("Ford", new[] { "Focus", "Fiesta", "Mondeo", "Kuga", "Puma", "Courier", "Transit", "Transit Custom", "Transit Connect", "Ranger" }),
+            ("Volkswagen", new[] { "Polo", "Golf", "Passat", "Jetta", "Tiguan", "T-Roc", "T-Cross", "Taigo", "Touareg", "Caddy", "Transporter", "Crafter", "Amarok" }),
+            ("Toyota", new[] { "Corolla", "Yaris", "Auris", "C-HR", "RAV4", "Hilux", "Avensis", "Camry", "Proace" }),
+            ("Hyundai", new[] { "i10", "i20", "Accent", "Elantra", "Tucson", "Bayon", "Kona", "Santa Fe", "H-1", "Starex" }),
+            ("Opel", new[] { "Corsa", "Astra", "Insignia", "Mokka", "Combo", "Vectra", "Vivaro" }),
+            ("Peugeot", new[] { "208", "301", "308", "2008", "3008", "508", "Partner", "Boxer", "Expert" }),
+            ("Citroen", new[] { "C3", "C-Elysee", "C4", "Berlingo", "Jumper", "Jumpy" }),
+            ("Dacia", new[] { "Duster", "Sandero", "Logan", "Dokker", "Lodgy", "Spring" }),
+            ("Honda", new[] { "Civic", "City", "Jazz", "CR-V", "HR-V" }),
+            ("Nissan", new[] { "Micra", "Qashqai", "Juke", "X-Trail", "Primera", "Almera" }),
+            ("Mercedes-Benz", new[] { "A Serisi", "C Serisi", "E Serisi", "Vito", "Sprinter", "Actros", "Atego", "Axor" }),
+            ("BMW", new[] { "1 Serisi", "3 Serisi", "5 Serisi", "X1", "X3", "X5" }),
+            ("Audi", new[] { "A3", "A4", "A6", "Q3", "Q5" }),
+            ("Skoda", new[] { "Fabia", "Octavia", "Superb", "Kodiaq", "Karoq", "Rapid" }),
+            ("Seat", new[] { "Ibiza", "Leon", "Arona", "Toledo" }),
+            ("Kia", new[] { "Picanto", "Rio", "Ceed", "Sportage", "Stonic", "Carens" }),
+            ("Chevrolet", new[] { "Aveo", "Cruze", "Lacetti", "Captiva", "Spark" }),
+            ("Mazda", new[] { "Mazda2", "Mazda3", "CX-5" }),
+            ("Suzuki", new[] { "Swift", "Vitara", "S-Cross", "Baleno" }),
+            ("Mitsubishi", new[] { "Lancer", "Outlander", "L200", "ASX" }),
+            ("Volvo", new[] { "S60", "S80", "XC60", "XC90", "FH", "FM" }),
+            ("Land Rover", new[] { "Defender", "Discovery", "Range Rover", "Evoque" }),
+            ("Jeep", new[] { "Renegade", "Compass", "Wrangler", "Grand Cherokee" }),
+            ("Isuzu", new[] { "D-Max", "NPR", "NQR" }),
+            ("Iveco", new[] { "Daily", "Eurocargo", "Stralis" }),
+            ("MAN", new[] { "TGX", "TGS", "TGL", "Lion's City" }),
+            ("Scania", new[] { "R Serisi", "P Serisi", "G Serisi" }),
+            ("DAF", new[] { "XF", "CF", "LF" }),
+            ("BMC", new[] { "Fatih", "Pro", "Yavuz", "Professional" }),
+            ("Otokar", new[] { "Kent", "Sultan", "Doruk", "Territo" }),
+            ("TEMSA", new[] { "Safir", "Avenue", "Maraton", "Prestij" }),
+            ("Yamaha", new[] { "NMAX", "XMAX", "MT-07", "YBR125", "Crypton" }),
+            ("Honda Motosiklet", new[] { "PCX", "CB500", "CBR", "Vario" }),
+            ("TOGG", new[] { "T10X" }),
+        };
+        db.AracModelleri.AddRange(
+            modeller.SelectMany(m => m.Modeller.Select(ad => new AracModeli { MarkaAdi = m.Marka, Ad = ad })));
+        db.SaveChanges();
+    }
+
     // Çekici ücreti artık (otopark tarifesi gibi) araç kategorisine göre 4 ayrı sütunda
     // tutuluyor (eski tek "CekiciUcretiSabit" sütunu yerine). SQLite'ta "ADD COLUMN IF NOT
     // EXISTS" olmadığından her biri ayrı ayrı denenip zaten varsa oluşan hata yutulur.
