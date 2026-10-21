@@ -4,6 +4,7 @@
     var gosterilecekTur = (SatisTuru)ViewBag.GosterilecekTur;
     var gosterilecekTarih = (DateTime)ViewBag.GosterilecekTarih;
     var satisSaati = (TimeSpan?)ViewBag.SatisSaati;
+    var tarihSeciliyor = (bool)ViewBag.TarihSeciliyor;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
     string TurAdi(SatisTuru t) => t switch
     {
@@ -22,6 +23,28 @@
         <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@Model.Id"><i class="bi bi-arrow-left"></i> Dosyaya Dön</a>
     </div>
 </div>
+
+@if (tarihSeciliyor)
+{
+    <div class="card p-3 mb-3 no-print">
+        <div class="form-section-title">@TurAdi(gosterilecekTur) Tarihi / Saati</div>
+        <p class="text-muted small">Bu dosya şu an "@TurAdi(gosterilecekTur)" aşamasında; bunun Satış Takvimi'nde sabit bir tarihi olmadığından tutanakta gösterilecek tarih ve saati burada seçin.</p>
+        <form method="get" class="row g-2 align-items-end">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <div class="col-auto">
+                <label class="form-label">Tarih</label>
+                <input class="form-control" type="date" name="secilenTarih" value="@gosterilecekTarih.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-auto">
+                <label class="form-label">Saat</label>
+                <input class="form-control" type="time" name="secilenSaat" value="@(satisSaati?.ToString(@"hh\:mm") ?? "10:00")" />
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" type="submit">Göster</button>
+            </div>
+        </form>
+    </div>
+}
 
 <div id="tutanakAlani">
     <div class="text-center mb-2 pb-2 border-bottom">
@@ -52,10 +75,17 @@
     </table>
     @if (!satisSaati.HasValue)
     {
-        <p class="text-muted small mt-1 no-print">
-            Bu satış türü/tarihi için henüz bir Komisyon Oturumu (ve dolayısıyla ihale saati) kaydedilmemiş.
-            <a asp-controller="Komisyon" asp-action="Index">Komisyon İşlemleri</a> ekranından ekleyebilirsiniz.
-        </p>
+        if (tarihSeciliyor)
+        {
+            <p class="text-muted small mt-1 no-print">Yukarıdaki formdan tarih ve saat seçip "Göster" butonuna basın.</p>
+        }
+        else
+        {
+            <p class="text-muted small mt-1 no-print">
+                Bu satış türü/tarihi için henüz bir Komisyon Oturumu (ve dolayısıyla ihale saati) kaydedilmemiş.
+                <a asp-controller="Komisyon" asp-action="Index">Komisyon İşlemleri</a> ekranından ekleyebilirsiniz.
+            </p>
+        }
     }
 
     @* ---- Bu bölümün altına eklenecek katılımcı/pey tablosu kullanıcıdan bekleniyor;

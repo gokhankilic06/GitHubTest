@@ -200,27 +200,70 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(IhaleTutanagi), new { id = dosya.Id });
         }
 
-        // İhale Tutanağı - yazdırılabilir resmi belge.
-        public async Task<IActionResult> IhaleTutanagi(int id)
+        // İhale Tutanağı - yazdırılabilir resmi belge. "secilenTarih"/"secilenSaat", dosya
+        // Pazarlık/6183-86 aşamasındaysa (bu ikisinin Satış Takvimi'nde sabit bir tarihi
+        // olmadığından) sayfadaki tarih/saat seçim formundan gelir.
+        public async Task<IActionResult> IhaleTutanagi(int id, DateTime? secilenTarih, TimeSpan? secilenSaat)
         {
             var dosya = await _db.Dosyalar
                 .Include(d => d.Satislar)
                 .FirstOrDefaultAsync(d => d.Id == id);
             if (dosya == null) return NotFound();
 
-            // Henüz hiç satış sonucu girilmemiş (ihale öncesi, Kayıt'tan hemen sonraki) bir
-            // dosyada gösterilecek bilgi, dosyanın kendi üzerindeki planlı 1. Satış
-            // tarihinden gelir; bir sonuç girildiyse (bu ekran o zaman da kullanılabilir)
-            // en son girilen sonucun tür/tarihi gösterilir.
-            var satis = dosya.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
-            var gosterilecekTur = satis?.SatisTuru ?? SatisTuru.BirinciSatis;
-            var gosterilecekTarih = satis?.SatisTarihi ?? dosya.Satis1Tarihi;
+            SatisTuru gosterilecekTur;
+            DateTime gosterilecekTarih;
+            bool tarihSeciliyor;
+
+            if (dosya.Durum == DosyaDurumu.Satildi)
+            {
+                // Dosya zaten satıldıysa, tutanak artık ileriye dönük değil geriye dönük bir
+                // kayıttır: gerçekleşen satışın tür/tarihi gösterilir.
+                var satilan = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi)
+                    ?? dosya.Satislar.OrderByDescending(s => s.SatisTarihi).First();
+                gosterilecekTur = satilan.SatisTuru;
+                gosterilecekTarih = satilan.SatisTarihi;
+                tarihSeciliyor = false;
+            }
+            else
+            {
+                // Dosyanın şu an hangi aşamayı beklediği (bkz. Dosya.Asama - tüm dallanma
+                // mantığının tek kaynağı) belirler: 1./2. Satış'ın Satış Takvimi'nden gelen
+                // sabit bir tarihi vardır; Pazarlık/6183-86'nın ise yoktur, bu yüzden o
+                // durumda tarih/saat sayfadan seçilir.
+                switch (dosya.Asama)
+                {
+                    case Dosya.SurecAsamasi.IkinciSatisBekliyor:
+                        gosterilecekTur = SatisTuru.IkinciSatis;
+                        gosterilecekTarih = dosya.Satis2Tarihi;
+                        tarihSeciliyor = false;
+                        break;
+                    case Dosya.SurecAsamasi.PazarlikBekliyor:
+                        gosterilecekTur = SatisTuru.Pazarlik;
+                        gosterilecekTarih = secilenTarih ?? DateTime.Today;
+                        tarihSeciliyor = true;
+                        break;
+                    case Dosya.SurecAsamasi.Madde6183_86Bekliyor:
+                        gosterilecekTur = SatisTuru.Madde6183_86;
+                        gosterilecekTarih = secilenTarih ?? DateTime.Today;
+                        tarihSeciliyor = true;
+                        break;
+                    default:
+                        // BirinciSatisBekliyor ve nadir görülecek diğer durumlar (AliciyaTerkBekliyor,
+                        // SurecTamamlandi) için varsayılan olarak 1. Satış bilgisi gösterilir.
+                        gosterilecekTur = SatisTuru.BirinciSatis;
+                        gosterilecekTarih = dosya.Satis1Tarihi;
+                        tarihSeciliyor = false;
+                        break;
+                }
+            }
+
             ViewBag.GosterilecekTur = gosterilecekTur;
             ViewBag.GosterilecekTarih = gosterilecekTarih;
+            ViewBag.TarihSeciliyor = tarihSeciliyor;
 
-            // 1. ve 2. Satış saati her zaman sabit 10:00'dır (bkz. Komisyon İşlemleri ekranı);
-            // Pazarlık/6183-86'da aynı gün birden fazla oturum olabileceğinden kaydedilmiş
-            // Komisyon Oturumu'ndan eşleştirilerek bulunur.
+            // 1. ve 2. Satış saati her zaman sabit 10:00'dır (bkz. Komisyon İşlemleri ekranı).
+            // Pazarlık/6183-86'da ise önce o tür/tarih için kaydedilmiş bir Komisyon Oturumu
+            // aranır; yoksa (tarih seçiliyorsa) sayfadan elle seçilen saat kullanılır.
             if (gosterilecekTur == SatisTuru.BirinciSatis || gosterilecekTur == SatisTuru.IkinciSatis)
             {
                 ViewBag.SatisSaati = new TimeSpan(10, 0, 0);
@@ -229,7 +272,7 @@ namespace AracSatisSistemi.Controllers
             {
                 var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
                     k.SatisTuru == gosterilecekTur && k.SatisTarihi.Date == gosterilecekTarih.Date);
-                ViewBag.SatisSaati = oturum?.SatisSaati;
+                ViewBag.SatisSaati = oturum?.SatisSaati ?? secilenSaat;
             }
 
             return View(dosya);
