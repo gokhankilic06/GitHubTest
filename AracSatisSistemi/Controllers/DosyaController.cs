@@ -208,13 +208,27 @@ namespace AracSatisSistemi.Controllers
                 .FirstOrDefaultAsync(d => d.Id == id);
             if (dosya == null) return NotFound();
 
-            // İhale saati, aynı satış türü/tarihi için kaydedilmiş bir Komisyon İşlemleri
-            // oturumundan (varsa) eşleştirilerek bulunur (bkz. TutanakRaporController - aynı mantık).
+            // Henüz hiç satış sonucu girilmemiş (ihale öncesi, Kayıt'tan hemen sonraki) bir
+            // dosyada gösterilecek bilgi, dosyanın kendi üzerindeki planlı 1. Satış
+            // tarihinden gelir; bir sonuç girildiyse (bu ekran o zaman da kullanılabilir)
+            // en son girilen sonucun tür/tarihi gösterilir.
             var satis = dosya.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
-            if (satis != null)
+            var gosterilecekTur = satis?.SatisTuru ?? SatisTuru.BirinciSatis;
+            var gosterilecekTarih = satis?.SatisTarihi ?? dosya.Satis1Tarihi;
+            ViewBag.GosterilecekTur = gosterilecekTur;
+            ViewBag.GosterilecekTarih = gosterilecekTarih;
+
+            // 1. ve 2. Satış saati her zaman sabit 10:00'dır (bkz. Komisyon İşlemleri ekranı);
+            // Pazarlık/6183-86'da aynı gün birden fazla oturum olabileceğinden kaydedilmiş
+            // Komisyon Oturumu'ndan eşleştirilerek bulunur.
+            if (gosterilecekTur == SatisTuru.BirinciSatis || gosterilecekTur == SatisTuru.IkinciSatis)
+            {
+                ViewBag.SatisSaati = new TimeSpan(10, 0, 0);
+            }
+            else
             {
                 var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
-                    k.SatisTuru == satis.SatisTuru && k.SatisTarihi.Date == satis.SatisTarihi.Date);
+                    k.SatisTuru == gosterilecekTur && k.SatisTarihi.Date == gosterilecekTarih.Date);
                 ViewBag.SatisSaati = oturum?.SatisSaati;
             }
 

@@ -1,9 +1,18 @@
 @model Dosya
 @{
     ViewData["Title"] = "İhale Tutanağı";
-    var satis = Model.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
+    var gosterilecekTur = (SatisTuru)ViewBag.GosterilecekTur;
+    var gosterilecekTarih = (DateTime)ViewBag.GosterilecekTarih;
     var satisSaati = (TimeSpan?)ViewBag.SatisSaati;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
+    string TurAdi(SatisTuru t) => t switch
+    {
+        SatisTuru.BirinciSatis => "1. Satış",
+        SatisTuru.IkinciSatis => "2. Satış",
+        SatisTuru.Pazarlik => "Pazarlık",
+        SatisTuru.Madde6183_86 => "6183/86 Mad.",
+        _ => t.ToString()
+    };
 }
 <div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h3>İhale Tutanağı - Dosya No: @Model.DosyaNo</h3>
@@ -37,11 +46,11 @@
 
     <table class="tutanak-tablo mt-2">
         <tr><td class="baslik" colspan="4">İHALE BİLGİLERİ</td></tr>
-        <tr><td class="etiket">Satış Türü</td><td colspan="3">@(satis?.SatisTuruGorunen ?? "-")</td></tr>
-        <tr><td class="etiket">İhale Tarihi / Saati</td><td colspan="3">@(satis?.SatisTarihi.ToString("dd.MM.yyyy") ?? "-") @(satisSaati.HasValue ? satisSaati.Value.ToString(@"hh\:mm") : "")</td></tr>
+        <tr><td class="etiket">Satış Türü</td><td colspan="3">@TurAdi(gosterilecekTur)</td></tr>
+        <tr><td class="etiket">İhale Tarihi / Saati</td><td colspan="3">@gosterilecekTarih.ToString("dd.MM.yyyy") @(satisSaati.HasValue ? satisSaati.Value.ToString(@"hh\:mm") : "")</td></tr>
         <tr><td class="etiket">Verilen Süre</td><td colspan="3">3 Gün</td></tr>
     </table>
-    @if (satis != null && !satisSaati.HasValue)
+    @if (!satisSaati.HasValue)
     {
         <p class="text-muted small mt-1 no-print">
             Bu satış türü/tarihi için henüz bir Komisyon Oturumu (ve dolayısıyla ihale saati) kaydedilmemiş.
