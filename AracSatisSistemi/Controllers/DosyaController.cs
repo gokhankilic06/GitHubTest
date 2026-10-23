@@ -259,18 +259,33 @@ namespace AracSatisSistemi.Controllers
             ViewBag.GosterilecekTarih = gosterilecekTarih;
             ViewBag.TarihSeciliyor = tarihSeciliyor;
 
-            // 1. ve 2. Satış saati her zaman sabit 10:00'dır (bkz. Komisyon İşlemleri ekranı).
-            // Pazarlık/6183-86'da ise önce o tür/tarih için kaydedilmiş bir Komisyon Oturumu
-            // aranır; yoksa (tarih seçiliyorsa) sayfadan elle seçilen saat kullanılır.
-            if (gosterilecekTur == SatisTuru.BirinciSatis || gosterilecekTur == SatisTuru.IkinciSatis)
+            // Gösterilecek tür/tarih için kaydedilmiş bir Komisyon Oturumu (bkz. Komisyon
+            // İşlemleri ekranı) varsa, SATIŞ KOMİSYONU imza bloğunda ve saatte ÖNCELİKLE o
+            // oturumun başkan/üyeleri ve saati kullanılır - dosyanın Kayıt anında bir kerelik
+            // kopyalanan eski (Güncellemeler'deki varsayılan komisyon) bilgisi değil. Hiç
+            // oturum kaydedilmemişse o eski kopya bilgiye geri dönülür.
+            var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
+                k.SatisTuru == gosterilecekTur && k.SatisTarihi.Date == gosterilecekTarih.Date);
+
+            ViewBag.KomisyonBaskani = oturum?.Baskan ?? dosya.KomisyonBaskani;
+            ViewBag.KomisyonUye1 = oturum?.Uye1 ?? dosya.KomisyonUye1;
+            ViewBag.KomisyonUye2 = oturum?.Uye2 ?? dosya.KomisyonUye2;
+            ViewBag.KomisyonUye3 = oturum?.Uye3 ?? dosya.KomisyonUye3;
+
+            // 1. ve 2. Satış saati, bir Komisyon Oturumu kaydı yoksa her zaman sabit 10:00'dır
+            // (bkz. Komisyon İşlemleri ekranı). Pazarlık/6183-86'da kayıt yoksa (tarih
+            // seçiliyorsa) sayfadan elle seçilen saat kullanılır.
+            if (oturum != null)
+            {
+                ViewBag.SatisSaati = oturum.SatisSaati;
+            }
+            else if (gosterilecekTur == SatisTuru.BirinciSatis || gosterilecekTur == SatisTuru.IkinciSatis)
             {
                 ViewBag.SatisSaati = new TimeSpan(10, 0, 0);
             }
             else
             {
-                var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
-                    k.SatisTuru == gosterilecekTur && k.SatisTarihi.Date == gosterilecekTarih.Date);
-                ViewBag.SatisSaati = oturum?.SatisSaati ?? secilenSaat;
+                ViewBag.SatisSaati = secilenSaat;
             }
 
             return View(dosya);
