@@ -3,12 +3,19 @@
     ViewData["Title"] = "İstatistik";
     var yillar = (List<int>)ViewBag.Yillar;
     var vergiDaireleri = (List<string>)ViewBag.VergiDaireleriListesi;
+    var alacakliVergiDaireleri = (List<string>)ViewBag.AlacakliVergiDaireleriListesi;
+    var iller = (List<string>)ViewBag.IllerListesi;
+    var aracCinsleri = (List<string>)ViewBag.AracCinsleriListesi;
+    var aracMarkalari = (List<string>)ViewBag.AracMarkalariListesi;
+    var otoparklar = (List<string>)ViewBag.OtoparklarListesi;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
     string Para(decimal d) => d.ToString("N2", trTR) + " TL";
     var excelUrl = Url.Action("ExcelIndir", "Istatistik", new
     {
         yil = ViewBag.Yil, ay = ViewBag.Ay, baslangic = ViewBag.Baslangic, bitis = ViewBag.Bitis,
-        satisTuru = ViewBag.SatisTuru, satisSonucu = ViewBag.SatisSonucu, durum = ViewBag.Durum, vergiDairesi = ViewBag.VergiDairesi
+        satisTuru = ViewBag.SatisTuru, satisSonucu = ViewBag.SatisSonucu, durum = ViewBag.Durum, vergiDairesi = ViewBag.VergiDairesi,
+        alacakliVergiDairesi = ViewBag.AlacakliVergiDairesi, il = ViewBag.Il, aracCinsi = ViewBag.AracCinsi,
+        aracMarkasi = ViewBag.AracMarkasi, otoparkAdi = ViewBag.OtoparkAdi, dosyaNo = ViewBag.DosyaNo, plaka = ViewBag.Plaka
     });
 }
 <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
@@ -94,6 +101,64 @@
                 }
             </select>
         </div>
+        <div class="col-md-3">
+            <label class="form-label">Alacaklı Vergi Dairesi</label>
+            <select class="form-select" name="alacakliVergiDairesi">
+                <option value="">Tümü</option>
+                @foreach (var vd in alacakliVergiDaireleri)
+                {
+                    <option value="@vd" selected="@(ViewBag.AlacakliVergiDairesi == vd)">@vd</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">İl</label>
+            <select class="form-select" name="il">
+                <option value="">Tümü</option>
+                @foreach (var i in iller)
+                {
+                    <option value="@i" selected="@(ViewBag.Il == i)">@i</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Araç Cinsi</label>
+            <select class="form-select" name="aracCinsi">
+                <option value="">Tümü</option>
+                @foreach (var c in aracCinsleri)
+                {
+                    <option value="@c" selected="@(ViewBag.AracCinsi == c)">@c</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Araç Markası</label>
+            <select class="form-select" name="aracMarkasi">
+                <option value="">Tümü</option>
+                @foreach (var m in aracMarkalari)
+                {
+                    <option value="@m" selected="@(ViewBag.AracMarkasi == m)">@m</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Otopark</label>
+            <select class="form-select" name="otoparkAdi">
+                <option value="">Tümü</option>
+                @foreach (var o in otoparklar)
+                {
+                    <option value="@o" selected="@(ViewBag.OtoparkAdi == o)">@o</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Dosya No</label>
+            <input class="form-control" name="dosyaNo" value="@ViewBag.DosyaNo" placeholder="ör. 2026/0001" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Plaka</label>
+            <input class="form-control" name="plaka" value="@ViewBag.Plaka" placeholder="ör. 06 ABC 123" />
+        </div>
         <div class="col-md-3 d-flex gap-2">
             <button type="submit" class="btn btn-primary"><i class="bi bi-funnel"></i> Filtrele</button>
             <a asp-action="Index" class="btn btn-outline-secondary">Temizle</a>
@@ -146,8 +211,29 @@
     </div>
     <div class="col-md-3 col-6">
         <div class="card p-3 text-center h-100">
-            <div class="text-muted small">Toplam Otopark + MTV</div>
-            <div class="fs-5 fw-bold">@Para(Model.ToplamOtopark + Model.ToplamMtv)</div>
+            <div class="text-muted small">Toplam Otopark Ücreti</div>
+            <div class="fs-5 fw-bold">@Para(Model.ToplamOtopark)</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Yıllara Göre Satış Bedeli</div>
+            <canvas id="yilGrafik" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Satış Türü Dağılımı</div>
+            <canvas id="turGrafik" height="220"></canvas>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Sonuç Dağılımı</div>
+            <canvas id="sonucGrafik" height="220"></canvas>
         </div>
     </div>
 </div>
@@ -233,6 +319,66 @@
             </div>
         </div>
     </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">İle Göre Kırılım</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>İl</th><th>Dosya</th><th>Satış</th><th>Satılan</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.IlKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@k.SatilanSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.IlKirilimi.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Araç Cinsine Göre Kırılım</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>Cinsi</th><th>Dosya</th><th>Satış</th><th>Satılan</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.AracCinsiKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@k.SatilanSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.AracCinsiKirilimi.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Markaya Göre Kırılım (İlk 15)</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle mb-0">
+                    <thead><tr><th>Marka</th><th>Dosya</th><th>Satış</th><th>Satılan</th><th>Toplam Bedel</th></tr></thead>
+                    <tbody>
+                        @foreach (var k in Model.AracMarkasiKirilimi)
+                        {
+                            <tr><td>@k.Etiket</td><td>@k.DosyaSayisi</td><td>@k.SatisSayisi</td><td>@k.SatilanSayisi</td><td>@Para(k.ToplamSatisBedeli)</td></tr>
+                        }
+                        @if (!Model.AracMarkasiKirilimi.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted">Kayıt yok</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="card p-3">
@@ -242,7 +388,7 @@
             <thead class="table-light">
                 <tr>
                     <th>Dosya No</th><th>Plaka</th><th>Cinsi/Markası</th><th>Adı Soyadı/Ünvanı</th>
-                    <th>Vergi Dairesi</th><th>Durum</th><th>Satış Türü</th><th>Satış Tarihi</th>
+                    <th>Vergi Dairesi</th><th>Alacaklı V.D.</th><th>İl</th><th>Durum</th><th>Satış Türü</th><th>Satış Tarihi</th>
                     <th>Sonuç</th><th>Satış Bedeli</th><th>Toplam Tutar</th>
                 </tr>
             </thead>
@@ -255,6 +401,8 @@
                         <td>@s.AracCinsi / @s.AracMarkasi</td>
                         <td>@s.AdiSoyadiUnvani</td>
                         <td>@s.VergiDairesiAdi</td>
+                        <td>@s.AlacakliVergiDairesi</td>
+                        <td>@s.Il</td>
                         <td>@s.DurumGorunen</td>
                         <td>@s.SatisTuruGorunen</td>
                         <td>@(s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
@@ -265,9 +413,53 @@
                 }
                 @if (!Model.Satirlar.Any())
                 {
-                    <tr><td colspan="11" class="text-center text-muted">Filtreye uyan kayıt bulunamadı.</td></tr>
+                    <tr><td colspan="13" class="text-center text-muted">Filtreye uyan kayıt bulunamadı.</td></tr>
                 }
             </tbody>
         </table>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const renkler = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948', '#b07aa1', '#ff9da7'];
+
+        new Chart(document.getElementById('yilGrafik'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YilKirilimi.Select(k => k.Etiket).Reverse())),
+                datasets: [{
+                    label: 'Toplam Satış Bedeli (TL)',
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.YilKirilimi.Select(k => k.ToplamSatisBedeli).Reverse())),
+                    backgroundColor: '#4e79a7'
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+        });
+
+        new Chart(document.getElementById('turGrafik'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SatisTuruKirilimi.Select(k => k.Etiket))),
+                datasets: [{
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SatisTuruKirilimi.Select(k => k.SatisSayisi))),
+                    backgroundColor: renkler
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+
+        new Chart(document.getElementById('sonucGrafik'), {
+            type: 'doughnut',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SonucKirilimi.Select(k => k.Etiket))),
+                datasets: [{
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SonucKirilimi.Select(k => k.SatisSayisi))),
+                    backgroundColor: renkler
+                }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+        });
+    </script>
+}

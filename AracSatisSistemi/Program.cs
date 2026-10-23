@@ -34,26 +34,31 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    SeedData.Initialize(db);
 
     // EnsureCreated() yalnızca veritabanı hiç yoksa şemayı oluşturur; daha önceki bir
     // sürümden kalma, dosyaları kayıtlı mevcut bir AracSatis.db'de modele sonradan
-    // eklenen tablolar otomatik oluşmaz. Bu yüzden yeni eklenen tablo burada elle
-    // (varsa dokunmadan) garanti altına alınır ki mevcut kayıtlar kaybolmadan yeni
-    // özellik çalışsın.
-    db.Database.ExecuteSqlRaw(@"CREATE TABLE IF NOT EXISTS ""SatisTarihleri"" (
-        ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_SatisTarihleri"" PRIMARY KEY AUTOINCREMENT,
-        ""Tarih"" TEXT NOT NULL
-    );");
-    db.Database.ExecuteSqlRaw(@"CREATE UNIQUE INDEX IF NOT EXISTS ""IX_SatisTarihleri_Tarih"" ON ""SatisTarihleri"" (""Tarih"");");
+    // eklenen tablolar/indeksler otomatik oluşmaz. Bu yüzden EF'nin o anki modelden
+    // ürettiği TÜM "CREATE TABLE"/"CREATE INDEX" ifadeleri burada IF NOT EXISTS ile
+    // tekrar çalıştırılır: modele sonradan eklenen her yeni tablo (ör. Memurlar,
+    // AliciKayitlari, KomisyonOturumlari, AracModelleri) tek tek elle yazılmaya gerek
+    // kalmadan eski bir AracSatis.db'de de otomatik oluşur; zaten var olan tablolara/
+    // verilere dokunulmaz. SeedData.Initialize'daki EnsureCreated'ın (ki o da bu
+    // güvenlik ağını tekrar çağırır, zararsız) ve seed sorgularının ÖNÜNDE çalışması
+    // için en başta yapılır; aksi halde SeedData'nın eski tablolardan birini (henüz
+    // oluşturulmamış yeni bir tablo oluşturulmadan önce) sorgulaması hataya düşebilir.
+    db.Database.EnsureCreated();
+    foreach (var ifadeHam in db.Database.GenerateCreateScript().Split(new[] { ";\r\n", ";\n" }, StringSplitOptions.RemoveEmptyEntries))
+    {
+        var ifade = ifadeHam.Trim();
+        if (ifade.Length == 0) continue;
+        ifade = System.Text.RegularExpressions.Regex.Replace(ifade, @"^CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ");
+        ifade = System.Text.RegularExpressions.Regex.Replace(ifade, @"^CREATE (UNIQUE )?INDEX ", "CREATE $1INDEX IF NOT EXISTS ");
+        try { db.Database.ExecuteSqlRaw(ifade + ";"); } catch { /* zaten varsa veya bağımlı tablo henüz yoksa göz ardı edilir */ }
+    }
 
-    db.Database.ExecuteSqlRaw(@"CREATE TABLE IF NOT EXISTS ""AracModelleri"" (
-        ""Id"" INTEGER NOT NULL CONSTRAINT ""PK_AracModelleri"" PRIMARY KEY AUTOINCREMENT,
-        ""MarkaAdi"" TEXT NOT NULL,
-        ""Ad"" TEXT NOT NULL
-    );");
+    SeedData.Initialize(db);
 
-    // Tablo az önce oluşturulmuş olabileceğinden (yukarıdaki CREATE TABLE ile), başlangıç
+    // Tablo az önce oluşturulmuş olabileceğinden (yukarıdaki genel güvenlik ağıyla), başlangıç
     // model listesi burada - tablo garantiye alındıktan SONRA - doldurulur. Yalnızca tablo
     // tamamen boşsa (daha önce hiç çalıştırılmadıysa veya kullanıcı henüz hiç model
     // eklemediyse) bir kerelik doldurulur; kullanıcı sonradan sildiği modeller tekrar eklenmez.

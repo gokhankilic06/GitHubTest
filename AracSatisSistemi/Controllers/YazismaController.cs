@@ -7,7 +7,7 @@ using AracSatisSistemi.Services;
 namespace AracSatisSistemi.Controllers
 {
     // YAZIŞMA ekranı: dosya no girilince borçlu/alıcı/araç bilgileri ve satışla ilgili
-    // mali özet (KDV, Damga Vergisi, Toplam, Otopark, MTV, Kalan Tutar) otomatik gelir.
+    // mali özet (KDV, Damga Vergisi, Toplam, Otopark, Kalan Tutar) otomatik gelir.
     // Ayrıca bu bilgilerle "[Vergi Dairesi]" ve "Üst Yazı" butonlarından Word belgesi üretilir.
     public class YazismaController : Controller
     {
@@ -44,7 +44,6 @@ namespace AracSatisSistemi.Controllers
             ViewBag.DvTutari = veri.DvTutari;
             ViewBag.ToplamTutar = veri.ToplamTutar;
             ViewBag.OtoparkTutari = veri.OtoparkTutari;
-            ViewBag.MtvTutari = veri.MtvTutari;
             ViewBag.KalanTutar = veri.KalanTutar;
 
             var mevcutIndex = tumDosyaNolar.IndexOf(dosyaNo);
@@ -102,10 +101,9 @@ namespace AracSatisSistemi.Controllers
             decimal otoparkTutari = satis != null
                 ? OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar)
                 : 0m;
-            decimal mtvTutari = satis?.MTV ?? 0m;
-            decimal kalanTutar = satisBedeli - otoparkTutari - mtvTutari;
+            decimal kalanTutar = satisBedeli - otoparkTutari;
 
-            return new YazismaVerisi(dosya, satis, satisBedeli, kdvTutari, dvTutari, toplamTutar, otoparkTutari, mtvTutari, kalanTutar);
+            return new YazismaVerisi(dosya, satis, satisBedeli, kdvTutari, dvTutari, toplamTutar, otoparkTutari, kalanTutar);
         }
 
         private record YazismaVerisi(
@@ -116,7 +114,6 @@ namespace AracSatisSistemi.Controllers
             decimal DvTutari,
             decimal ToplamTutar,
             decimal OtoparkTutari,
-            decimal MtvTutari,
             decimal KalanTutar);
     }
 }

@@ -24,6 +24,9 @@ namespace AracSatisSistemi.Controllers
             public string AracMarkasi { get; set; } = string.Empty;
             public string AdiSoyadiUnvani { get; set; } = string.Empty;
             public string VergiDairesiAdi { get; set; } = string.Empty;
+            public string AlacakliVergiDairesi { get; set; } = string.Empty;
+            public string Il { get; set; } = string.Empty;
+            public string? OtoparkAdi { get; set; }
             public DateTime KayitTarihi { get; set; }
             public decimal MuhammenBedel { get; set; }
             public DosyaDurumu Durum { get; set; }
@@ -35,7 +38,6 @@ namespace AracSatisSistemi.Controllers
             public decimal KdvTutari { get; set; }
             public decimal DvTutari { get; set; }
             public decimal OtoparkTutari { get; set; }
-            public decimal MtvTutari { get; set; }
             public decimal ToplamTutar { get; set; }
 
             public string SatisTuruGorunen => SatisTuru switch
@@ -78,17 +80,21 @@ namespace AracSatisSistemi.Controllers
             public decimal ToplamKdv { get; set; }
             public decimal ToplamDv { get; set; }
             public decimal ToplamOtopark { get; set; }
-            public decimal ToplamMtv { get; set; }
 
             public List<Kirilim> YilKirilimi { get; set; } = new();
             public List<Kirilim> SatisTuruKirilimi { get; set; } = new();
             public List<Kirilim> SonucKirilimi { get; set; } = new();
             public List<Kirilim> VergiDairesiKirilimi { get; set; } = new();
+            public List<Kirilim> IlKirilimi { get; set; } = new();
+            public List<Kirilim> AracCinsiKirilimi { get; set; } = new();
+            public List<Kirilim> AracMarkasiKirilimi { get; set; } = new();
         }
 
         private async Task<List<Satir>> FiltreliListeGetir(
             int? yil, int? ay, DateTime? baslangic, DateTime? bitis,
-            SatisTuru? satisTuru, SatisSonucu? satisSonucu, DosyaDurumu? durum, string? vergiDairesi)
+            SatisTuru? satisTuru, SatisSonucu? satisSonucu, DosyaDurumu? durum, string? vergiDairesi,
+            string? alacakliVergiDairesi, string? il, string? aracCinsi, string? aracMarkasi,
+            string? otoparkAdi, string? dosyaNo, string? plaka)
         {
             var sorgu =
                 from d in _db.Dosyalar
@@ -112,9 +118,28 @@ namespace AracSatisSistemi.Controllers
                 sorgu = sorgu.Where(x => x.d.Durum == durum.Value);
             if (!string.IsNullOrWhiteSpace(vergiDairesi))
                 sorgu = sorgu.Where(x => x.d.VergiDairesiAdi == vergiDairesi);
+            if (!string.IsNullOrWhiteSpace(alacakliVergiDairesi))
+                sorgu = sorgu.Where(x => x.d.AlacakliVergiDairesi == alacakliVergiDairesi);
+            if (!string.IsNullOrWhiteSpace(aracCinsi))
+                sorgu = sorgu.Where(x => x.d.AracCinsi == aracCinsi);
+            if (!string.IsNullOrWhiteSpace(aracMarkasi))
+                sorgu = sorgu.Where(x => x.d.AracMarkasi == aracMarkasi);
+            if (!string.IsNullOrWhiteSpace(otoparkAdi))
+                sorgu = sorgu.Where(x => x.d.OtoparkAdi == otoparkAdi);
+            if (!string.IsNullOrWhiteSpace(dosyaNo))
+                sorgu = sorgu.Where(x => x.d.DosyaNo.Contains(dosyaNo));
+            if (!string.IsNullOrWhiteSpace(plaka))
+                sorgu = sorgu.Where(x => x.d.Plaka.Contains(plaka));
+            if (!string.IsNullOrWhiteSpace(il))
+            {
+                var ilVergiDaireleri = await _db.VergiDaireleri.Where(v => v.Sehir == il).Select(v => v.Ad).ToListAsync();
+                sorgu = sorgu.Where(x => ilVergiDaireleri.Contains(x.d.VergiDairesiAdi));
+            }
 
             var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
             var kategoriSozlugu = await _db.AracCinsleri.ToDictionaryAsync(c => c.Ad, c => c.OtoparkKategorisi);
+            var sehirSozlugu = (await _db.VergiDaireleri.ToListAsync())
+                .GroupBy(v => v.Ad).ToDictionary(g => g.Key, g => g.First().Sehir);
 
             var liste = await sorgu
                 .OrderByDescending(x => x.d.DosyaNo)
@@ -129,7 +154,6 @@ namespace AracSatisSistemi.Controllers
                 var otopark = x.s != null
                     ? OtoparkHesaplayici.GercekOtoparkUcreti(x.s, x.d.AracCinsi, kategoriSozlugu, genelAyar)
                     : 0m;
-                var mtv = x.s?.MTV ?? 0m;
                 var toplam = (satisBedeli ?? 0m) + kdv + dv;
 
                 return new Satir
@@ -141,6 +165,9 @@ namespace AracSatisSistemi.Controllers
                     AracMarkasi = x.d.AracMarkasi,
                     AdiSoyadiUnvani = x.d.AdiSoyadiUnvani,
                     VergiDairesiAdi = x.d.VergiDairesiAdi,
+                    AlacakliVergiDairesi = x.d.AlacakliVergiDairesi,
+                    Il = sehirSozlugu.TryGetValue(x.d.VergiDairesiAdi, out var sehir) ? sehir : "-",
+                    OtoparkAdi = x.d.OtoparkAdi,
                     KayitTarihi = x.d.KayitTarihi,
                     MuhammenBedel = x.d.MuhammenBedel,
                     Durum = x.d.Durum,
@@ -152,7 +179,6 @@ namespace AracSatisSistemi.Controllers
                     KdvTutari = kdv,
                     DvTutari = dv,
                     OtoparkTutari = otopark,
-                    MtvTutari = mtv,
                     ToplamTutar = toplam
                 };
             }).ToList();
@@ -173,8 +199,7 @@ namespace AracSatisSistemi.Controllers
                 ToplamSatisBedeli = satilanlar.Sum(s => s.SatisBedeli ?? 0m),
                 ToplamKdv = satilanlar.Sum(s => s.KdvTutari),
                 ToplamDv = satilanlar.Sum(s => s.DvTutari),
-                ToplamOtopark = satilanlar.Sum(s => s.OtoparkTutari),
-                ToplamMtv = satilanlar.Sum(s => s.MtvTutari)
+                ToplamOtopark = satilanlar.Sum(s => s.OtoparkTutari)
             };
             model.OrtalamaSatisBedeli = satilanlar.Count > 0 ? Math.Round(model.ToplamSatisBedeli / satilanlar.Count, 2) : 0m;
 
@@ -228,14 +253,57 @@ namespace AracSatisSistemi.Controllers
                 .OrderByDescending(k => k.DosyaSayisi)
                 .ToList();
 
+            model.IlKirilimi = satirlar
+                .GroupBy(s => s.Il)
+                .Select(g => new Kirilim
+                {
+                    Etiket = g.Key,
+                    DosyaSayisi = g.Select(s => s.DosyaId).Distinct().Count(),
+                    SatisSayisi = g.Count(s => s.SatisTuru.HasValue),
+                    SatilanSayisi = g.Count(s => s.SatisSonucu == SatisSonucu.Satildi),
+                    ToplamSatisBedeli = g.Where(s => s.SatisSonucu == SatisSonucu.Satildi).Sum(s => s.SatisBedeli ?? 0m)
+                })
+                .OrderByDescending(k => k.DosyaSayisi)
+                .ToList();
+
+            model.AracCinsiKirilimi = satirlar
+                .GroupBy(s => s.AracCinsi)
+                .Select(g => new Kirilim
+                {
+                    Etiket = g.Key,
+                    DosyaSayisi = g.Select(s => s.DosyaId).Distinct().Count(),
+                    SatisSayisi = g.Count(s => s.SatisTuru.HasValue),
+                    SatilanSayisi = g.Count(s => s.SatisSonucu == SatisSonucu.Satildi),
+                    ToplamSatisBedeli = g.Where(s => s.SatisSonucu == SatisSonucu.Satildi).Sum(s => s.SatisBedeli ?? 0m)
+                })
+                .OrderByDescending(k => k.DosyaSayisi)
+                .ToList();
+
+            model.AracMarkasiKirilimi = satirlar
+                .GroupBy(s => s.AracMarkasi)
+                .Select(g => new Kirilim
+                {
+                    Etiket = g.Key,
+                    DosyaSayisi = g.Select(s => s.DosyaId).Distinct().Count(),
+                    SatisSayisi = g.Count(s => s.SatisTuru.HasValue),
+                    SatilanSayisi = g.Count(s => s.SatisSonucu == SatisSonucu.Satildi),
+                    ToplamSatisBedeli = g.Where(s => s.SatisSonucu == SatisSonucu.Satildi).Sum(s => s.SatisBedeli ?? 0m)
+                })
+                .OrderByDescending(k => k.DosyaSayisi)
+                .Take(15)
+                .ToList();
+
             return model;
         }
 
         public async Task<IActionResult> Index(
             int? yil, int? ay, DateTime? baslangic, DateTime? bitis,
-            SatisTuru? satisTuru, SatisSonucu? satisSonucu, DosyaDurumu? durum, string? vergiDairesi)
+            SatisTuru? satisTuru, SatisSonucu? satisSonucu, DosyaDurumu? durum, string? vergiDairesi,
+            string? alacakliVergiDairesi, string? il, string? aracCinsi, string? aracMarkasi,
+            string? otoparkAdi, string? dosyaNo, string? plaka)
         {
-            var satirlar = await FiltreliListeGetir(yil, ay, baslangic, bitis, satisTuru, satisSonucu, durum, vergiDairesi);
+            var satirlar = await FiltreliListeGetir(yil, ay, baslangic, bitis, satisTuru, satisSonucu, durum, vergiDairesi,
+                alacakliVergiDairesi, il, aracCinsi, aracMarkasi, otoparkAdi, dosyaNo, plaka);
             var model = ModeliOlustur(satirlar);
 
             ViewBag.Yil = yil;
@@ -246,26 +314,41 @@ namespace AracSatisSistemi.Controllers
             ViewBag.SatisSonucu = satisSonucu;
             ViewBag.Durum = durum;
             ViewBag.VergiDairesi = vergiDairesi;
+            ViewBag.AlacakliVergiDairesi = alacakliVergiDairesi;
+            ViewBag.Il = il;
+            ViewBag.AracCinsi = aracCinsi;
+            ViewBag.AracMarkasi = aracMarkasi;
+            ViewBag.OtoparkAdi = otoparkAdi;
+            ViewBag.DosyaNo = dosyaNo;
+            ViewBag.Plaka = plaka;
 
             var yillar = await _db.Dosyalar.Select(d => d.KayitTarihi.Year)
                 .Union(_db.Satislar.Select(s => s.SatisTarihi.Year))
                 .Distinct().OrderByDescending(y => y).ToListAsync();
             ViewBag.Yillar = yillar;
             ViewBag.VergiDaireleriListesi = await _db.Dosyalar.OrderBy(d => d.VergiDairesiAdi).Select(d => d.VergiDairesiAdi).Distinct().ToListAsync();
+            ViewBag.AlacakliVergiDaireleriListesi = await _db.Dosyalar.OrderBy(d => d.AlacakliVergiDairesi).Select(d => d.AlacakliVergiDairesi).Distinct().ToListAsync();
+            ViewBag.IllerListesi = await _db.VergiDaireleri.OrderBy(v => v.Sehir).Select(v => v.Sehir).Distinct().ToListAsync();
+            ViewBag.AracCinsleriListesi = await _db.Dosyalar.OrderBy(d => d.AracCinsi).Select(d => d.AracCinsi).Distinct().ToListAsync();
+            ViewBag.AracMarkalariListesi = await _db.Dosyalar.OrderBy(d => d.AracMarkasi).Select(d => d.AracMarkasi).Distinct().ToListAsync();
+            ViewBag.OtoparklarListesi = await _db.Dosyalar.Where(d => d.OtoparkAdi != null).OrderBy(d => d.OtoparkAdi).Select(d => d.OtoparkAdi).Distinct().ToListAsync();
 
             return View(model);
         }
 
         public async Task<IActionResult> ExcelIndir(
             int? yil, int? ay, DateTime? baslangic, DateTime? bitis,
-            SatisTuru? satisTuru, SatisSonucu? satisSonucu, DosyaDurumu? durum, string? vergiDairesi)
+            SatisTuru? satisTuru, SatisSonucu? satisSonucu, DosyaDurumu? durum, string? vergiDairesi,
+            string? alacakliVergiDairesi, string? il, string? aracCinsi, string? aracMarkasi,
+            string? otoparkAdi, string? dosyaNo, string? plaka)
         {
-            var satirlar = await FiltreliListeGetir(yil, ay, baslangic, bitis, satisTuru, satisSonucu, durum, vergiDairesi);
+            var satirlar = await FiltreliListeGetir(yil, ay, baslangic, bitis, satisTuru, satisSonucu, durum, vergiDairesi,
+                alacakliVergiDairesi, il, aracCinsi, aracMarkasi, otoparkAdi, dosyaNo, plaka);
 
             using var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add("İstatistik");
-            string[] baslik = { "Dosya No", "Plaka", "Cinsi", "Markası", "Adı Soyadı/Ünvanı", "Vergi Dairesi", "Durum",
-                "Satış Türü", "Satış Tarihi", "Sonuç", "Satış Bedeli", "KDV", "Damga Vergisi", "Otopark", "MTV", "Toplam Tutar" };
+            string[] baslik = { "Dosya No", "Plaka", "Cinsi", "Markası", "Adı Soyadı/Ünvanı", "Vergi Dairesi", "Alacaklı Vergi Dairesi", "İl", "Durum",
+                "Satış Türü", "Satış Tarihi", "Sonuç", "Satış Bedeli", "KDV", "Damga Vergisi", "Otopark", "Toplam Tutar" };
             for (int i = 0; i < baslik.Length; i++) ws.Cell(1, i + 1).Value = baslik[i];
 
             var satir = 2;
@@ -277,16 +360,17 @@ namespace AracSatisSistemi.Controllers
                 ws.Cell(satir, 4).Value = s.AracMarkasi;
                 ws.Cell(satir, 5).Value = s.AdiSoyadiUnvani;
                 ws.Cell(satir, 6).Value = s.VergiDairesiAdi;
-                ws.Cell(satir, 7).Value = s.DurumGorunen;
-                ws.Cell(satir, 8).Value = s.SatisTuruGorunen;
-                ws.Cell(satir, 9).Value = s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "";
-                ws.Cell(satir, 10).Value = s.SonucGorunen;
-                ws.Cell(satir, 11).Value = s.SatisBedeli;
-                ws.Cell(satir, 12).Value = s.KdvTutari;
-                ws.Cell(satir, 13).Value = s.DvTutari;
-                ws.Cell(satir, 14).Value = s.OtoparkTutari;
-                ws.Cell(satir, 15).Value = s.MtvTutari;
-                ws.Cell(satir, 16).Value = s.ToplamTutar;
+                ws.Cell(satir, 7).Value = s.AlacakliVergiDairesi;
+                ws.Cell(satir, 8).Value = s.Il;
+                ws.Cell(satir, 9).Value = s.DurumGorunen;
+                ws.Cell(satir, 10).Value = s.SatisTuruGorunen;
+                ws.Cell(satir, 11).Value = s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "";
+                ws.Cell(satir, 12).Value = s.SonucGorunen;
+                ws.Cell(satir, 13).Value = s.SatisBedeli;
+                ws.Cell(satir, 14).Value = s.KdvTutari;
+                ws.Cell(satir, 15).Value = s.DvTutari;
+                ws.Cell(satir, 16).Value = s.OtoparkTutari;
+                ws.Cell(satir, 17).Value = s.ToplamTutar;
                 satir++;
             }
             ws.Columns().AdjustToContents();

@@ -39,10 +39,6 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Adres")]
         public string? Adres { get; set; }
 
-        [Display(Name = "MTV (TL)")]
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal? MTV { get; set; }
-
         [Display(Name = "Otoparka Giriş Tarihi")]
         [DataType(DataType.Date)]
         public DateTime? OtoparkaGirisTarihi { get; set; }
@@ -59,10 +55,6 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Verilen Süre (Son Gün)")]
         [DataType(DataType.Date)]
         public DateTime? VerilenSure { get; set; }
-
-        [Display(Name = "Ödeme Vadesi")]
-        [DataType(DataType.Date)]
-        public DateTime? OdemeVadesi { get; set; }
 
         [Display(Name = "Faturayı Kesen Otopark Adı/Ünvanı")]
         public string? FaturayiKesenOtopark { get; set; }

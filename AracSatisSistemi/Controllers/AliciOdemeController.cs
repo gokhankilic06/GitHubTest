@@ -163,11 +163,9 @@ namespace AracSatisSistemi.Controllers
             satis.Adres = form.Adres;
             satis.AliciTelefon = form.AliciTelefon;
             satis.VerilenSure = form.VerilenSure;
-            satis.OdemeVadesi = form.OdemeVadesi;
             satis.FaturayiKesenOtopark = form.FaturayiKesenOtopark;
             satis.OtoparkaGirisTarihi = form.OtoparkaGirisTarihi;
             satis.CekiciBedeli = form.CekiciBedeli;
-            satis.MTV = form.MTV;
 
             // Bu alıcı daha önce kayıtlı değilse (yeni vergi numarasıysa) alıcı listesine eklenir;
             // sonraki satışlarda "Kayıtlı Alıcılardan Seç" ile tekrar seçilebilsin.
