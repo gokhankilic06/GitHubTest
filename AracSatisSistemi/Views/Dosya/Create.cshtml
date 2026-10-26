@@ -241,6 +241,8 @@
 </form>
 
 @section Scripts {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         // Doldurulmuş formdaki alan/değerleri Excel (.xlsx) olarak indirir.
@@ -273,33 +275,33 @@
 
         const vergiDaireleriData = @Html.Raw(ViewBag.VergiDaireleriJson);
 
-        function kademeliVergiDairesiKur(sehirSelectId, vdSelectId) {
+        // Vergi Dairesi Adı ve Alacaklı Vergi Dairesi kutuları, listeler uzun olduğundan
+        // Tom Select ile yazarak arama yapılabilir hale getiriliyor.
+        const vergiDairesiAdiTS = new TomSelect('#VergiDairesiAdi', { create: false });
+        const vergiDairesi2TS = new TomSelect('#vergiDairesi2', { create: false });
+        vergiDairesi2TS.disable();
+
+        function kademeliVergiDairesiKur(sehirSelectId) {
             const sehirSelect = document.getElementById(sehirSelectId);
-            const vdSelect = document.getElementById(vdSelectId);
             sehirSelect.addEventListener('change', function () {
                 const secilenSehir = this.value;
-                vdSelect.innerHTML = '';
+                vergiDairesi2TS.clear(true);
+                vergiDairesi2TS.clearOptions();
                 if (!secilenSehir) {
-                    vdSelect.disabled = true;
-                    vdSelect.innerHTML = '<option value="">-- Önce il seçiniz --</option>';
+                    vergiDairesi2TS.addOption({ value: '', text: '-- Önce il seçiniz --' });
+                    vergiDairesi2TS.setValue('', true);
+                    vergiDairesi2TS.disable();
                     return;
                 }
-                vdSelect.disabled = false;
-                const bosOpt = document.createElement('option');
-                bosOpt.value = '';
-                bosOpt.textContent = '-- Vergi Dairesi Seçiniz --';
-                vdSelect.appendChild(bosOpt);
+                vergiDairesi2TS.addOption({ value: '', text: '-- Vergi Dairesi Seçiniz --' });
                 vergiDaireleriData
                     .filter(v => v.Sehir === secilenSehir)
-                    .forEach(v => {
-                        const opt = document.createElement('option');
-                        opt.value = v.Ad;
-                        opt.textContent = v.Ad;
-                        vdSelect.appendChild(opt);
-                    });
+                    .forEach(v => vergiDairesi2TS.addOption({ value: v.Ad, text: v.Ad }));
+                vergiDairesi2TS.setValue('', true);
+                vergiDairesi2TS.enable();
             });
         }
-        kademeliVergiDairesiKur('sehir2', 'vergiDairesi2');
+        kademeliVergiDairesiKur('sehir2');
 
         const bedelInput = document.getElementById('muhammenBedel');
         const teminatOut = document.getElementById('teminatOnizleme');
