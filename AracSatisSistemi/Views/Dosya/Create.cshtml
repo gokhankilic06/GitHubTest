@@ -4,7 +4,6 @@
     var cinsler = (List<AracCinsi>)ViewBag.Cinsler;
     var markalar = (List<AracMarkasi>)ViewBag.Markalar;
     var otoparklar = (List<OtoparkKaydi>)ViewBag.Otoparklar;
-    var sehirler = (List<string>)ViewBag.Sehirler;
     var ankaraVergiDaireleri = (List<VergiDairesiKaydi>)ViewBag.AnkaraVergiDaireleri;
     var renkler = (List<AracRengi>)ViewBag.Renkler;
 }
@@ -47,20 +46,10 @@
             <label class="form-label" asp-for="VergiDairesiYaziSayisi"></label>
             <input class="form-control" asp-for="VergiDairesiYaziSayisi" />
         </div>
-        <div class="col-md-2">
-            <label class="form-label">Alacaklı Vergi Dairesi - İl</label>
-            <select class="form-select" id="sehir2">
-                <option value="">-- İl Seçiniz --</option>
-                @foreach (var s in sehirler)
-                {
-                    <option value="@s">@s</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-3">
+        <div class="col-md-5">
             <label class="form-label" asp-for="AlacakliVergiDairesi"></label>
-            <select class="form-select" asp-for="AlacakliVergiDairesi" id="vergiDairesi2" disabled>
-                <option value="">-- Önce il seçiniz --</option>
+            <select class="form-select" asp-for="AlacakliVergiDairesi" id="vergiDairesi2">
+                <option value="">-- Seçiniz --</option>
             </select>
         </div>
     </div>
@@ -276,32 +265,19 @@
         const vergiDaireleriData = @Html.Raw(ViewBag.VergiDaireleriJson);
 
         // Vergi Dairesi Adı ve Alacaklı Vergi Dairesi kutuları, listeler uzun olduğundan
-        // Tom Select ile yazarak arama yapılabilir hale getiriliyor.
+        // Tom Select ile yazarak arama yapılabilir hale getiriliyor. Alacaklı Vergi Dairesi
+        // artık önce İl seçmeyi gerektirmiyor; Türkiye genelindeki tüm vergi daireleri
+        // baştan yüklü geliyor ve şehir adı yanında gösterilerek doğrudan aranabiliyor.
         const vergiDairesiAdiTS = new TomSelect('#VergiDairesiAdi', { create: false });
-        const vergiDairesi2TS = new TomSelect('#vergiDairesi2', { create: false });
-        vergiDairesi2TS.disable();
-
-        function kademeliVergiDairesiKur(sehirSelectId) {
-            const sehirSelect = document.getElementById(sehirSelectId);
-            sehirSelect.addEventListener('change', function () {
-                const secilenSehir = this.value;
-                vergiDairesi2TS.clear(true);
-                vergiDairesi2TS.clearOptions();
-                if (!secilenSehir) {
-                    vergiDairesi2TS.addOption({ value: '', text: '-- Önce il seçiniz --' });
-                    vergiDairesi2TS.setValue('', true);
-                    vergiDairesi2TS.disable();
-                    return;
-                }
-                vergiDairesi2TS.addOption({ value: '', text: '-- Vergi Dairesi Seçiniz --' });
-                vergiDaireleriData
-                    .filter(v => v.Sehir === secilenSehir)
-                    .forEach(v => vergiDairesi2TS.addOption({ value: v.Ad, text: v.Ad }));
-                vergiDairesi2TS.setValue('', true);
-                vergiDairesi2TS.enable();
-            });
-        }
-        kademeliVergiDairesiKur('sehir2');
+        const vergiDairesi2TS = new TomSelect('#vergiDairesi2', {
+            create: false,
+            options: vergiDaireleriData.map(v => ({ value: v.Ad, text: `${v.Ad} (${v.Sehir})` })),
+            valueField: 'value',
+            labelField: 'text',
+            searchField: ['text']
+        });
+        const mevcutAlacakliVD = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AlacakliVergiDairesi));
+        if (mevcutAlacakliVD) vergiDairesi2TS.setValue(mevcutAlacakliVD, true);
 
         const bedelInput = document.getElementById('muhammenBedel');
         const teminatOut = document.getElementById('teminatOnizleme');
