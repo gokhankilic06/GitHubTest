@@ -71,7 +71,9 @@ namespace AracSatisSistemi.Data
                 {
                     "Beyaz", "Siyah", "Gri", "Gümüş", "Kırmızı", "Mavi", "Lacivert",
                     "Yeşil", "Sarı", "Turuncu", "Kahverengi", "Bej", "Bordo", "Mor",
-                    "Pembe", "Altın", "Turkuaz", "Diğer"
+                    "Pembe", "Altın", "Turkuaz",
+                    "Okyanus Yeşili", "Okyanus Mavisi", "Gün Batımı Kırmızısı",
+                    "Manyetik Mavi", "İnci Beyazı", "Bulut Gri", "Metalik Gri"
                 };
                 context.AracRenkleri.AddRange(renkler.Select(a => new AracRengi { Ad = a }));
             }

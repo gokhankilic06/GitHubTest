@@ -140,6 +140,34 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
+    // Araç Renkleri listesine sonradan istenen metalik/sedef tonlar eklendi; daha önce
+    // doldurulmuş (ve kullanıcı tarafından düzenlenmiş) listelere de zarar vermeden,
+    // yalnızca henüz eklenmemiş olanlar eklenir. Eski "Diğer" (düz metin, tek başına seçilen)
+    // satırı da burada siliniyor çünkü artık Araç Tipi'ndeki gibi gerçek bir "Diğer (elle yaz)"
+    // seçeneği var; ikisi birden listede görünmesin diye.
+    {
+        var yeniRenkler = new[]
+        {
+            "Okyanus Yeşili", "Okyanus Mavisi", "Gün Batımı Kırmızısı",
+            "Manyetik Mavi", "İnci Beyazı", "Bulut Gri", "Metalik Gri"
+        };
+        var mevcutRenkler = db.AracRenkleri.Select(r => r.Ad).ToHashSet();
+        var eklenecekRenkler = yeniRenkler.Where(r => !mevcutRenkler.Contains(r))
+            .Select(r => new AracRengi { Ad = r }).ToList();
+        if (eklenecekRenkler.Count > 0)
+        {
+            db.AracRenkleri.AddRange(eklenecekRenkler);
+            db.SaveChanges();
+        }
+
+        var eskiDigerKaydi = db.AracRenkleri.FirstOrDefault(r => r.Ad == "Diğer");
+        if (eskiDigerKaydi != null)
+        {
+            db.AracRenkleri.Remove(eskiDigerKaydi);
+            db.SaveChanges();
+        }
+    }
+
     // Çekici ücreti artık (otopark tarifesi gibi) araç kategorisine göre 4 ayrı sütunda
     // tutuluyor (eski tek "CekiciUcretiSabit" sütunu yerine). SQLite'ta "ADD COLUMN IF NOT
     // EXISTS" olmadığından her biri ayrı ayrı denenip zaten varsa oluşan hata yutulur.

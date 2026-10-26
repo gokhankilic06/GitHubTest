@@ -128,13 +128,15 @@
         </div>
         <div class="col-md-3">
             <label class="form-label" asp-for="Renk"></label>
-            <select class="form-select" asp-for="Renk">
+            <select class="form-select" id="renkSelect" name="Renk">
                 <option value="">-- Seçiniz --</option>
                 @foreach (var r in renkler)
                 {
                     <option value="@r.Ad">@r.Ad</option>
                 }
+                <option value="__DIGER__">Diğer (elle yaz)</option>
             </select>
+            <input class="form-control d-none mt-2" id="renkManuel" name="Renk" placeholder="Renk (elle yazın)" disabled />
         </div>
         <div class="col-md-3">
             <label class="form-label" asp-for="RuhsatVar">Ruhsatın Olup Olmadığı</label>
@@ -400,5 +402,37 @@
         });
 
         aracTipiniAyarla(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AracTipi)));
+
+        // Renk: Araç Tipi'ndeki ile aynı mantık - listede olmayan bir renk için
+        // "Diğer (elle yaz)" seçilince metin kutusuna geçilir.
+        const renkListesi = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(renkler.Select(r => r.Ad)));
+        const renkSelect = document.getElementById('renkSelect');
+        const renkManuel = document.getElementById('renkManuel');
+
+        function renkManuelModunaGec(mevcutDeger) {
+            renkSelect.classList.add('d-none');
+            renkSelect.disabled = true;
+            renkManuel.classList.remove('d-none');
+            renkManuel.disabled = false;
+            renkManuel.value = mevcutDeger || '';
+        }
+
+        function renkiAyarla(mevcutDeger) {
+            if (mevcutDeger && !renkListesi.includes(mevcutDeger)) {
+                renkManuelModunaGec(mevcutDeger);
+            } else {
+                renkSelect.classList.remove('d-none');
+                renkSelect.disabled = false;
+                renkManuel.classList.add('d-none');
+                renkManuel.disabled = true;
+                renkSelect.value = mevcutDeger || '';
+            }
+        }
+
+        renkSelect.addEventListener('change', () => {
+            if (renkSelect.value === '__DIGER__') renkManuelModunaGec('');
+        });
+
+        renkiAyarla(@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Renk)));
     </script>
 }
