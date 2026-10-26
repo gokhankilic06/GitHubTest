@@ -20,6 +20,18 @@ namespace AracSatisSistemi.Data
             return tarih;
         }
 
+        // "Önümüzdeki hafta Çarşamba"yı bulur: bugünün içinde bulunduğu haftadan SONRAKİ
+        // haftanın Çarşambası (bugün Çarşamba olsa bile bu haftaki değil, gelecek haftaki
+        // alınır - ihale için yeterli hazırlık süresi bırakmak amacıyla). O tarih resmi
+        // tatile denk gelirse bir sonraki Çarşamba'ya ertelenir (bkz. SonrakiCarsamba).
+        public static DateTime OnumuzdekiHaftaCarsambasi(DateTime bugun, ICollection<DateTime> resmiTatiller)
+        {
+            var haftaIciGunIndex = ((int)bugun.DayOfWeek + 6) % 7; // Pazartesi=0 ... Pazar=6
+            var buHaftaPazartesi = bugun.Date.AddDays(-haftaIciGunIndex);
+            var onumuzdekiHaftaCarsamba = buHaftaPazartesi.AddDays(9); // +7 gün (sonraki hafta) + 2 gün (Çarşamba)
+            return SonrakiCarsamba(onumuzdekiHaftaCarsamba, resmiTatiller);
+        }
+
         // Bir tarih hafta sonu (Cumartesi/Pazar) veya resmi tatil ise iş günü sayılmaz.
         private static bool IsGunuMu(DateTime tarih, ICollection<DateTime> resmiTatiller)
             => tarih.DayOfWeek != DayOfWeek.Saturday

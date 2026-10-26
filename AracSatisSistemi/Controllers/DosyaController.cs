@@ -63,10 +63,12 @@ namespace AracSatisSistemi.Controllers
             await DoldurListeler();
             var komisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
 
-            // 1. ve 2. Satış tarihleri artık "Yıllık Satış Takvimi"nden (idarenin önceden
+            // 1. ve 2. Satış tarihleri önce "Yıllık Satış Takvimi"nden (idarenin önceden
             // belirleyip vergi dairelerine bildirdiği resmi ihale günleri) önerilir: bugünden
-            // sonraki ilk iki takvim tarihi. Takvimde yeterli tarih yoksa memur uyarılır ve
-            // tarihleri formdan elle seçebilir.
+            // sonraki ilk iki takvim tarihi. Takvimde tarih yoksa/yetmiyorsa, eksik olan(lar)
+            // otomatik olarak "önümüzdeki hafta Çarşamba" (1. Satış) ve "1. Satıştan bir
+            // hafta sonrası" (2. Satış) üzerinden - resmi tatiller atlanarak - hesaplanır.
+            // Her iki durumda da bu tarihler yalnızca öneridir; memur formdan elle değiştirebilir.
             var bugun = DateTime.Today;
             var sonrakiTarihler = await _db.SatisTarihleri
                 .Where(t => t.Tarih >= bugun)
@@ -75,11 +77,13 @@ namespace AracSatisSistemi.Controllers
                 .Select(t => t.Tarih)
                 .ToListAsync();
 
-            if (sonrakiTarihler.Count < 2)
-            {
-                ViewBag.SatisTakvimiUyarisi = "Yıllık Satış Takvimi'nde bugünden sonraki yeterli tarih bulunamadı. " +
-                    "Lütfen önce \"Güncellemeler > Satış Takvimi\" ekranından tarihleri girin; bu dosya için 1. ve 2. Satış tarihlerini şimdilik elle seçmeniz gerekebilir.";
-            }
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            var satis1Onerisi = sonrakiTarihler.Count > 0
+                ? sonrakiTarihler[0]
+                : IhaleTarihHesaplayici.OnumuzdekiHaftaCarsambasi(bugun, resmiTatiller);
+            var satis2Onerisi = sonrakiTarihler.Count > 1
+                ? sonrakiTarihler[1]
+                : IhaleTarihHesaplayici.SonrakiCarsamba(satis1Onerisi.AddDays(7), resmiTatiller);
 
             var dosya = new Dosya
             {
@@ -88,8 +92,8 @@ namespace AracSatisSistemi.Controllers
                 KomisyonUye1 = komisyon?.Uye1,
                 KomisyonUye2 = komisyon?.Uye2,
                 KomisyonUye3 = komisyon?.Uye3,
-                Satis1Tarihi = sonrakiTarihler.Count > 0 ? sonrakiTarihler[0] : bugun,
-                Satis2Tarihi = sonrakiTarihler.Count > 1 ? sonrakiTarihler[1] : bugun
+                Satis1Tarihi = satis1Onerisi,
+                Satis2Tarihi = satis2Onerisi
             };
             return View(dosya);
         }
