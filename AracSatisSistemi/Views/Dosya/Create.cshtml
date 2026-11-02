@@ -4,6 +4,7 @@
     var cinsler = (List<AracCinsi>)ViewBag.Cinsler;
     var markalar = (List<AracMarkasi>)ViewBag.Markalar;
     var otoparklar = (List<OtoparkKaydi>)ViewBag.Otoparklar;
+    var sehirler = (List<string>)ViewBag.Sehirler;
     var ankaraVergiDaireleri = (List<VergiDairesiKaydi>)ViewBag.AnkaraVergiDaireleri;
     var renkler = (List<AracRengi>)ViewBag.Renkler;
 }
@@ -46,10 +47,20 @@
             <label class="form-label" asp-for="VergiDairesiYaziSayisi"></label>
             <input class="form-control" asp-for="VergiDairesiYaziSayisi" />
         </div>
-        <div class="col-md-5">
+        <div class="col-md-2">
+            <label class="form-label">Alacaklı Vergi Dairesi - İl</label>
+            <select class="form-select" id="sehir2">
+                <option value="">-- İl Seçiniz --</option>
+                @foreach (var s in sehirler)
+                {
+                    <option value="@s">@s</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
             <label class="form-label" asp-for="AlacakliVergiDairesi"></label>
-            <select class="form-select" asp-for="AlacakliVergiDairesi" id="vergiDairesi2">
-                <option value="">-- Seçiniz --</option>
+            <select class="form-select" asp-for="AlacakliVergiDairesi" id="vergiDairesi2" disabled>
+                <option value="">-- Önce il seçiniz --</option>
             </select>
         </div>
     </div>
@@ -230,8 +241,6 @@
 </form>
 
 @section Scripts {
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         // Doldurulmuş formdaki alan/değerleri Excel (.xlsx) olarak indirir.
@@ -264,25 +273,33 @@
 
         const vergiDaireleriData = @Html.Raw(ViewBag.VergiDaireleriJson);
 
-        // Vergi Dairesi Adı ve Alacaklı Vergi Dairesi kutuları, listeler uzun olduğundan
-        // Tom Select ile yazarak arama yapılabilir hale getiriliyor. Alacaklı Vergi Dairesi
-        // önce İl seçmeyi gerektirmiyor; Türkiye genelindeki tüm vergi daireleri baştan
-        // yüklü geliyor, İl başlıklarına göre gruplanmış halde gösteriliyor ve doğrudan
-        // (ya il adıyla ya da vergi dairesi adıyla) aranabiliyor.
-        const vergiDairesiAdiTS = new TomSelect('#VergiDairesiAdi', { create: false });
-        const illerOptgroup = [...new Set(vergiDaireleriData.map(v => v.Sehir))].map(s => ({ value: s, label: s }));
-        const vergiDairesi2TS = new TomSelect('#vergiDairesi2', {
-            create: false,
-            options: vergiDaireleriData.map(v => ({ value: v.Ad, text: v.Ad, sehir: v.Sehir })),
-            valueField: 'value',
-            labelField: 'text',
-            searchField: ['text', 'sehir'],
-            optgroupField: 'sehir',
-            optgroups: illerOptgroup,
-            lockOptgroupOrder: true
-        });
-        const mevcutAlacakliVD = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AlacakliVergiDairesi));
-        if (mevcutAlacakliVD) vergiDairesi2TS.setValue(mevcutAlacakliVD, true);
+        function kademeliVergiDairesiKur(sehirSelectId, vdSelectId) {
+            const sehirSelect = document.getElementById(sehirSelectId);
+            const vdSelect = document.getElementById(vdSelectId);
+            sehirSelect.addEventListener('change', function () {
+                const secilenSehir = this.value;
+                vdSelect.innerHTML = '';
+                if (!secilenSehir) {
+                    vdSelect.disabled = true;
+                    vdSelect.innerHTML = '<option value="">-- Önce il seçiniz --</option>';
+                    return;
+                }
+                vdSelect.disabled = false;
+                const bosOpt = document.createElement('option');
+                bosOpt.value = '';
+                bosOpt.textContent = '-- Vergi Dairesi Seçiniz --';
+                vdSelect.appendChild(bosOpt);
+                vergiDaireleriData
+                    .filter(v => v.Sehir === secilenSehir)
+                    .forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v.Ad;
+                        opt.textContent = v.Ad;
+                        vdSelect.appendChild(opt);
+                    });
+            });
+        }
+        kademeliVergiDairesiKur('sehir2', 'vergiDairesi2');
 
         const bedelInput = document.getElementById('muhammenBedel');
         const teminatOut = document.getElementById('teminatOnizleme');
