@@ -266,15 +266,20 @@
 
         // Vergi Dairesi Adı ve Alacaklı Vergi Dairesi kutuları, listeler uzun olduğundan
         // Tom Select ile yazarak arama yapılabilir hale getiriliyor. Alacaklı Vergi Dairesi
-        // artık önce İl seçmeyi gerektirmiyor; Türkiye genelindeki tüm vergi daireleri
-        // baştan yüklü geliyor ve şehir adı yanında gösterilerek doğrudan aranabiliyor.
+        // önce İl seçmeyi gerektirmiyor; Türkiye genelindeki tüm vergi daireleri baştan
+        // yüklü geliyor, İl başlıklarına göre gruplanmış halde gösteriliyor ve doğrudan
+        // (ya il adıyla ya da vergi dairesi adıyla) aranabiliyor.
         const vergiDairesiAdiTS = new TomSelect('#VergiDairesiAdi', { create: false });
+        const illerOptgroup = [...new Set(vergiDaireleriData.map(v => v.Sehir))].map(s => ({ value: s, label: s }));
         const vergiDairesi2TS = new TomSelect('#vergiDairesi2', {
             create: false,
-            options: vergiDaireleriData.map(v => ({ value: v.Ad, text: `${v.Ad} (${v.Sehir})` })),
+            options: vergiDaireleriData.map(v => ({ value: v.Ad, text: v.Ad, sehir: v.Sehir })),
             valueField: 'value',
             labelField: 'text',
-            searchField: ['text']
+            searchField: ['text', 'sehir'],
+            optgroupField: 'sehir',
+            optgroups: illerOptgroup,
+            lockOptgroupOrder: true
         });
         const mevcutAlacakliVD = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AlacakliVergiDairesi));
         if (mevcutAlacakliVD) vergiDairesi2TS.setValue(mevcutAlacakliVD, true);
