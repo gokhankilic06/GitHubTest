@@ -1,82 +1,85 @@
+using System.Text.Json;
 using AracSatisSistemi.Models;
 
 namespace AracSatisSistemi.Data
 {
+    // JSON dosyalarından (Data/ReferansVerileri/*.json) okunan satırların şekli.
+    public class AracCinsiVerisi
+    {
+        public string Ad { get; set; } = string.Empty;
+        public string Kategori { get; set; } = string.Empty;
+    }
+
+    public class VergiDairesiVerisi
+    {
+        public string Ad { get; set; } = string.Empty;
+        public string Sehir { get; set; } = string.Empty;
+    }
+
+    public class AracModeliVerisi
+    {
+        public string Marka { get; set; } = string.Empty;
+        public List<string> Modeller { get; set; } = new();
+    }
+
     public static class SeedData
     {
+        private static readonly string VeriKlasoru = Path.Combine(AppContext.BaseDirectory, "Data", "ReferansVerileri");
+
+        // Ayarlar ekranındaki "Tam Listeyi Yükle" gibi butonlar da aynı referans
+        // verisini (ör. Türkiye genelindeki vergi daireleri) kullanabilsin diye public.
+        public static List<T> JsonOku<T>(string dosyaAdi)
+        {
+            var yol = Path.Combine(VeriKlasoru, dosyaAdi);
+            if (!File.Exists(yol)) return new List<T>();
+            var json = File.ReadAllText(yol);
+            return JsonSerializer.Deserialize<List<T>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<T>();
+        }
+
         public static void Initialize(AppDbContext context)
         {
             context.Database.EnsureCreated();
 
-            if (!context.AracCinsleri.Any())
-            {
-                // Otopark ücret tarifesindeki 4 kategoriye göre varsayılan eşleme; Güncellemeler
-                // ekranından her cins için gerekirse değiştirilebilir.
-                var cinsler = new (string Ad, OtoparkAracKategorisi Kategori)[]
-                {
-                    ("Otomobil", OtoparkAracKategorisi.KucukArac),
-                    ("Kamyonet", OtoparkAracKategorisi.MinibusKamyonet),
-                    ("Kamyon", OtoparkAracKategorisi.BuyukArac),
-                    ("Tır", OtoparkAracKategorisi.BuyukArac),
-                    ("Minibüs", OtoparkAracKategorisi.MinibusKamyonet),
-                    ("Midibüs", OtoparkAracKategorisi.BuyukArac),
-                    ("Otobüs", OtoparkAracKategorisi.BuyukArac),
-                    ("Traktör", OtoparkAracKategorisi.BuyukArac),
-                    ("Motosiklet", OtoparkAracKategorisi.Motor),
-                    ("Çekici", OtoparkAracKategorisi.BuyukArac),
-                    ("Römork", OtoparkAracKategorisi.BuyukArac),
-                    ("İş Makinesi", OtoparkAracKategorisi.BuyukArac),
-                    ("Diğer", OtoparkAracKategorisi.KucukArac),
-                };
-                context.AracCinsleri.AddRange(cinsler.Select(a => new AracCinsi { Ad = a.Ad, OtoparkKategorisi = a.Kategori }));
-            }
+            // Araç cinsi/marka/model, vergi dairesi, otopark ve renk gibi referans listelerinin
+            // ham verisi artık kod içinde değil Data/ReferansVerileri/*.json dosyalarında
+            // tutuluyor. Her başlangıçta, veritabanında henüz olmayan kayıtlar bu dosyalardan
+            // tamamlanır; zaten var olan (ve Güncellemeler ekranından kullanıcı tarafından
+            // düzenlenmiş/silinmiş) kayıtlara dokunulmaz. Böylece hem ilk kurulum hem de daha
+            // önce kısmen doldurulmuş eski bir veritabanı güvenle güncellenir, ve dosyalara
+            // yeni satır eklenince (ör. yeni bir marka/model) mevcut kurulumlar da otomatik
+            // yakalar.
 
-            if (!context.AracMarkalari.Any())
-            {
-                // NOT: Bu liste düzenlenebilir bir başlangıç listesidir. Tam ve güncel marka
-                // listesi için Güncellemeler ekranından https://www.tsb.org.tr/tr/kasko-deger-listesi
-                // adresindeki liste referans alınarak eklenmelidir.
-                var markalar = new[]
-                {
-                    "Renault", "Fiat", "Ford", "Volkswagen", "Toyota", "Hyundai", "Opel",
-                    "Peugeot", "Citroen", "Dacia", "Honda", "Nissan", "Mercedes-Benz", "BMW",
-                    "Audi", "Skoda", "Seat", "Kia", "Chevrolet", "Mazda", "Suzuki",
-                    "Mitsubishi", "Volvo", "Land Rover", "Jeep", "Isuzu", "Iveco", "MAN",
-                    "Scania", "DAF", "BMC", "Otokar", "TEMSA", "Yamaha", "Honda Motosiklet",
-                    "TOGG", "Diğer"
-                };
-                context.AracMarkalari.AddRange(markalar.Select(a => new AracMarkasi { Ad = a }));
-            }
+            var mevcutCinsler = context.AracCinsleri.Select(c => c.Ad).ToHashSet();
+            context.AracCinsleri.AddRange(JsonOku<AracCinsiVerisi>("AracCinsleri.json")
+                .Where(c => !mevcutCinsler.Contains(c.Ad))
+                .Select(c => new AracCinsi { Ad = c.Ad, OtoparkKategorisi = Enum.Parse<OtoparkAracKategorisi>(c.Kategori) }));
 
-            if (!context.VergiDaireleri.Any())
-            {
-                context.VergiDaireleri.AddRange(TumTurkiyeVergiDaireleri.Liste);
-            }
+            var mevcutMarkalar = context.AracMarkalari.Select(m => m.Ad).ToHashSet();
+            context.AracMarkalari.AddRange(JsonOku<string>("AracMarkalari.json")
+                .Where(m => !mevcutMarkalar.Contains(m))
+                .Select(m => new AracMarkasi { Ad = m }));
 
-            if (!context.Otoparklar.Any())
-            {
-                // Ankara'daki yediemin otoparkları - örnek/başlangıç listesi.
-                var otoparklar = new[]
-                {
-                    "Ostim Yediemin Otoparkı", "Sincan Yediemin Otoparkı",
-                    "Mamak Yediemin Otoparkı", "Çubuk Yediemin Otoparkı",
-                    "Polatlı Yediemin Otoparkı"
-                };
-                context.Otoparklar.AddRange(otoparklar.Select(a => new OtoparkKaydi { Ad = a }));
-            }
+            var mevcutVergiDaireleri = context.VergiDaireleri.Select(v => v.Ad).ToHashSet();
+            context.VergiDaireleri.AddRange(JsonOku<VergiDairesiVerisi>("VergiDaireleri.json")
+                .Where(v => !mevcutVergiDaireleri.Contains(v.Ad))
+                .Select(v => new VergiDairesiKaydi { Ad = v.Ad, Sehir = v.Sehir }));
 
-            if (!context.AracRenkleri.Any())
-            {
-                var renkler = new[]
-                {
-                    "Beyaz", "Siyah", "Gri", "Gümüş", "Kırmızı", "Mavi", "Lacivert",
-                    "Yeşil", "Sarı", "Turuncu", "Kahverengi", "Bej", "Bordo", "Mor",
-                    "Pembe", "Altın", "Turkuaz",
-                    "Okyanus Yeşili", "Okyanus Mavisi", "Gün Batımı Kırmızısı",
-                    "Manyetik Mavi", "İnci Beyazı", "Bulut Gri", "Metalik Gri"
-                };
-                context.AracRenkleri.AddRange(renkler.Select(a => new AracRengi { Ad = a }));
-            }
+            var mevcutOtoparklar = context.Otoparklar.Select(o => o.Ad).ToHashSet();
+            context.Otoparklar.AddRange(JsonOku<string>("Otoparklar.json")
+                .Where(o => !mevcutOtoparklar.Contains(o))
+                .Select(o => new OtoparkKaydi { Ad = o }));
+
+            var mevcutRenkler = context.AracRenkleri.Select(r => r.Ad).ToHashSet();
+            context.AracRenkleri.AddRange(JsonOku<string>("AracRenkleri.json")
+                .Where(r => !mevcutRenkler.Contains(r))
+                .Select(r => new AracRengi { Ad = r }));
+
+            // Araç Modelleri marka bazlı tutulduğundan (MarkaAdi + Ad birlikte benzersiz)
+            // eşleşme iki alanın birleşimiyle yapılır.
+            var mevcutModeller = context.AracModelleri.Select(m => m.MarkaAdi + "|" + m.Ad).ToHashSet();
+            context.AracModelleri.AddRange(JsonOku<AracModeliVerisi>("AracModelleri.json")
+                .SelectMany(m => m.Modeller.Select(ad => new AracModeli { MarkaAdi = m.Marka, Ad = ad }))
+                .Where(m => !mevcutModeller.Contains(m.MarkaAdi + "|" + m.Ad)));
 
             if (!context.KomisyonAyarlari.Any())
             {

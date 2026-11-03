@@ -22,4 +22,12 @@
     <PackageReference Include="System.Data.OleDb" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Araç cinsi/marka/model, vergi dairesi, otopark ve renk gibi referans listelerinin
+         ham verisi kodda değil burada tutulur (bkz. Data/SeedData.cs). Bu .json dosyaları
+         SDK tarafından zaten Content olarak dahil edildiğinden (Include değil Update),
+         yalnızca derleme çıktısına kopyalanmaları için işaretlenir. -->
+    <Content Update="Data\ReferansVerileri\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

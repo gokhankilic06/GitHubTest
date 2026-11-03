@@ -163,7 +163,7 @@ namespace AracSatisSistemi.Controllers
                 .ToListAsync();
             var mevcutSet = mevcutlar.ToHashSet();
 
-            var eksikler = TumTurkiyeVergiDaireleri.Liste
+            var eksikler = SeedData.JsonOku<VergiDairesiVerisi>("VergiDaireleri.json")
                 .Where(x => !mevcutSet.Contains(x.Sehir + "|" + x.Ad))
                 .Select(x => new VergiDairesiKaydi { Ad = x.Ad, Sehir = x.Sehir })
                 .ToList();
