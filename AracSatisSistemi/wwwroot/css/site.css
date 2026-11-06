@@ -185,7 +185,7 @@ a .card:hover, .card.menu-card:hover {
     max-width: 800px;
     margin: 0 auto;
     background: #fff;
-    padding: 24px 28px;
+    padding: 40px 48px;
     border: 1px solid #dee2e6;
 }
 @media print {
@@ -193,15 +193,16 @@ a .card:hover, .card.menu-card:hover {
 }
 
 /* Bu sayfalardaki ".form-section-title" ekran genelindeki koyu/lacivert arka planlı
-   rozet değil, resmi bir basılı belgeye yakışan sade (arka plansız), büyük ve koyu
-   renkli bir başlık olarak görünsün - ekrandaki/diğer sayfalardaki haline dokunmadan. */
+   rozet değil, resmi bir basılı belgeye yakışan sade (arka plansız, çizgisiz), büyük
+   ve koyu renkli bir başlık olarak görünsün - ekrandaki/diğer sayfalardaki haline
+   dokunmadan. */
 .a4-sayfa .form-section-title {
     background: none;
     color: var(--brand-1);
     padding: 0;
     margin: 1.5rem 0 .75rem 0;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    border-bottom: 2px solid var(--brand-1);
+    border: none;
     border-radius: 0;
 }
