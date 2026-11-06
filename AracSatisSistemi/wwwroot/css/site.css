@@ -200,17 +200,16 @@ a .card:hover, .card.menu-card:hover {
     background: none;
     color: var(--brand-1);
     padding: 0;
-    margin: 1rem 0 .4rem 0;
+    margin: 1.5rem 0 .5rem 0;
     font-size: 1.1rem;
     font-weight: 700;
     border: none;
     border-radius: 0;
 }
-.a4-sayfa .form-section-title:first-child { margin-top: 0; }
 
 /* Dosya Detayı/Satış Detayları ekranındaki bölümler, ekrandaki ayrı "kart" widget'ları
    (gölgeli, yuvarlak köşeli, aralarında geniş boşluklu) gibi değil, tek bir akan
-   belge gibi görünsün diye ".card" yerine kullanılır - gereksiz boşluğu ortadan
-   kaldırır. */
-.belge-bolumu { margin-bottom: .5rem; }
+   belge gibi görünsün diye ".card" yerine kullanılır; yine de bölümler birbirine
+   yapışık durmasın diye aralarında bir miktar boşluk bırakılır. */
+.belge-bolumu { margin-bottom: 1.1rem; }
 .belge-bolumu:last-child { margin-bottom: 0; }

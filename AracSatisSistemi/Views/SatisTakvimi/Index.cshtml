@@ -55,41 +55,56 @@
 
 <div class="card p-3">
     <div class="form-section-title">Gelecek Satış Tarihleri (@gelecekTarihler.Count)</div>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered align-middle">
-            <thead class="table-light">
-                <tr><th>#</th><th>Tarih</th><th>Gün</th><th>Uyarı</th><th></th></tr>
-            </thead>
-            <tbody>
-                @for (var i = 0; i < gelecekTarihler.Count; i++)
-                {
-                    var t = gelecekTarihler[i];
-                    var haftaSonu = t.Tarih.DayOfWeek == DayOfWeek.Saturday || t.Tarih.DayOfWeek == DayOfWeek.Sunday;
-                    var tatil = resmiTatiller.Contains(t.Tarih.Date);
-                    <tr class="@(i < 2 ? "table-primary" : "")">
-                        <td>@(i == 0 ? "1. Satış (sıradaki)" : i == 1 ? "2. Satış (sıradaki)" : (i + 1).ToString())</td>
-                        <td>@t.Tarih.ToString("dd.MM.yyyy")</td>
-                        <td>@t.Tarih.ToString("dddd", trTR)</td>
-                        <td>
-                            @if (haftaSonu) { <span class="badge bg-warning text-dark">Hafta Sonu</span> }
-                            @if (tatil) { <span class="badge bg-danger">Resmi Tatil</span> }
-                        </td>
-                        <td>
-                            <form asp-action="Sil" method="post" onsubmit="return confirm('@t.Tarih.ToString("dd.MM.yyyy") tarihini takvimden silmek istediğinizden emin misiniz?');">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@t.Id" />
-                                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-                @if (!gelecekTarihler.Any())
-                {
-                    <tr><td colspan="5" class="text-center text-muted">Gelecek için takvimde kayıtlı tarih yok. Yukarıdan tarih ekleyin.</td></tr>
-                }
-            </tbody>
-        </table>
-    </div>
+    @if (gelecekTarihler.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered align-middle takvim-tablo">
+                <thead class="table-light">
+                    <tr><th>#</th><th>Tarih</th><th>Gün</th><th>Uyarı</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @{ var globalIndex = 0; }
+                    @foreach (var ay in gelecekTarihler.GroupBy(t => new { t.Tarih.Year, t.Tarih.Month }))
+                    {
+                        var buAy = ay.Key.Year == bugun.Year && ay.Key.Month == bugun.Month;
+                        <tr class="ay-baslik @(buAy ? "ay-baslik-bu-ay" : "")">
+                            <td colspan="5">
+                                <span class="ay-adi">@ay.First().Tarih.ToString("MMMM yyyy", trTR)</span>
+                                <span class="text-muted small fw-normal">(@ay.Count() tarih@(buAy ? " - bu ay" : ""))</span>
+                            </td>
+                        </tr>
+                        @foreach (var t in ay)
+                        {
+                            var i = globalIndex;
+                            globalIndex++;
+                            var haftaSonu = t.Tarih.DayOfWeek == DayOfWeek.Saturday || t.Tarih.DayOfWeek == DayOfWeek.Sunday;
+                            var tatil = resmiTatiller.Contains(t.Tarih.Date);
+                            <tr class="@(i < 2 ? "table-primary" : "")">
+                                <td>@(i == 0 ? "1. Satış (sıradaki)" : i == 1 ? "2. Satış (sıradaki)" : (i + 1).ToString())</td>
+                                <td>@t.Tarih.ToString("dd.MM.yyyy")</td>
+                                <td>@t.Tarih.ToString("dddd", trTR)</td>
+                                <td>
+                                    @if (haftaSonu) { <span class="badge bg-warning text-dark">Hafta Sonu</span> }
+                                    @if (tatil) { <span class="badge bg-danger">Resmi Tatil</span> }
+                                </td>
+                                <td>
+                                    <form asp-action="Sil" method="post" onsubmit="return confirm('@t.Tarih.ToString("dd.MM.yyyy") tarihini takvimden silmek istediğinizden emin misiniz?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted mb-0 py-3">Gelecek için takvimde kayıtlı tarih yok. Yukarıdan tarih ekleyin.</p>
+    }
 </div>
 
 @if (gecmisTarihler.Any())
@@ -97,25 +112,46 @@
     <div class="card p-3 mt-3">
         <div class="form-section-title">Geçmiş Satış Tarihleri (@gecmisTarihler.Count)</div>
         <div class="table-responsive">
-            <table class="table table-sm table-bordered align-middle">
+            <table class="table table-sm table-bordered align-middle takvim-tablo">
                 <thead class="table-light"><tr><th>Tarih</th><th>Gün</th><th></th></tr></thead>
                 <tbody>
-                    @foreach (var t in gecmisTarihler.OrderByDescending(t => t.Tarih))
+                    @foreach (var ay in gecmisTarihler.OrderByDescending(t => t.Tarih).GroupBy(t => new { t.Tarih.Year, t.Tarih.Month }).OrderByDescending(g => g.Key.Year).ThenByDescending(g => g.Key.Month))
                     {
-                        <tr>
-                            <td>@t.Tarih.ToString("dd.MM.yyyy")</td>
-                            <td>@t.Tarih.ToString("dddd", trTR)</td>
-                            <td>
-                                <form asp-action="Sil" method="post" onsubmit="return confirm('@t.Tarih.ToString("dd.MM.yyyy") tarihini takvimden silmek istediğinizden emin misiniz?');">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@t.Id" />
-                                    <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                                </form>
-                            </td>
+                        <tr class="ay-baslik">
+                            <td colspan="3"><span class="ay-adi">@ay.First().Tarih.ToString("MMMM yyyy", trTR)</span> <span class="text-muted small fw-normal">(@ay.Count() tarih)</span></td>
                         </tr>
+                        @foreach (var t in ay)
+                        {
+                            <tr>
+                                <td>@t.Tarih.ToString("dd.MM.yyyy")</td>
+                                <td>@t.Tarih.ToString("dddd", trTR)</td>
+                                <td>
+                                    <form asp-action="Sil" method="post" onsubmit="return confirm('@t.Tarih.ToString("dd.MM.yyyy") tarihini takvimden silmek istediğinizden emin misiniz?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@t.Id" />
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
         </div>
     </div>
 }
+
+<style>
+    .takvim-tablo .ay-baslik td {
+        background: #eef1f6;
+        font-weight: 700;
+        color: var(--brand-1);
+        padding-top: .6rem;
+        padding-bottom: .6rem;
+    }
+    .takvim-tablo .ay-baslik .ay-adi { text-transform: capitalize; }
+    .takvim-tablo .ay-baslik-bu-ay td {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+</style>
