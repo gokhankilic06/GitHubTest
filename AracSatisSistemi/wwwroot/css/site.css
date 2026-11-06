@@ -175,3 +175,33 @@ a .card:hover, .card.menu-card:hover {
     body { background: #fff !important; }
     .card { box-shadow: none !important; border: 1px solid #ddd !important; }
 }
+
+/* İhale Tutanağı, Dosya Detayı/Satış Detayları gibi yazdırılan/PDF'e aktarılan
+   ekranlarda içerik alanını A4 dikey (portre) bir kağıdı andıracak şekilde dar ve
+   ortalı tutar. Bu alan html2canvas ile olduğu gibi görüntü olarak yakalanıp
+   PDF'e/yazdırmaya aktarıldığından, ekrandaki bu dar görünüm çıktının da yatay değil
+   dikey bir sayfa gibi çıkmasını sağlar. */
+.a4-sayfa {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 24px 28px;
+    border: 1px solid #dee2e6;
+}
+@media print {
+    .a4-sayfa { max-width: none; border: none; padding: 0; }
+}
+
+/* Bu sayfalardaki ".form-section-title" ekran genelindeki koyu/lacivert arka planlı
+   rozet değil, resmi bir basılı belgeye yakışan sade (arka plansız), büyük ve koyu
+   renkli bir başlık olarak görünsün - ekrandaki/diğer sayfalardaki haline dokunmadan. */
+.a4-sayfa .form-section-title {
+    background: none;
+    color: var(--brand-1);
+    padding: 0;
+    margin: 1.5rem 0 .75rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-bottom: 2px solid var(--brand-1);
+    border-radius: 0;
+}
