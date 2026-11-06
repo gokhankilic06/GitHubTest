@@ -98,6 +98,15 @@ using (var scope = app.Services.CreateScope())
             ""MotorCekiciUcreti"" = CASE WHEN ""MotorCekiciUcreti"" IN (0, 1000) THEN 2000 ELSE ""MotorCekiciUcreti"" END;");
     }
     catch { /* tablo/sütunlar bir şekilde yoksa sessizce geçilir */ }
+
+    // "Model Yılı Üst Sınırı" ayarı (Kayıt İşlemleri/Dosya Düzenle ekranındaki "Model
+    // Yılı" listesinin üst sınırı) sonradan eklendi; eski veritabanlarında sütun yoksa
+    // eklenir ve 0 ise (henüz hiç "Güncellemeler" ekranından değiştirilmemişse) makul bir
+    // varsayılana (2027) ayarlanır. Kullanıcı kendi değerini girdiyse dokunulmaz.
+    try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""GenelAyarlar"" ADD COLUMN ""MaksimumModelYili"" INTEGER NOT NULL DEFAULT 0;"); }
+    catch { /* sütun zaten varsa göz ardı edilir */ }
+    try { db.Database.ExecuteSqlRaw(@"UPDATE ""GenelAyarlar"" SET ""MaksimumModelYili"" = 2027 WHERE ""MaksimumModelYili"" = 0;"); }
+    catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.

@@ -113,6 +113,11 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Motor - Çekici Ücreti (TL)")]
         public decimal MotorCekiciUcreti { get; set; }
 
+        // Kayıt İşlemleri/Dosya Düzenle ekranlarındaki "Model Yılı" listesinin üst sınırı.
+        // Yıl ilerledikçe burada artırılabilir; kodda sabit bir tarih kalmaz.
+        [Display(Name = "Model Yılı Üst Sınırı")]
+        public int MaksimumModelYili { get; set; } = 2027;
+
         // Kategoriye göre (6 aya kadar, 6 aydan sonra) günlük ücret çiftini döner.
         public (decimal IlkDonem, decimal IkinciDonem) OtoparkTarifesi(OtoparkAracKategorisi kategori) => kategori switch
         {

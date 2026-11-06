@@ -120,7 +120,7 @@
             <label class="form-label" asp-for="ModelYili"></label>
             <select class="form-select" asp-for="ModelYili">
                 <option value="">-- Seçiniz --</option>
-                @for (var yil = 2035; yil >= 1940; yil--)
+                @for (var yil = (int)ViewBag.MaksimumModelYili; yil >= 1940; yil--)
                 {
                     <option value="@yil">@yil</option>
                 }

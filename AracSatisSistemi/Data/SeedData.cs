@@ -109,7 +109,8 @@ namespace AracSatisSistemi.Data
                     KucukAracCekiciUcreti = 2000.00m,
                     MinibusKamyonetCekiciUcreti = 2000.00m,
                     BuyukAracCekiciUcreti = 5000.00m,
-                    MotorCekiciUcreti = 2000.00m
+                    MotorCekiciUcreti = 2000.00m,
+                    MaksimumModelYili = 2027
                 });
             }
 

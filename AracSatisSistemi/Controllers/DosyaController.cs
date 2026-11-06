@@ -344,6 +344,10 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
 
+            // "Model Yılı" listesinin üst sınırı - Güncellemeler ekranından ayarlanır.
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            ViewBag.MaksimumModelYili = genelAyar?.MaksimumModelYili > 0 ? genelAyar.MaksimumModelYili : 2027;
+
             var vergiDaireleri = await _db.VergiDaireleri.OrderBy(a => a.Sehir).ThenBy(a => a.Ad).ToListAsync();
 
             // "İlgili Vergi Dairesi" alanı - sadece Ankara'daki vergi daireleri (il seçimine gerek yok).
