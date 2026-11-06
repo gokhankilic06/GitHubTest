@@ -33,7 +33,7 @@
     <div class="text-end small text-muted" style="width:90px;">@Model.KayitTarihi.ToString("dd.MM.yyyy")</div>
 </div>
 
-<div class="card p-3 mb-3">
+<div class="belge-bolumu">
     <div class="d-flex flex-wrap gap-3">
         <div class="kimlik-kutu">
             <span class="kimlik-etiket">Dosya No:</span>
@@ -50,12 +50,14 @@
     </div>
 </div>
 
-<div class="card p-3 mb-3">
+<div class="belge-bolumu">
     <div class="form-section-title">İlgili Vergi Dairesi</div>
     <table class="detay-tablo">
         <tr>
-            <td class="etiket">Vergi Dairesi Adı</td><td>@Model.VergiDairesiAdi</td>
-            <td class="etiket">Alacaklı Vergi Dairesi</td><td>@Model.AlacakliVergiDairesi</td>
+            <td class="etiket">Vergi Dairesi Adı</td><td colspan="3">@Model.VergiDairesiAdi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Alacaklı Vergi Dairesi</td><td colspan="3">@Model.AlacakliVergiDairesi</td>
         </tr>
         <tr>
             <td class="etiket">Vergi Dairesi Yazısı Tarihi</td><td>@Model.VergiDairesiYaziTarihi?.ToString("dd.MM.yyyy")</td>
@@ -64,7 +66,7 @@
     </table>
 </div>
 
-<div class="card p-3 mb-3">
+<div class="belge-bolumu">
     <div class="form-section-title">Borçlu Mükellef</div>
     <table class="detay-tablo">
         <tr>
@@ -78,7 +80,7 @@
     </table>
 </div>
 
-<div class="card p-3 mb-3">
+<div class="belge-bolumu">
     <div class="form-section-title">Araç Bilgileri</div>
     <table class="detay-tablo">
         <tr>
@@ -116,7 +118,7 @@
     </table>
 </div>
 
-<div class="card p-3 mb-3">
+<div class="belge-bolumu">
     <div class="form-section-title">Planlanan İhale Tarihleri</div>
     <table class="detay-tablo">
         <tr>
@@ -128,7 +130,7 @@
 
 @if (Model.Satislar.Any())
 {
-    <div class="card p-3 mb-3">
+    <div class="belge-bolumu">
         <div class="form-section-title">Satış Bilgileri</div>
         <table class="satis-tablo">
             <thead>
@@ -165,7 +167,7 @@
 
 @if (Model.IptalIade != null && Model.IptalIade.AliciyaTerkSecildi)
 {
-    <div class="card p-3 mb-3">
+    <div class="belge-bolumu">
         <div class="form-section-title">Alıcıya Terk (6183 sayılı Kanun Md. 85/86)</div>
         <table class="detay-tablo">
             <tr>
@@ -186,7 +188,7 @@
 
 @if (Model.IptalIade != null && (Model.IptalIade.SatisIptaliSecildi || Model.IptalIade.SatisIadesiSecildi || Model.IptalIade.DosyaKapatildi))
 {
-    <div class="card p-3 mb-3">
+    <div class="belge-bolumu">
         <div class="form-section-title">İptal / İade / Kapama</div>
         <table class="detay-tablo">
             <tr>
@@ -236,9 +238,10 @@
                 gizlenecekler.forEach(el => el.style.display = '');
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const genislik = 210;
+                const kenarBosluk = 10; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
+                const genislik = 210 - (2 * kenarBosluk);
                 const yukseklik = (canvas.height * genislik) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
                 devamEt(pdf);
             }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
         }
