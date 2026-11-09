@@ -13,7 +13,7 @@
 }
 <h3>Satış Sonucu Gir</h3>
 
-<form asp-action="SonucGir" method="post">
+<form asp-action="SonucGir" method="post" id="sonucForm">
     @Html.AntiForgeryToken()
     <input type="hidden" name="DosyaId" value="@Model.DosyaId" />
     <input type="hidden" name="SatisTuru" value="@((int)Model.SatisTuru)" />
@@ -59,7 +59,11 @@
                 </div>
             </div>
 
-            <div class="col-md-3" id="aliciVknAlani"><label class="form-label" asp-for="AliciVKN"></label><input class="form-control" asp-for="AliciVKN" maxlength="10" /></div>
+            <div class="col-md-3" id="aliciVknAlani">
+                <label class="form-label" asp-for="AliciVKN"></label>
+                <input class="form-control" asp-for="AliciVKN" id="aliciVkn" maxlength="10" inputmode="numeric" placeholder="10 haneli" autocomplete="off" />
+                <div class="form-text text-danger" id="aliciVknUyari" style="display:none;">Vergi Numarası (VKN) 10 haneli olmalıdır.</div>
+            </div>
             <div class="col-md-3" id="aliciAdiAlani"><label class="form-label" asp-for="AliciAdiSoyadi"></label><input class="form-control" asp-for="AliciAdiSoyadi" /></div>
             <div class="col-md-3" id="adresAlani"><label class="form-label" asp-for="Adres"></label><input class="form-control" asp-for="Adres" /></div>
 
@@ -94,6 +98,28 @@
         }
         sonucSelect.addEventListener('change', bedelAlaniniAyarla);
         bedelAlaniniAyarla();
+
+        // Alıcı VKN: sadece rakam kabul edilir (yapıştırmada da süzülür) ve 10 haneden
+        // kısa/uzun girilirse (maxlength=10 üst sınırı zaten engellediğinden pratikte
+        // sadece eksik haneli durum kalır) uyarı gösterilir.
+        const aliciVkn = document.getElementById('aliciVkn');
+        const aliciVknUyari = document.getElementById('aliciVknUyari');
+        function aliciVknDogrula() {
+            aliciVkn.value = aliciVkn.value.replace(/\D/g, '').slice(0, 10);
+            const tamamMi = aliciVkn.value.length === 0 || aliciVkn.value.length === 10;
+            aliciVknUyari.style.display = tamamMi ? 'none' : '';
+            aliciVkn.classList.toggle('is-invalid', !tamamMi);
+        }
+        aliciVkn.addEventListener('input', aliciVknDogrula);
+        aliciVkn.addEventListener('blur', aliciVknDogrula);
+
+        document.getElementById('sonucForm').addEventListener('submit', e => {
+            aliciVknDogrula();
+            if (sonucSelect.value === '1' && aliciVkn.value.length !== 0 && aliciVkn.value.length !== 10) {
+                e.preventDefault();
+                aliciVkn.focus();
+            }
+        });
 
         // Satış Bedeli: okunaklı olsun diye yazarken binlik ayraç (nokta) otomatik eklenir
         // (ör. 300000 -> 300.000); sunucuya gönderilen gerçek değer ayrı bir gizli alanda

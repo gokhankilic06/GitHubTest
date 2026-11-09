@@ -24,10 +24,10 @@
     </div>
 </div>
 
-<div id="yazdirAlani">
-    <div class="text-center mb-3">
+<div id="yazdirAlani" class="yatay-sayfa">
+    <div class="text-center mb-3 pb-2 border-bottom">
         <h4 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h4>
-        <h5 class="mb-0 fw-bold">@turAdiBuyuk LİSTESİ&nbsp;&nbsp;@tarih.ToString("dd.MM.yyyy")</h5>
+        <h5 class="text-muted mb-0">@turAdiBuyuk LİSTESİ&nbsp;&nbsp;@tarih.ToString("dd.MM.yyyy")</h5>
     </div>
 
     <div class="table-responsive">
@@ -100,8 +100,21 @@
 </div>
 
 <style>
-    .satis-listesi-tablo { font-size: 0.85rem; }
-    .satis-listesi-tablo th { vertical-align: middle; }
+    /* Bu liste çok sütunlu geniş bir tablo olduğundan (İhale Tutanağı/Satış Detayları'nın
+       aksine) dikey değil yatay (A4 enine) kalır; sadece ekranda/çıktıda kenarlarda
+       makul bir boşluk bırakan hafif bir "sayfa" görünümü eklenir. */
+    .yatay-sayfa {
+        background: #fff;
+        padding: 28px 34px;
+        border: 1px solid #dee2e6;
+    }
+    @@media print {
+        .yatay-sayfa { border: none; padding: 0; }
+    }
+    .satis-listesi-tablo { font-size: 0.82rem; }
+    .satis-listesi-tablo th { vertical-align: middle; font-weight: 700; }
+    .satis-listesi-tablo td, .satis-listesi-tablo th { padding: .45rem .5rem; }
+    .satis-listesi-tablo tfoot td { font-size: 0.85rem; }
 </style>
 
 @section Scripts {
@@ -111,9 +124,10 @@
             html2canvas(alan, { scale: 2 }).then(canvas => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('l', 'mm', 'a4');
-                const genislik = 297;
+                const kenarBosluk = 8; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
+                const genislik = 297 - (2 * kenarBosluk);
                 const yukseklik = (canvas.height * genislik) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
                 devamEt(pdf);
             });
         }
