@@ -219,12 +219,6 @@ namespace AracSatisSistemi.Controllers
                 satis.SatisBedeli = null;
             }
 
-            satis.AliciVKN = satis.AliciVKN?.Trim();
-            if (!string.IsNullOrEmpty(satis.AliciVKN) && satis.AliciVKN.Length != 10)
-            {
-                ModelState.AddModelError(nameof(Satis.AliciVKN), "Vergi Numarası (VKN) 10 haneli olmalıdır.");
-            }
-
             if (!TurGecerliMi(dosya, satis.SatisTuru))
             {
                 TempData["Hata"] = "Bu dosya için bu satış türünde sonuç girişi şu an uygun değil (sonuç zaten girilmiş olabilir veya bir önceki aşama tamamlanmamış).";
