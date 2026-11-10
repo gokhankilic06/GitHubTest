@@ -23,12 +23,7 @@
                 <option value="2satis" selected="@(tutanakTuru == "2satis")">2 Satış Listesi</option>
                 <option value="pazarlik" selected="@(tutanakTuru == "pazarlik")">Pazarlıktaki Araçlar</option>
                 <option value="6183" selected="@(tutanakTuru == "6183")">6183/86 Tek Satış</option>
-                <option value="vergidairesi" selected="@(tutanakTuru == "vergidairesi")">Vergi Dairesi Bazında</option>
-                <option value="otopark" selected="@(tutanakTuru == "otopark")">Otopark Listesi</option>
-                <option value="ilan" selected="@(tutanakTuru == "ilan")">İlan Listesi</option>
-                <option value="aracsorgu" selected="@(tutanakTuru == "aracsorgu")">Araç Satış Sorgu</option>
                 <option value="sorgu" selected="@(tutanakTuru == "sorgu")">Sorgu</option>
-                <option value="acikdosyalar" selected="@(tutanakTuru == "acikdosyalar")">Açık Dosyalar</option>
             </select>
             <div class="form-text">Tür seçimi, aşağıdaki kriterlerden ilgili olanları otomatik önerir; Listele'ye basmadan önce isterseniz değiştirebilirsiniz.</div>
         </div>
@@ -238,13 +233,11 @@
         // Tutanak Türü seçimi, ilgili filtreleri otomatik önerir (Listele'ye basınca uygulanır).
         document.getElementById('tutanakTuruSecim').addEventListener('change', function () {
             const satisTuru = document.getElementById('satisTuruSecim');
-            const durum = document.getElementById('durumSecim');
             switch (this.value) {
                 case '1satis': satisTuru.value = '1'; break;
                 case '2satis': satisTuru.value = '2'; break;
                 case 'pazarlik': satisTuru.value = '3'; break;
                 case '6183': satisTuru.value = '4'; break;
-                case 'acikdosyalar': durum.value = 'aktif'; break;
             }
         });
 
