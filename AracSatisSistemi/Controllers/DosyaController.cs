@@ -212,56 +212,10 @@ namespace AracSatisSistemi.Controllers
                 .FirstOrDefaultAsync(d => d.Id == id);
             if (dosya == null) return NotFound();
 
-            SatisTuru gosterilecekTur;
-            DateTime gosterilecekTarih;
-            bool tarihSeciliyor;
-
-            if (dosya.Durum == DosyaDurumu.Satildi)
-            {
-                // Dosya zaten satıldıysa, tutanak artık ileriye dönük değil geriye dönük bir
-                // kayıttır: gerçekleşen satışın tür/tarihi gösterilir.
-                var satilan = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi)
-                    ?? dosya.Satislar.OrderByDescending(s => s.SatisTarihi).First();
-                gosterilecekTur = satilan.SatisTuru;
-                gosterilecekTarih = satilan.SatisTarihi;
-                tarihSeciliyor = false;
-            }
-            else
-            {
-                // Dosyanın şu an hangi aşamayı beklediği (bkz. Dosya.Asama - tüm dallanma
-                // mantığının tek kaynağı) belirler: 1./2. Satış'ın Satış Takvimi'nden gelen
-                // sabit bir tarihi vardır; Pazarlık/6183-86'nın ise yoktur, bu yüzden o
-                // durumda tarih/saat sayfadan seçilir.
-                switch (dosya.Asama)
-                {
-                    case Dosya.SurecAsamasi.IkinciSatisBekliyor:
-                        gosterilecekTur = SatisTuru.IkinciSatis;
-                        gosterilecekTarih = dosya.Satis2Tarihi;
-                        tarihSeciliyor = false;
-                        break;
-                    case Dosya.SurecAsamasi.PazarlikBekliyor:
-                        gosterilecekTur = SatisTuru.Pazarlik;
-                        gosterilecekTarih = secilenTarih ?? DateTime.Today;
-                        tarihSeciliyor = true;
-                        break;
-                    case Dosya.SurecAsamasi.Madde6183_86Bekliyor:
-                        gosterilecekTur = SatisTuru.Madde6183_86;
-                        gosterilecekTarih = secilenTarih ?? DateTime.Today;
-                        tarihSeciliyor = true;
-                        break;
-                    default:
-                        // BirinciSatisBekliyor ve nadir görülecek diğer durumlar (AliciyaTerkBekliyor,
-                        // SurecTamamlandi) için varsayılan olarak 1. Satış bilgisi gösterilir.
-                        gosterilecekTur = SatisTuru.BirinciSatis;
-                        gosterilecekTarih = dosya.Satis1Tarihi;
-                        tarihSeciliyor = false;
-                        break;
-                }
-            }
-
-            ViewBag.GosterilecekTur = gosterilecekTur;
-            ViewBag.GosterilecekTarih = gosterilecekTarih;
-            ViewBag.TarihSeciliyor = tarihSeciliyor;
+            var cozum = IhaleTutanagiCozucu.Coz(dosya, secilenTarih);
+            ViewBag.GosterilecekTur = cozum.Tur;
+            ViewBag.GosterilecekTarih = cozum.Tarih;
+            ViewBag.TarihSeciliyor = cozum.TarihSeciliyor;
 
             // Gösterilecek tür/tarih için kaydedilmiş bir Komisyon Oturumu (bkz. Komisyon
             // İşlemleri ekranı) varsa, SATIŞ KOMİSYONU imza bloğunda ve saatte ÖNCELİKLE o
@@ -269,28 +223,14 @@ namespace AracSatisSistemi.Controllers
             // kopyalanan eski (Güncellemeler'deki varsayılan komisyon) bilgisi değil. Hiç
             // oturum kaydedilmemişse o eski kopya bilgiye geri dönülür.
             var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
-                k.SatisTuru == gosterilecekTur && k.SatisTarihi.Date == gosterilecekTarih.Date);
+                k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date);
 
-            ViewBag.KomisyonBaskani = oturum?.Baskan ?? dosya.KomisyonBaskani;
-            ViewBag.KomisyonUye1 = oturum?.Uye1 ?? dosya.KomisyonUye1;
-            ViewBag.KomisyonUye2 = oturum?.Uye2 ?? dosya.KomisyonUye2;
-            ViewBag.KomisyonUye3 = oturum?.Uye3 ?? dosya.KomisyonUye3;
-
-            // 1. ve 2. Satış saati, bir Komisyon Oturumu kaydı yoksa her zaman sabit 10:00'dır
-            // (bkz. Komisyon İşlemleri ekranı). Pazarlık/6183-86'da kayıt yoksa (tarih
-            // seçiliyorsa) sayfadan elle seçilen saat kullanılır.
-            if (oturum != null)
-            {
-                ViewBag.SatisSaati = oturum.SatisSaati;
-            }
-            else if (gosterilecekTur == SatisTuru.BirinciSatis || gosterilecekTur == SatisTuru.IkinciSatis)
-            {
-                ViewBag.SatisSaati = new TimeSpan(10, 0, 0);
-            }
-            else
-            {
-                ViewBag.SatisSaati = secilenSaat;
-            }
+            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(dosya, cozum.Tur, cozum.Tarih, oturum, secilenSaat);
+            ViewBag.KomisyonBaskani = komisyon.Baskan;
+            ViewBag.KomisyonUye1 = komisyon.Uye1;
+            ViewBag.KomisyonUye2 = komisyon.Uye2;
+            ViewBag.KomisyonUye3 = komisyon.Uye3;
+            ViewBag.SatisSaati = komisyon.Saat;
 
             return View(dosya);
         }

@@ -142,68 +142,85 @@
 
 @* ---- YAZDIRMA / PDF ALANI: sadece yazdırırken görünür, ekranda gizli ---- *@
 <div id="yazdirmaAlani" style="display:none;">
-    @foreach (var s in Model)
+    @if (tutanakTuru == "ihale")
     {
-        <div class="tutanak-blok">
-            <div class="text-center mb-2">
-                <h5 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h5>
-                <h6 class="mb-0">İHALE TUTANAĞI</h6>
+        var ihaleGorunumleri = (List<IhaleTutanagiGorunumu>)(ViewBag.IhaleGorunumleri ?? new List<IhaleTutanagiGorunumu>());
+        @foreach (var g in ihaleGorunumleri)
+        {
+            <div class="tutanak-blok">
+                @await Html.PartialAsync("~/Views/Dosya/_IhaleTutanagiIcerik.cshtml", g)
             </div>
-
-            <table class="tutanak-tablo">
-                <tr><td class="baslik" colspan="2">BORÇLU MÜKELLEFİN:</td><td class="baslik text-end" colspan="2">Dosya No: <strong>@s.DosyaNo</strong></td></tr>
-                <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td colspan="3">@s.AdiSoyadiUnvani</td></tr>
-                <tr><td class="etiket">Vergi Numarası</td><td>@s.VergiKimlikNumarasi</td><td class="etiket">TC Kimlik Numarası</td><td>@s.TCKimlikNumarasi</td></tr>
-                <tr><td class="etiket">Vergi Dairesi Adı</td><td>@s.VergiDairesiAdi</td><td class="etiket">Alacaklı Vergi Dairesi</td><td>@s.AlacakliVergiDairesi</td></tr>
-            </table>
-
-            <table class="tutanak-tablo mt-2">
-                <tr><td class="baslik" colspan="2">ARAÇ DETAYI:</td><td class="baslik text-end" colspan="2">Plaka: <strong>@s.Plaka</strong></td></tr>
-                <tr><td class="etiket">Cinsi</td><td>@s.AracCinsi</td><td class="etiket">Tipi</td><td>@s.AracTipi</td></tr>
-                <tr><td class="etiket">Markası</td><td>@s.AracMarkasi</td><td class="etiket">Model Yılı</td><td>@s.ModelYili</td></tr>
-            </table>
-
-            <table class="tutanak-tablo mt-2">
-                <tr><td class="baslik" colspan="2">İHALE BİLGİLERİ:</td><td class="baslik text-end" colspan="2">Muhammen Bedeli: <strong>@s.MuhammenBedel.ToString("N2", trTR) TL</strong></td></tr>
-                <tr><td class="etiket">Satış Türü</td><td colspan="3">@s.SatisTuruGorunen</td></tr>
-                <tr><td class="etiket">İhale Tarihi / Saati</td><td colspan="3">@(s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "-") @(s.SatisSaati.HasValue ? s.SatisSaati.Value.ToString(@"hh\:mm") : "")</td></tr>
-                <tr><td class="etiket">Verilen Süre</td><td colspan="3">3 Gün</td></tr>
-            </table>
-
-            <p class="tutanak-paragraf mt-2">
-                Yukarıda detay bilgileri bulunan haczedilen menkul malın, yapılan ihaleye iştirak eden kişilerden
-                en yüksek bedeli teklif eden, aşağıda adı soyadı ve imzası bulunan şahsa ihale edildiğine ilişkin tutanaktır.
-            </p>
-
-            <table class="tutanak-tablo">
-                <tr class="baslik">
-                    <td>Adı ve Soyadı (Ünvanı)</td>
-                    <td>TC Kimlik No / Vergi Kimlik No</td>
-                    <td>İrtibat Adresi</td>
-                    <td>Satış Bedeli</td>
-                    <td>İmzası</td>
-                </tr>
-                <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-                <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-            </table>
-
-            <div class="text-center mt-3 mb-2 fw-bold">SATIŞ KOMİSYONU</div>
-            <div class="row text-center">
-                <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
-                <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
-                <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
-                <div class="col-3"><div class="imza-cizgi">@s.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
-            </div>
-        </div>
+        }
+        @if (!ihaleGorunumleri.Any())
+        {
+            <p class="text-muted text-center">Kriterlere uyan kayıt bulunamadı.</p>
+        }
     }
-    @if (!Model.Any())
+    else
     {
-        <p class="text-muted text-center">Kriterlere uyan kayıt bulunamadı.</p>
+        @foreach (var s in Model)
+        {
+            <div class="tutanak-blok">
+                <div class="text-center mb-2">
+                    <h5 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h5>
+                    <h6 class="mb-0">İHALE TUTANAĞI</h6>
+                </div>
+
+                <table class="tutanak-tablo">
+                    <tr><td class="baslik" colspan="2">BORÇLU MÜKELLEFİN:</td><td class="baslik text-end" colspan="2">Dosya No: <strong>@s.DosyaNo</strong></td></tr>
+                    <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td colspan="3">@s.AdiSoyadiUnvani</td></tr>
+                    <tr><td class="etiket">Vergi Numarası</td><td>@s.VergiKimlikNumarasi</td><td class="etiket">TC Kimlik Numarası</td><td>@s.TCKimlikNumarasi</td></tr>
+                    <tr><td class="etiket">Vergi Dairesi Adı</td><td>@s.VergiDairesiAdi</td><td class="etiket">Alacaklı Vergi Dairesi</td><td>@s.AlacakliVergiDairesi</td></tr>
+                </table>
+
+                <table class="tutanak-tablo mt-2">
+                    <tr><td class="baslik" colspan="2">ARAÇ DETAYI:</td><td class="baslik text-end" colspan="2">Plaka: <strong>@s.Plaka</strong></td></tr>
+                    <tr><td class="etiket">Cinsi</td><td>@s.AracCinsi</td><td class="etiket">Tipi</td><td>@s.AracTipi</td></tr>
+                    <tr><td class="etiket">Markası</td><td>@s.AracMarkasi</td><td class="etiket">Model Yılı</td><td>@s.ModelYili</td></tr>
+                </table>
+
+                <table class="tutanak-tablo mt-2">
+                    <tr><td class="baslik" colspan="2">İHALE BİLGİLERİ:</td><td class="baslik text-end" colspan="2">Muhammen Bedeli: <strong>@s.MuhammenBedel.ToString("N2", trTR) TL</strong></td></tr>
+                    <tr><td class="etiket">Satış Türü</td><td colspan="3">@s.SatisTuruGorunen</td></tr>
+                    <tr><td class="etiket">İhale Tarihi / Saati</td><td colspan="3">@(s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "-") @(s.SatisSaati.HasValue ? s.SatisSaati.Value.ToString(@"hh\:mm") : "")</td></tr>
+                    <tr><td class="etiket">Verilen Süre</td><td colspan="3">3 Gün</td></tr>
+                </table>
+
+                <p class="tutanak-paragraf mt-2">
+                    Yukarıda detay bilgileri bulunan haczedilen menkul malın, yapılan ihaleye iştirak eden kişilerden
+                    en yüksek bedeli teklif eden, aşağıda adı soyadı ve imzası bulunan şahsa ihale edildiğine ilişkin tutanaktır.
+                </p>
+
+                <table class="tutanak-tablo">
+                    <tr class="baslik">
+                        <td>Adı ve Soyadı (Ünvanı)</td>
+                        <td>TC Kimlik No / Vergi Kimlik No</td>
+                        <td>İrtibat Adresi</td>
+                        <td>Satış Bedeli</td>
+                        <td>İmzası</td>
+                    </tr>
+                    <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                    <tr><td style="height:28px;">&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                </table>
+
+                <div class="text-center mt-3 mb-2 fw-bold">SATIŞ KOMİSYONU</div>
+                <div class="row text-center">
+                    <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
+                    <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
+                    <div class="col-3"><div class="imza-cizgi">@s.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+                    <div class="col-3"><div class="imza-cizgi">@s.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
+                </div>
+            </div>
+        }
+        @if (!Model.Any())
+        {
+            <p class="text-muted text-center">Kriterlere uyan kayıt bulunamadı.</p>
+        }
     }
 </div>
 
 <style>
-    .tutanak-blok { padding: 12px 4px; page-break-after: always; }
+    .tutanak-blok { padding: 30px 40px; page-break-after: always; }
     .tutanak-blok:last-child { page-break-after: auto; }
     .tutanak-tablo { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
     .tutanak-tablo td { border: 1px solid #333; padding: 4px 6px; vertical-align: middle; }
@@ -263,14 +280,15 @@
 
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const genislik = 210;
+            const kenarBosluk = 10; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
+            const genislik = 210 - (2 * kenarBosluk);
 
             let zincir = Promise.resolve();
             bloklar.forEach((blok, i) => {
                 zincir = zincir.then(() => html2canvas(blok, { scale: 2 }).then(canvas => {
                     if (i > 0) pdf.addPage();
                     const yukseklik = (canvas.height * genislik) / canvas.width;
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, genislik, yukseklik);
+                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
                 }));
             });
             zincir.then(() => {

@@ -126,6 +126,62 @@ namespace AracSatisSistemi.Controllers
             return liste;
         }
 
+        // Tutanak Türü "İhale Tutanağı" iken toplu dökümde gösterilecek liste: her dosya
+        // için gösterilecek satış türü/tarihi, Dosya.Asama'nın (bkz. IhaleTutanagiCozucu)
+        // tek kaynak mantığıyla çözülür - dosyanın henüz hiç Satış sonucu girilmemiş
+        // (ör. 1. Satış'ı bekleyen) olması burada sorun olmaz, çünkü bu durum zaten
+        // Dosya.Satis1Tarihi/Satis2Tarihi üzerinden doğrudan okunur, bir Satış kaydına
+        // bağlı değildir. Genel filtreyle (dosyaNo/plaka/vergiDairesi/durum) eşleşen
+        // dosyalar arasından, satisTuru/satisTarihi de verilmişse, çözülen tür/tarihe göre
+        // ayrıca süzülür.
+        private async Task<List<IhaleTutanagiGorunumu>> IhaleGorunumleriGetir(
+            string? dosyaNo, string? plaka, string? vergiDairesi, string durum,
+            SatisTuru? satisTuruFiltre, DateTime? satisTarihiFiltre)
+        {
+            var sorgu = _db.Dosyalar.Include(d => d.Satislar).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(dosyaNo)) sorgu = sorgu.Where(d => d.DosyaNo == dosyaNo);
+            if (!string.IsNullOrWhiteSpace(plaka)) sorgu = sorgu.Where(d => d.Plaka == plaka);
+            if (!string.IsNullOrWhiteSpace(vergiDairesi)) sorgu = sorgu.Where(d => d.VergiDairesiAdi == vergiDairesi);
+            if (durum == "aktif")
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti);
+            else if (durum == "pasif")
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi
+                    || d.Durum == DosyaDurumu.AliciyaTerkEdildi);
+
+            var dosyalar = await sorgu.OrderBy(d => d.DosyaNo).ToListAsync();
+            var komisyonOturumlari = await _db.KomisyonOturumlari.ToListAsync();
+
+            var sonuc = new List<IhaleTutanagiGorunumu>();
+            foreach (var d in dosyalar)
+            {
+                var cozum = IhaleTutanagiCozucu.Coz(d);
+                if (satisTuruFiltre.HasValue && cozum.Tur != satisTuruFiltre.Value) continue;
+                if (satisTarihiFiltre.HasValue && cozum.Tarih.Date != satisTarihiFiltre.Value.Date) continue;
+
+                var oturum = komisyonOturumlari.FirstOrDefault(k =>
+                    k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date);
+                var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(d, cozum.Tur, cozum.Tarih, oturum);
+
+                sonuc.Add(new IhaleTutanagiGorunumu
+                {
+                    Dosya = d,
+                    GosterilecekTur = cozum.Tur,
+                    GosterilecekTarih = cozum.Tarih,
+                    TarihSeciliyor = cozum.TarihSeciliyor,
+                    SatisSaati = komisyon.Saat,
+                    KomisyonBaskani = komisyon.Baskan,
+                    KomisyonUye1 = komisyon.Uye1,
+                    KomisyonUye2 = komisyon.Uye2,
+                    KomisyonUye3 = komisyon.Uye3
+                });
+            }
+            return sonuc
+                .OrderBy(g => g.GosterilecekTarih)
+                .ThenBy(g => g.Dosya.DosyaNo)
+                .ToList();
+        }
+
         public async Task<IActionResult> Index(
             string tutanakTuru = "ihale",
             string? dosyaNo = null,
@@ -150,6 +206,11 @@ namespace AracSatisSistemi.Controllers
             ViewBag.DosyaNolar = await _db.Dosyalar.OrderByDescending(d => d.DosyaNo).Select(d => d.DosyaNo).ToListAsync();
             ViewBag.Plakalar = await _db.Dosyalar.OrderBy(d => d.Plaka).Select(d => d.Plaka).Distinct().ToListAsync();
             ViewBag.VergiDaireleriListesi = await _db.Dosyalar.OrderBy(d => d.VergiDairesiAdi).Select(d => d.VergiDairesiAdi).Distinct().ToListAsync();
+
+            if (tutanakTuru == "ihale")
+            {
+                ViewBag.IhaleGorunumleri = await IhaleGorunumleriGetir(dosyaNo, plaka, vergiDairesi, durum, satisTuru, satisTarihi);
+            }
 
             return View(veri);
         }
