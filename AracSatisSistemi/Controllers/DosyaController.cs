@@ -169,6 +169,7 @@ namespace AracSatisSistemi.Controllers
             dosya.HasarDurumu = guncel.HasarDurumu;
             dosya.MuhammenBedel = guncel.MuhammenBedel;
             dosya.KdvOrani = guncel.KdvOrani;
+            dosya.DamgaVergisiOrani = guncel.DamgaVergisiOrani;
             dosya.OtoparkaGirisTarihi = guncel.OtoparkaGirisTarihi;
             dosya.KomisyonBaskani = guncel.KomisyonBaskani;
             dosya.KomisyonUye1 = guncel.KomisyonUye1;

@@ -90,14 +90,60 @@
         </div>
         <div class="col-12 d-flex flex-wrap gap-2">
             <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> Listele</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="yazdir()"><i class="bi bi-printer"></i> Yazdır</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="pdfKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
-            <a class="btn btn-outline-success" id="excelLink" href="#"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
+            @if (tutanakTuru != "satiskarari" && tutanakTuru != "sorgu")
+            {
+                <button type="button" class="btn btn-outline-secondary" onclick="yazdir()"><i class="bi bi-printer"></i> Yazdır</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="pdfKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+                <a class="btn btn-outline-success" id="excelLink" href="#"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
+            }
         </div>
     </form>
 </div>
 
-<div class="card p-3 no-print">
+@if (tutanakTuru == "satiskarari" || tutanakTuru == "sorgu")
+{
+    var tekilDosya = (Dosya?)ViewBag.TekilDosya;
+    var turEtiket = tutanakTuru == "satiskarari" ? "Satış Kararı" : "Sorgu";
+    var turAction = tutanakTuru == "satiskarari" ? "SatisKarari" : "Sorgu";
+    <div class="card p-3 no-print">
+        <div class="form-section-title">@turEtiket - Özet</div>
+        @if (string.IsNullOrWhiteSpace((string?)ViewBag.DosyaNo))
+        {
+            <p class="text-muted mb-0">Yukarıdan bir Dosya No seçip "Listele"ye basın; dosya özeti burada görünecek.</p>
+        }
+        else if (tekilDosya == null)
+        {
+            <p class="text-danger mb-0">"@ViewBag.DosyaNo" numaralı dosya bulunamadı.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Dosya No</th><th>Plaka</th><th>Adı Soyadı/Ünvanı</th><th>Durum</th><th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@tekilDosya.DosyaNo</td>
+                            <td>@tekilDosya.Plaka</td>
+                            <td>@tekilDosya.AdiSoyadiUnvani</td>
+                            <td>@tekilDosya.GenelDurumGorunen</td>
+                            <td class="d-flex gap-2">
+                                <a class="btn btn-sm btn-outline-primary" asp-action="@turAction" asp-route-dosyaNo="@tekilDosya.DosyaNo"><i class="bi bi-eye"></i> Görüntüle</a>
+                                <a class="btn btn-sm btn-outline-secondary" asp-action="@turAction" asp-route-dosyaNo="@tekilDosya.DosyaNo" asp-route-otomatikYazdir="true"><i class="bi bi-printer"></i> Yazdır</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="card p-3 no-print">
     <div class="form-section-title">Liste</div>
     <div class="table-responsive">
         <table class="table table-striped table-bordered align-middle">
@@ -138,7 +184,8 @@
             </tbody>
         </table>
     </div>
-</div>
+    </div>
+}
 
 @* ---- YAZDIRMA / PDF ALANI: sadece yazdırırken görünür, ekranda gizli ---- *@
 <div id="yazdirmaAlani" style="display:none;">
@@ -239,6 +286,7 @@
         (function () {
             const form = document.getElementById('filtreFormu');
             const excelLink = document.getElementById('excelLink');
+            if (!excelLink) return;
             function baglantiyiGuncelle() {
                 const params = new URLSearchParams(new FormData(form));
                 excelLink.href = '@Url.Action("ExcelIndir")?' + params.toString();

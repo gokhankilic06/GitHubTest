@@ -1,0 +1,158 @@
+@model AracSatisSistemi.Data.SatisMaliOzet
+@{
+    ViewData["Title"] = "Araç Satış Kararı";
+    var d = Model.Dosya;
+    var satis = Model.Satis!;
+    var satisSaati = (TimeSpan?)ViewBag.SatisSaati;
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
+    string TurAdi(SatisTuru t) => t switch
+    {
+        SatisTuru.BirinciSatis => "1. Satış",
+        SatisTuru.IkinciSatis => "2. Satış",
+        SatisTuru.Pazarlik => "Pazarlık",
+        SatisTuru.Madde6183_86 => "6183/86 Mad.",
+        _ => t.ToString()
+    };
+}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h3>Araç Satış Kararı - Dosya No: @d.DosyaNo</h3>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="Index" asp-route-tutanakTuru="satiskarari"><i class="bi bi-arrow-left"></i> Geri</a>
+    </div>
+</div>
+
+<div id="kararAlani" class="a4-sayfa">
+    <div class="text-center mb-2 pb-2 border-bottom">
+        <div class="small">T.C.</div>
+        <h4 class="fw-bold mb-0">GELİR İDARESİ BAŞKANLIĞI</h4>
+        <div>Ankara Defterdarlığı</div>
+        <div class="small text-muted">(Gelir Kanunları Tahsilat Grup Müdürlüğü)</div>
+        <h5 class="fw-bold mt-2 mb-0">ARAÇ SATIŞ KARARI</h5>
+    </div>
+
+    <table class="tutanak-tablo">
+        <tr><td class="baslik" colspan="2">BORÇLU MÜKELLEF</td><td class="baslik text-end" colspan="2">Dosya No: <strong>@d.DosyaNo</strong></td></tr>
+        <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td colspan="3">@d.AdiSoyadiUnvani</td></tr>
+        <tr><td class="etiket">Vergi Numarası</td><td>@d.VergiKimlikNumarasi</td><td class="etiket">TC Kimlik Numarası</td><td>@d.TCKimlikNumarasi</td></tr>
+        <tr><td class="etiket">Vergi Dairesi Adı</td><td>@d.VergiDairesiAdi</td><td class="etiket">Alacaklı Vergi Dairesi</td><td>@d.AlacakliVergiDairesi</td></tr>
+        <tr><td class="etiket">Plaka</td><td colspan="3">@d.Plaka</td></tr>
+    </table>
+
+    <table class="tutanak-tablo mt-2">
+        <tr><td class="baslik" colspan="6">ARAÇ DETAYI</td></tr>
+        <tr>
+            <td class="etiket">Cinsi</td><td>@d.AracCinsi</td>
+            <td class="etiket">Muhammen Bedeli</td><td>@d.MuhammenBedel.ToString("N2", trTR) TL</td>
+            <td class="etiket">Satış Bedeli</td><td class="fw-bold">@Model.SatisBedeli.ToString("N2", trTR) TL</td>
+        </tr>
+        <tr>
+            <td class="etiket">Markası</td><td>@d.AracMarkasi</td>
+            <td class="etiket">Renk</td><td>@d.Renk</td>
+            <td class="etiket">KDV (%@d.KdvOrani.ToString("0.00", trTR))</td><td>@Model.KdvTutari.ToString("N2", trTR) TL</td>
+        </tr>
+        <tr>
+            <td class="etiket">Tipi</td><td>@d.AracTipi</td>
+            <td class="etiket">Ruhsat</td><td>@(d.RuhsatVar ? "Var" : "Yok")</td>
+            <td class="etiket">Damga V. (%@((d.DamgaVergisiOrani / 10m).ToString("0.000", trTR)))</td><td>@Model.DvTutari.ToString("N2", trTR) TL</td>
+        </tr>
+        <tr>
+            <td class="etiket">Model Yılı</td><td>@d.ModelYili</td>
+            <td class="etiket">Anahtar</td><td>@(d.AnahtarVar ? "Var" : "Yok")</td>
+            <td class="etiket baslik">TOPLAM TUTAR</td><td class="baslik fw-bold">@Model.ToplamTutar.ToString("N2", trTR) TL</td>
+        </tr>
+    </table>
+
+    <table class="tutanak-tablo mt-2">
+        <tr><td class="baslik" colspan="3">İHALE BİLGİLERİ</td></tr>
+        <tr><td class="etiket">Satış Türü</td><td class="etiket">Satış Tarihi</td><td class="etiket">Satış Saati</td></tr>
+        <tr>
+            <td>@TurAdi(satis.SatisTuru)</td>
+            <td>@satis.SatisTarihi.ToString("dd.MM.yyyy")</td>
+            <td>@(satisSaati.HasValue ? satisSaati.Value.ToString(@"hh\:mm") : "-")</td>
+        </tr>
+    </table>
+
+    <table class="tutanak-tablo mt-2">
+        <tr><td class="baslik" colspan="4">ALICI BİLGİLERİ</td></tr>
+        <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td colspan="3">@satis.AliciAdiSoyadi</td></tr>
+        <tr><td class="etiket">Adresi</td><td colspan="3">@satis.Adres</td></tr>
+        <tr><td class="etiket">Vergi Kimlik No</td><td>@satis.AliciVKN</td><td class="etiket">TC Kimlik No</td><td>@satis.AliciTCKN</td></tr>
+        <tr><td class="etiket">Verilen Süre</td><td>3 Gün</td><td class="etiket">Vade Tarihi</td><td>@(satis.VerilenSure?.ToString("dd.MM.yyyy") ?? "-")</td></tr>
+    </table>
+
+    <table class="tutanak-tablo mt-2">
+        <tr><td class="baslik" colspan="3">ARAÇ OTOPARK BİLGİLERİ</td></tr>
+        <tr><td class="etiket">Faturayı Kesecek Otopark Adı</td><td class="etiket">Otopark Bedeli</td><td class="etiket">Çekici Bedeli</td></tr>
+        <tr>
+            <td>@satis.FaturayiKesenOtopark</td>
+            <td>@(Model.OtoparkTutari > 0 ? Model.OtoparkTutari.ToString("N2", trTR) + " TL" : "-")</td>
+            <td>@(satis.CekiciBedeli.HasValue ? satis.CekiciBedeli.Value.ToString("N2", trTR) + " TL" : "-")</td>
+        </tr>
+    </table>
+
+    <p class="tutanak-paragraf mt-4">
+        Yukarıda bilgileri bulunan hacizli menkul malın satışı; yapılan ihaleye iştirak eden kişiler arasında en yüksek
+        bedeli veren yukarıda Adı/Soyadı (Ünvanı) belirtilen şahsa eksiksiz olarak ihale edilmiş ve satış kararı 5 (beş)
+        suret olarak düzenlenmiştir. İhale alıcısının 2918 Sayılı Trafik Kanunun 20. maddesine göre bir ay içerisinde
+        tescil ettirmesi gerekmektedir.
+    </p>
+    <p class="tutanak-paragraf text-end">@satis.SatisTarihi.ToString("dd.MM.yyyy")</p>
+
+    <div class="text-center mt-4 mb-1 fw-bold">SATIŞ EKİBİ</div>
+    <div class="row text-center">
+        <div class="col"><div class="imza-cizgi">@satis.AliciAdiSoyadi</div><span class="small text-muted">ALICI</span></div>
+        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
+        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
+        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
+        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+    </div>
+</div>
+
+<style>
+    .tutanak-tablo { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .tutanak-tablo td { border: 1px solid #333; padding: 5px 8px; vertical-align: middle; }
+    .tutanak-tablo td.etiket { font-weight: 600; background: #f8f9fa; }
+    .tutanak-tablo td.baslik { font-weight: 700; background: #eaeaea; }
+    .tutanak-paragraf { font-size: 0.85rem; }
+    .imza-cizgi { border-top: 1px solid #333; margin-top: 3rem; padding-top: .25rem; min-height: 1.2rem; }
+</style>
+
+@section Scripts {
+    <script>
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('kararAlani');
+            const gizlenecekler = alan.querySelectorAll('.no-print');
+            gizlenecekler.forEach(el => el.style.display = 'none');
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                gizlenecekler.forEach(el => el.style.display = '');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const kenarBosluk = 10;
+                const genislik = 210 - (2 * kenarBosluk);
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
+                devamEt(pdf);
+            }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('AracSatisKarari_@(d.DosyaNo.Replace("/", "_")).pdf'));
+        }
+
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+
+        // Tutanak ve Raporlar'daki özet satırından "Yazdır"a basılınca buraya
+        // ?otomatikYazdir=true ile gelinir; sayfa açılır açılmaz yazdırma otomatik tetiklenir.
+        @if (Context.Request.Query["otomatikYazdir"] == "true")
+        {
+            <text>yazdirTemiz();</text>
+        }
+    </script>
+}

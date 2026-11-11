@@ -211,6 +211,12 @@ namespace AracSatisSistemi.Controllers
             {
                 ViewBag.IhaleGorunumleri = await IhaleGorunumleriGetir(dosyaNo, plaka, vergiDairesi, durum, satisTuru, satisTarihi);
             }
+            else if ((tutanakTuru == "satiskarari" || tutanakTuru == "sorgu") && !string.IsNullOrWhiteSpace(dosyaNo))
+            {
+                // Bu iki tür, listeden değil doğrudan bir dosya no seçilip tek bir dosya için
+                // özet sıra + Görüntüle/Yazdır eylemleriyle çalışır (bkz. Index.cshtml).
+                ViewBag.TekilDosya = await _db.Dosyalar.FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            }
 
             return View(veri);
         }
@@ -249,6 +255,44 @@ namespace AracSatisSistemi.Controllers
             stream.Position = 0;
             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 $"TutanakRapor_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+        }
+
+        // GET: /TutanakRapor/SatisKarari?dosyaNo=.. - "Satış Kararı" türü için tekil belge.
+        // Yalnızca o dosyanın "Satıldı" sonuçlanmış bir satışı varsa anlamlıdır (bu belge
+        // gerçekleşmiş bir satışın resmi kararını gösterir); yoksa listeye geri döner.
+        public async Task<IActionResult> SatisKarari(string dosyaNo)
+        {
+            var veri = await SatisMaliOzetHesaplayici.Getir(_db, dosyaNo);
+            if (veri == null || veri.Satis == null || veri.Satis.SatisSonucu != SatisSonucu.Satildi)
+            {
+                TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya için \"Satıldı\" sonuçlanmış bir satış bulunamadı. Araç Satış Kararı yalnızca tamamlanmış satışlar için düzenlenebilir.";
+                return RedirectToAction(nameof(Index), new { tutanakTuru = "satiskarari" });
+            }
+
+            var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
+                k.SatisTuru == veri.Satis.SatisTuru && k.SatisTarihi.Date == veri.Satis.SatisTarihi.Date);
+            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(veri.Dosya, veri.Satis.SatisTuru, veri.Satis.SatisTarihi, oturum);
+
+            ViewBag.KomisyonBaskani = komisyon.Baskan;
+            ViewBag.KomisyonUye1 = komisyon.Uye1;
+            ViewBag.KomisyonUye2 = komisyon.Uye2;
+            ViewBag.KomisyonUye3 = komisyon.Uye3;
+            ViewBag.SatisSaati = komisyon.Saat;
+
+            return View(veri);
+        }
+
+        // GET: /TutanakRapor/Sorgu?dosyaNo=.. - "Sorgu" türü için tekil dosya özeti belgesi.
+        // Satış sonucu olsun olmasın (henüz hiç satılmamış bir dosya için de) kullanılabilir.
+        public async Task<IActionResult> Sorgu(string dosyaNo)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.Satislar).FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            if (dosya == null)
+            {
+                TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
+                return RedirectToAction(nameof(Index), new { tutanakTuru = "sorgu" });
+            }
+            return View(dosya);
         }
     }
 }

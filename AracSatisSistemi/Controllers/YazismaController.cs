@@ -30,7 +30,7 @@ namespace AracSatisSistemi.Controllers
                 return View();
             }
 
-            var veri = await VeriGetir(dosyaNo);
+            var veri = await SatisMaliOzetHesaplayici.Getir(_db, dosyaNo);
             if (veri == null)
             {
                 TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
@@ -55,7 +55,7 @@ namespace AracSatisSistemi.Controllers
 
         public async Task<IActionResult> VergiDairesiYazisiIndir(string dosyaNo)
         {
-            var veri = await VeriGetir(dosyaNo);
+            var veri = await SatisMaliOzetHesaplayici.Getir(_db, dosyaNo);
             if (veri == null)
             {
                 TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
@@ -69,7 +69,7 @@ namespace AracSatisSistemi.Controllers
 
         public async Task<IActionResult> UstYaziIndir(string dosyaNo)
         {
-            var veri = await VeriGetir(dosyaNo);
+            var veri = await SatisMaliOzetHesaplayici.Getir(_db, dosyaNo);
             if (veri == null)
             {
                 TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
@@ -81,39 +81,5 @@ namespace AracSatisSistemi.Controllers
             return File(belge, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", dosyaAdi);
         }
 
-        private async Task<YazismaVerisi?> VeriGetir(string dosyaNo)
-        {
-            var dosya = await _db.Dosyalar.Include(d => d.Satislar).FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
-            if (dosya == null) return null;
-
-            // Gösterilecek satış kaydı: varsa "Satıldı" sonuçlanan, yoksa en son girilen.
-            var satis = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi)
-                ?? dosya.Satislar.OrderByDescending(s => s.SatisTarihi).FirstOrDefault();
-
-            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
-            var aracCinsi = await _db.AracCinsleri.FirstOrDefaultAsync(c => c.Ad == dosya.AracCinsi);
-            var kategori = aracCinsi?.OtoparkKategorisi ?? OtoparkAracKategorisi.KucukArac;
-
-            decimal satisBedeli = satis?.SatisBedeli ?? 0m;
-            decimal kdvTutari = Math.Round(satisBedeli * dosya.KdvOrani / 100m, 2);
-            decimal dvTutari = Math.Round(satisBedeli * dosya.DamgaVergisiOrani / 1000m, 2);
-            decimal toplamTutar = satisBedeli + kdvTutari + dvTutari;
-            decimal otoparkTutari = satis != null
-                ? OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar)
-                : 0m;
-            decimal kalanTutar = satisBedeli - otoparkTutari;
-
-            return new YazismaVerisi(dosya, satis, satisBedeli, kdvTutari, dvTutari, toplamTutar, otoparkTutari, kalanTutar);
-        }
-
-        private record YazismaVerisi(
-            Dosya Dosya,
-            Satis? Satis,
-            decimal SatisBedeli,
-            decimal KdvTutari,
-            decimal DvTutari,
-            decimal ToplamTutar,
-            decimal OtoparkTutari,
-            decimal KalanTutar);
     }
 }

@@ -107,6 +107,12 @@ using (var scope = app.Services.CreateScope())
     catch { /* sütun zaten varsa göz ardı edilir */ }
     try { db.Database.ExecuteSqlRaw(@"UPDATE ""GenelAyarlar"" SET ""MaksimumModelYili"" = 2027 WHERE ""MaksimumModelYili"" = 0;"); }
     catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
+
+    // "Damga Vergisi Oranı" artık dosya bazında saklanıp düzenlenebiliyor (eskiden hep
+    // sabit binde 5,69 olarak hesaplanıyordu); eski veritabanlarında sütun yoksa eklenir
+    // ve mevcut tüm dosyalara o zamana kadar geçerli olan binde 5,69 değeri atanır.
+    try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Dosyalar"" ADD COLUMN ""DamgaVergisiOrani"" decimal(18,2) NOT NULL DEFAULT 5.69;"); }
+    catch { /* sütun zaten varsa göz ardı edilir */ }
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.

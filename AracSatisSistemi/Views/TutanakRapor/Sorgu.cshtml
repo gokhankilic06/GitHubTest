@@ -1,0 +1,138 @@
+@model Dosya
+@{
+    ViewData["Title"] = "Sorgu";
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
+    string TurAdi(SatisTuru t) => t switch
+    {
+        SatisTuru.BirinciSatis => "1. Satış",
+        SatisTuru.IkinciSatis => "2. Satış",
+        SatisTuru.Pazarlik => "Pazarlık",
+        SatisTuru.Madde6183_86 => "6183/86 Mad.",
+        _ => t.ToString()
+    };
+}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h3>Sorgu - Dosya No: @Model.DosyaNo</h3>
+    <div class="d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="Index" asp-route-tutanakTuru="sorgu"><i class="bi bi-arrow-left"></i> Geri</a>
+    </div>
+</div>
+
+<div id="sorguAlani" class="a4-sayfa">
+    <h4 class="fw-bold mb-0">ANKARA DEFTERDARLIĞI</h4>
+    <div class="small text-muted mb-3">
+        Haczedilen Mallar Ortak Satış Deposu<br />
+        Araç Satış Detayları
+    </div>
+
+    <table class="sorgu-tablo mb-2">
+        <tr>
+            <td class="etiket" style="width:15%;">Dosya No:</td><td>@Model.DosyaNo</td>
+            <td class="etiket" style="width:15%;">Durum:</td><td>@Model.GenelDurumGorunen</td>
+        </tr>
+    </table>
+
+    <div class="sorgu-bolum-baslik">İLGİLİ VERGİ DAİRESİ</div>
+    <table class="sorgu-tablo mb-2">
+        <tr><td class="etiket" style="width:30%;">Vergi Dairesi Adı</td><td>@Model.VergiDairesiAdi</td></tr>
+        <tr><td class="etiket">Vergi Dairesi Yazısı Tarihi</td><td>@(Model.VergiDairesiYaziTarihi?.ToString("dd.MM.yyyy") ?? "-")</td></tr>
+        <tr><td class="etiket">Vergi Dairesi Yazı Sayısı</td><td>@Model.VergiDairesiYaziSayisi</td></tr>
+        <tr><td class="etiket">Alacaklı Vergi Dairesi</td><td>@Model.AlacakliVergiDairesi</td></tr>
+    </table>
+
+    <div class="sorgu-bolum-baslik">BORÇLU MÜKELLEF BİLGİLERİ</div>
+    <table class="sorgu-tablo mb-2">
+        <tr><td class="etiket" style="width:30%;">Vergi Numarası</td><td>@Model.VergiKimlikNumarasi</td></tr>
+        <tr><td class="etiket">TC Kimlik Numarası</td><td>@Model.TCKimlikNumarasi</td></tr>
+        <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td>@Model.AdiSoyadiUnvani</td></tr>
+        <tr><td class="etiket">Sorumlu</td><td>@Model.KanuniTemsilci</td></tr>
+    </table>
+
+    <div class="sorgu-bolum-baslik">ARAÇ ÖZELLİKLERİ</div>
+    <table class="sorgu-tablo mb-2">
+        <tr><td class="etiket" style="width:20%;">Plaka</td><td style="width:30%;">@Model.Plaka</td><td class="etiket" style="width:25%;">Muhammen Bedeli</td><td>@Model.MuhammenBedel.ToString("N2", trTR) TL</td></tr>
+        <tr><td class="etiket">Cinsi</td><td>@Model.AracCinsi</td><td class="etiket">KDV Oranı</td><td>%@Model.KdvOrani.ToString("0.00", trTR)</td></tr>
+        <tr><td class="etiket">Markası</td><td>@Model.AracMarkasi</td><td class="etiket">Damga Vergisi Oranı</td><td>%@((Model.DamgaVergisiOrani / 10m).ToString("0.000", trTR))</td></tr>
+        <tr><td class="etiket">Tipi</td><td>@Model.AracTipi</td><td class="etiket">Ruhsat</td><td>@(Model.RuhsatVar ? "Var" : "Yok")</td></tr>
+        <tr><td class="etiket">Model Yılı</td><td>@Model.ModelYili</td><td class="etiket">Anahtar</td><td>@(Model.AnahtarVar ? "Var" : "Yok")</td></tr>
+        <tr><td class="etiket">Renk</td><td>@Model.Renk</td><td class="etiket">Otopark Adı</td><td>@Model.OtoparkAdi</td></tr>
+        @if (!string.IsNullOrWhiteSpace(Model.HasarDurumu))
+        {
+            <tr><td class="etiket">Hasar Durumu</td><td colspan="3">@Model.HasarDurumu</td></tr>
+        }
+    </table>
+
+    <div class="sorgu-bolum-baslik">SATIŞ BİLGİLERİ</div>
+    <table class="sorgu-tablo">
+        <tr class="baslik-satir">
+            <td>Satış Türü</td><td>Satış Tarihi</td><td>SONUÇ</td><td>Satış Bedeli</td><td>Satın Alan Adı Soyadı/Ünvanı</td>
+        </tr>
+        @foreach (var s in Model.Satislar.OrderBy(s => s.SatisTarihi))
+        {
+            <tr>
+                <td>@TurAdi(s.SatisTuru)</td>
+                <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
+                <td>@TurAdi(s.SatisTuru) @s.SonucGorunen</td>
+                <td>@(s.SatisBedeli.HasValue ? s.SatisBedeli.Value.ToString("N2", trTR) + " TL" : "-")</td>
+                <td>@s.AliciAdiSoyadi</td>
+            </tr>
+        }
+        @if (!Model.Satislar.Any())
+        {
+            <tr><td colspan="5" class="text-center text-muted">Henüz satış sonucu girilmemiş.</td></tr>
+        }
+    </table>
+</div>
+
+<style>
+    .sorgu-tablo { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    .sorgu-tablo td { border: 1px solid #93c5fd; padding: 6px 10px; vertical-align: middle; }
+    .sorgu-tablo td.etiket { font-weight: 600; background: #eff6ff; color: #1e3a8a; }
+    .sorgu-tablo tr.baslik-satir td { font-weight: 700; background: #eff6ff; color: #1e3a8a; }
+    .sorgu-bolum-baslik {
+        font-weight: 700;
+        background: #dbeafe;
+        color: #1e3a8a;
+        padding: .4rem .75rem;
+        margin-top: .25rem;
+        border: 1px solid #93c5fd;
+        border-bottom: none;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('sorguAlani');
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const kenarBosluk = 10;
+                const genislik = 210 - (2 * kenarBosluk);
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
+                devamEt(pdf);
+            });
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('Sorgu_@(Model.DosyaNo.Replace("/", "_")).pdf'));
+        }
+
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+
+        // Tutanak ve Raporlar'daki özet satırından "Yazdır"a basılınca buraya
+        // ?otomatikYazdir=true ile gelinir; sayfa açılır açılmaz yazdırma otomatik tetiklenir.
+        @if (Context.Request.Query["otomatikYazdir"] == "true")
+        {
+            <text>yazdirTemiz();</text>
+        }
+    </script>
+}

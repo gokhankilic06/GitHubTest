@@ -124,9 +124,12 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Teminat (TL)")]
         public decimal Teminat => MuhammenBedel > 10000m ? Math.Round(MuhammenBedel * 0.05m, 2) : 0m;
 
-        // Damga vergisi oranı sabit: binde 5,69
-        [NotMapped]
-        public decimal DamgaVergisiOrani => 5.69m;
+        // Damga vergisi oranı (binde) - kayıt anında varsayılan güncel orana (5,69) göre
+        // doldurulur ama dosya bazında düzenlenebilir; zamanla değişen resmi orana göre
+        // eski dosyalarda geçmişteki oran, yeni dosyalarda güncel oran saklı kalabilsin diye.
+        [Display(Name = "Damga Vergisi Oranı (Binde)")]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal DamgaVergisiOrani { get; set; } = 5.69m;
 
         [NotMapped]
         [Display(Name = "Damga Vergisi Tutarı (TL)")]

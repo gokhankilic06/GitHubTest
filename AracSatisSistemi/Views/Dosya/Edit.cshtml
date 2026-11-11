@@ -198,7 +198,11 @@
             </select>
         </div>
         <div class="col-md-3">
-            <label class="form-label">Damga Vergisi Tutarı (Binde 5,69)</label>
+            <label class="form-label" asp-for="DamgaVergisiOrani"></label>
+            <input class="form-control" asp-for="DamgaVergisiOrani" type="number" step="0.01" min="0" id="damgaVergisiOrani" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Damga Vergisi Tutarı (Tahmini)</label>
             <div class="input-group">
                 <input class="form-control" id="damgaVergisiOnizleme" readonly />
                 <span class="input-group-text">TL</span>
@@ -324,13 +328,16 @@
         const bedelGosterim = document.getElementById('muhammenBedelGosterim');
         const teminatOut = document.getElementById('teminatOnizleme');
         const damgaOut = document.getElementById('damgaVergisiOnizleme');
+        const damgaOraniInput = document.getElementById('damgaVergisiOrani');
         function hesapla() {
             const bedel = parseFloat(bedelInput.value) || 0;
+            const damgaOrani = parseFloat(damgaOraniInput.value) || 0;
             const teminat = bedel > 10000 ? (bedel * 0.05) : 0;
-            const damgaVergisi = bedel * 5.69 / 1000;
+            const damgaVergisi = bedel * damgaOrani / 1000;
             teminatOut.value = teminat.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             damgaOut.value = damgaVergisi.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
+        damgaOraniInput.addEventListener('input', hesapla);
 
         // Muhammen Bedel: okunaklı olsun diye yazarken binlik ayraç (nokta) otomatik
         // eklenir (ör. 300000 -> 300.000); sunucuya gönderilen gerçek değer (gizli
