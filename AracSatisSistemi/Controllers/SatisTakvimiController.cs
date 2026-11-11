@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
+using ClosedXML.Excel;
 
 namespace AracSatisSistemi.Controllers
 {
@@ -15,13 +16,74 @@ namespace AracSatisSistemi.Controllers
         private readonly AppDbContext _db;
         public SatisTakvimiController(AppDbContext db) => _db = db;
 
+        // Her takvim tarihi için o tarihte 1./2. Satış'ını BEKLEYEN (henüz sonucu
+        // girilmemiş) dosya sayısını hesaplar; takvimi "Satış Sonuçlarını Gir" akışına
+        // doğrudan bağlayan sayaç + bağlantı burada üretilir (bkz. Index.cshtml).
+        private async Task<(Dictionary<DateTime, int> Birinci, Dictionary<DateTime, int> Ikinci)> PlanliDosyaSayilariGetir()
+        {
+            var aktifDosyalar = await _db.Dosyalar.Include(d => d.Satislar)
+                .Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti)
+                .ToListAsync();
+
+            var birinci = aktifDosyalar.Where(d => d.Asama == Dosya.SurecAsamasi.BirinciSatisBekliyor)
+                .GroupBy(d => d.Satis1Tarihi.Date)
+                .ToDictionary(g => g.Key, g => g.Count());
+            var ikinci = aktifDosyalar.Where(d => d.Asama == Dosya.SurecAsamasi.IkinciSatisBekliyor)
+                .GroupBy(d => d.Satis2Tarihi.Date)
+                .ToDictionary(g => g.Key, g => g.Count());
+
+            return (birinci, ikinci);
+        }
+
         public async Task<IActionResult> Index()
         {
             var tumTarihler = await _db.SatisTarihleri.OrderBy(t => t.Tarih).ToListAsync();
             var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
             ViewBag.ResmiTatiller = resmiTatiller;
             ViewBag.Bugun = DateTime.Today;
+
+            var (birinci, ikinci) = await PlanliDosyaSayilariGetir();
+            ViewBag.BirinciSatisSayilari = birinci;
+            ViewBag.IkinciSatisSayilari = ikinci;
+
             return View(tumTarihler);
+        }
+
+        // Takvimi, her tarihteki planlı dosya sayılarıyla birlikte Excel olarak indirir.
+        public async Task<IActionResult> ExcelIndir()
+        {
+            var tumTarihler = await _db.SatisTarihleri.OrderBy(t => t.Tarih).ToListAsync();
+            var resmiTatiller = (await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync()).ToHashSet();
+            var bugun = DateTime.Today;
+            var trTR = new System.Globalization.CultureInfo("tr-TR");
+            var (birinci, ikinci) = await PlanliDosyaSayilariGetir();
+
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Satış Takvimi");
+            string[] baslik = { "Tarih", "Gün", "Durum", "Hafta Sonu mu", "Resmi Tatil mi", "1. Satış İçin Planlı Dosya", "2. Satış İçin Planlı Dosya" };
+            for (int i = 0; i < baslik.Length; i++) ws.Cell(1, i + 1).Value = baslik[i];
+
+            var satir = 2;
+            foreach (var t in tumTarihler)
+            {
+                var gun = t.Tarih.Date;
+                ws.Cell(satir, 1).Value = gun.ToString("dd.MM.yyyy");
+                ws.Cell(satir, 2).Value = gun.ToString("dddd", trTR);
+                ws.Cell(satir, 3).Value = gun >= bugun ? "Gelecek" : "Geçmiş";
+                ws.Cell(satir, 4).Value = (gun.DayOfWeek == DayOfWeek.Saturday || gun.DayOfWeek == DayOfWeek.Sunday) ? "Evet" : "Hayır";
+                ws.Cell(satir, 5).Value = resmiTatiller.Contains(gun) ? "Evet" : "Hayır";
+                ws.Cell(satir, 6).Value = birinci.TryGetValue(gun, out var b) ? b : 0;
+                ws.Cell(satir, 7).Value = ikinci.TryGetValue(gun, out var i2) ? i2 : 0;
+                satir++;
+            }
+            ws.Columns().AdjustToContents();
+            ws.Row(1).Style.Font.Bold = true;
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            stream.Position = 0;
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"SatisTakvimi_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
         }
 
         // POST: /SatisTakvimi/Ekle - tek bir tarih ekler.
