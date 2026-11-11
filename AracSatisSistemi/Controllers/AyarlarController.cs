@@ -88,7 +88,19 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> MarkaSil(int id)
         {
             var kayit = await _db.AracMarkalari.FindAsync(id);
-            if (kayit != null) { _db.AracMarkalari.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            // Kullanımdaki bir marka silinirse, o markayı kullanan eski dosyaların Düzenle
+            // ekranındaki açılır listede markası artık görünmez (seçim boş kalır) - veri
+            // kaybolmaz ama kafa karıştırır; bu yüzden kullanımdayken silinmesi engellenir.
+            if (await _db.Dosyalar.AnyAsync(d => d.AracMarkasi == kayit.Ad))
+            {
+                TempData["Hata"] = $"\"{kayit.Ad}\" markası en az bir dosyada kullanılıyor, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.AracMarkalari.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -107,7 +119,16 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> ModelSil(int id)
         {
             var kayit = await _db.AracModelleri.FindAsync(id);
-            if (kayit != null) { _db.AracModelleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            if (await _db.Dosyalar.AnyAsync(d => d.AracMarkasi == kayit.MarkaAdi && d.AracTipi == kayit.Ad))
+            {
+                TempData["Hata"] = $"\"{kayit.MarkaAdi} / {kayit.Ad}\" modeli en az bir dosyada kullanılıyor, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.AracModelleri.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -126,7 +147,16 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> CinsSil(int id)
         {
             var kayit = await _db.AracCinsleri.FindAsync(id);
-            if (kayit != null) { _db.AracCinsleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            if (await _db.Dosyalar.AnyAsync(d => d.AracCinsi == kayit.Ad))
+            {
+                TempData["Hata"] = $"\"{kayit.Ad}\" cinsi en az bir dosyada kullanılıyor, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.AracCinsleri.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -186,7 +216,16 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> VergiDairesiSil(int id)
         {
             var kayit = await _db.VergiDaireleri.FindAsync(id);
-            if (kayit != null) { _db.VergiDaireleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            if (await _db.Dosyalar.AnyAsync(d => d.VergiDairesiAdi == kayit.Ad || d.AlacakliVergiDairesi == kayit.Ad))
+            {
+                TempData["Hata"] = $"\"{kayit.Ad}\" en az bir dosyada (vergi dairesi veya alacaklı vergi dairesi olarak) kullanılıyor, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.VergiDaireleri.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -201,7 +240,18 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> OtoparkSil(int id)
         {
             var kayit = await _db.Otoparklar.FindAsync(id);
-            if (kayit != null) { _db.Otoparklar.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            var kullaniliyor = await _db.Dosyalar.AnyAsync(d => d.OtoparkAdi == kayit.Ad)
+                || await _db.Satislar.AnyAsync(s => s.FaturayiKesenOtopark == kayit.Ad);
+            if (kullaniliyor)
+            {
+                TempData["Hata"] = $"\"{kayit.Ad}\" otoparkı en az bir dosyada kullanılıyor, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.Otoparklar.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -216,7 +266,16 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> RenkSil(int id)
         {
             var kayit = await _db.AracRenkleri.FindAsync(id);
-            if (kayit != null) { _db.AracRenkleri.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            if (await _db.Dosyalar.AnyAsync(d => d.Renk == kayit.Ad))
+            {
+                TempData["Hata"] = $"\"{kayit.Ad}\" rengi en az bir dosyada kullanılıyor, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.AracRenkleri.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -231,7 +290,24 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> MemurSil(int id)
         {
             var kayit = await _db.Memurlar.FindAsync(id);
-            if (kayit != null) { _db.Memurlar.Remove(kayit); await _db.SaveChangesAsync(); }
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            // Hem kaydedilmiş Komisyon Oturumları'nda (gerçek ihale komisyonları) hem de
+            // dosyaların kayıt anında kopyaladığı komisyon bilgisinde kullanılıp
+            // kullanılmadığı kontrol edilir.
+            var kullaniliyor = await _db.KomisyonOturumlari.AnyAsync(k =>
+                    k.Baskan == kayit.AdSoyad || k.Uye1 == kayit.AdSoyad || k.Uye2 == kayit.AdSoyad || k.Uye3 == kayit.AdSoyad)
+                || await _db.Dosyalar.AnyAsync(d =>
+                    d.KomisyonBaskani == kayit.AdSoyad || d.KomisyonUye1 == kayit.AdSoyad
+                    || d.KomisyonUye2 == kayit.AdSoyad || d.KomisyonUye3 == kayit.AdSoyad);
+            if (kullaniliyor)
+            {
+                TempData["Hata"] = $"\"{kayit.AdSoyad}\" en az bir komisyon oturumunda/dosyada kayıtlı, bu yüzden silinemez.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.Memurlar.Remove(kayit);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

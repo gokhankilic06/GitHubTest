@@ -223,10 +223,11 @@ namespace AracSatisSistemi.Controllers
             // oturumun başkan/üyeleri ve saati kullanılır - dosyanın Kayıt anında bir kerelik
             // kopyalanan eski (Güncellemeler'deki varsayılan komisyon) bilgisi değil. Hiç
             // oturum kaydedilmemişse o eski kopya bilgiye geri dönülür.
-            var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
-                k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date);
+            var oturumlar = await _db.KomisyonOturumlari
+                .Where(k => k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date)
+                .ToListAsync();
 
-            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(dosya, cozum.Tur, cozum.Tarih, oturum, secilenSaat);
+            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(dosya, cozum.Tur, cozum.Tarih, oturumlar, secilenSaat);
             ViewBag.KomisyonBaskani = komisyon.Baskan;
             ViewBag.KomisyonUye1 = komisyon.Uye1;
             ViewBag.KomisyonUye2 = komisyon.Uye2;

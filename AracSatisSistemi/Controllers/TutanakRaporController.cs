@@ -159,9 +159,9 @@ namespace AracSatisSistemi.Controllers
                 if (satisTuruFiltre.HasValue && cozum.Tur != satisTuruFiltre.Value) continue;
                 if (satisTarihiFiltre.HasValue && cozum.Tarih.Date != satisTarihiFiltre.Value.Date) continue;
 
-                var oturum = komisyonOturumlari.FirstOrDefault(k =>
-                    k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date);
-                var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(d, cozum.Tur, cozum.Tarih, oturum);
+                var oturumlar = komisyonOturumlari.Where(k =>
+                    k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date).ToList();
+                var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(d, cozum.Tur, cozum.Tarih, oturumlar);
 
                 sonuc.Add(new IhaleTutanagiGorunumu
                 {
@@ -269,9 +269,14 @@ namespace AracSatisSistemi.Controllers
                 return RedirectToAction(nameof(Index), new { tutanakTuru = "satiskarari" });
             }
 
-            var oturum = await _db.KomisyonOturumlari.FirstOrDefaultAsync(k =>
-                k.SatisTuru == veri.Satis.SatisTuru && k.SatisTarihi.Date == veri.Satis.SatisTarihi.Date);
-            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(veri.Dosya, veri.Satis.SatisTuru, veri.Satis.SatisTarihi, oturum);
+            // NOT: Satis kaydı yalnızca tarih tutar, saat tutmaz; aynı gün birden fazla
+            // Pazarlık/6183-86 oturumu varsa burada hangisinin bu satışa ait olduğu kesin
+            // ayırt edilemez (bkz. IhaleTutanagiCozucu.KomisyonBilgisi dokümantasyonu) - bu
+            // durumda o günün ilk kaydedilen oturumu gösterilir.
+            var oturumlar = await _db.KomisyonOturumlari
+                .Where(k => k.SatisTuru == veri.Satis.SatisTuru && k.SatisTarihi.Date == veri.Satis.SatisTarihi.Date)
+                .ToListAsync();
+            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(veri.Dosya, veri.Satis.SatisTuru, veri.Satis.SatisTarihi, oturumlar);
 
             ViewBag.KomisyonBaskani = komisyon.Baskan;
             ViewBag.KomisyonUye1 = komisyon.Uye1;

@@ -39,9 +39,20 @@ namespace AracSatisSistemi.Data
         // Gösterilecek tür/tarih için kaydedilmiş bir Komisyon Oturumu varsa SATIŞ KOMİSYONU
         // imza bloğunda ve saatte öncelikle o oturumun bilgileri kullanılır; hiç oturum
         // kaydedilmemişse dosyanın Kayıt anında kopyalanan eski bilgiye geri dönülür.
+        //
+        // "oturumlarAyniGunTur": aynı satış türü/tarihi için kaydedilmiş TÜM oturumlar (tek bir
+        // tanesi değil). Pazarlık/6183-86'da aynı gün birden fazla oturum (farklı saatlerde)
+        // olabileceğinden (bkz. Komisyon İşlemleri ekranı), bir saat seçilmişse (secilenSaat)
+        // o saate TAM eşleşen oturum aranır; aksi halde yanlış oturumun başkan/üyeleri bu
+        // dosyanın tutanağına yazılmış olurdu. 1./2. Satış'ta tarih başına tek oturum
+        // beklendiğinden ilk (tek) kayıt kullanılır.
         public static (string? Baskan, string? Uye1, string? Uye2, string? Uye3, TimeSpan? Saat) KomisyonBilgisi(
-            Dosya dosya, SatisTuru tur, DateTime tarih, KomisyonOturumu? oturum, TimeSpan? secilenSaat = null)
+            Dosya dosya, SatisTuru tur, DateTime tarih, IReadOnlyList<KomisyonOturumu> oturumlarAyniGunTur, TimeSpan? secilenSaat = null)
         {
+            var oturum = secilenSaat.HasValue
+                ? oturumlarAyniGunTur.FirstOrDefault(o => o.SatisSaati == secilenSaat.Value)
+                : oturumlarAyniGunTur.FirstOrDefault();
+
             var saat = oturum != null
                 ? oturum.SatisSaati
                 : (tur == SatisTuru.BirinciSatis || tur == SatisTuru.IkinciSatis ? new TimeSpan(10, 0, 0) : secilenSaat);

@@ -17,6 +17,12 @@
         }
         <a class="btn btn-outline-danger" asp-controller="IptalIade" asp-action="Islem" asp-route-dosyaId="@Model.Id"><i class="bi bi-arrow-return-left"></i> İptal / İade / Kapama</a>
         <a class="btn btn-outline-dark" asp-action="IhaleTutanagi" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-text"></i> İhale Tutanağı</a>
+        <a class="btn btn-outline-dark" asp-controller="Yazisma" asp-action="Index" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-envelope-paper"></i> Yazışma</a>
+        <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="Sorgu" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-search"></i> Sorgu</a>
+        @if (Model.Durum == DosyaDurumu.Satildi)
+        {
+            <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="SatisKarari" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-file-earmark-check"></i> Satış Kararı</a>
+        }
         <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
         <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
         <a class="btn btn-outline-success" asp-action="ExcelIndir" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>

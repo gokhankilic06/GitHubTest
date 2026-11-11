@@ -52,6 +52,17 @@ namespace AracSatisSistemi.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            // Aynı satış türü/tarihi/saatinde ikinci bir oturum eklenirse, İhale Tutanağı/Satış
+            // Kararı gibi ekranlarda hangi oturumun esas alınacağı belirsizleşir (bkz.
+            // IhaleTutanagiCozucu.KomisyonBilgisi); bu yüzden burada engellenir.
+            var cakisanVar = await _db.KomisyonOturumlari.AnyAsync(k =>
+                k.SatisTuru == form.SatisTuru && k.SatisTarihi.Date == form.SatisTarihi.Date && k.SatisSaati == form.SatisSaati);
+            if (cakisanVar)
+            {
+                TempData["Hata"] = $"{form.SatisTarihi:dd.MM.yyyy} tarihinde, {form.SatisSaati:hh\\:mm} saatinde, bu satış türü için zaten kayıtlı bir komisyon oturumu var. Aynı gün farklı bir oturum eklemek istiyorsanız farklı bir saat seçin.";
+                return RedirectToAction(nameof(Index));
+            }
+
             _db.KomisyonOturumlari.Add(form);
             await _db.SaveChangesAsync();
             TempData["Basari"] = $"{form.Id} nolu komisyon oturumu kaydedildi.";
