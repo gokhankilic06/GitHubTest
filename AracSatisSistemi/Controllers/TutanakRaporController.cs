@@ -297,6 +297,8 @@ namespace AracSatisSistemi.Controllers
                 TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
                 return RedirectToAction(nameof(Index), new { tutanakTuru = "sorgu" });
             }
+            ViewBag.GenelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
+            ViewBag.OtoparkKategoriSozlugu = await _db.AracCinsleri.ToDictionaryAsync(c => c.Ad, c => c.OtoparkKategorisi);
             return View(dosya);
         }
     }

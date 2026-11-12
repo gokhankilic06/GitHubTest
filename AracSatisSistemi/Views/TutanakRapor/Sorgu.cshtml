@@ -1,15 +1,10 @@
 @model Dosya
+@using AracSatisSistemi.Data
 @{
     ViewData["Title"] = "Sorgu";
     var trTR = new System.Globalization.CultureInfo("tr-TR");
-    string TurAdi(SatisTuru t) => t switch
-    {
-        SatisTuru.BirinciSatis => "1. Satış",
-        SatisTuru.IkinciSatis => "2. Satış",
-        SatisTuru.Pazarlik => "Pazarlık",
-        SatisTuru.Madde6183_86 => "6183/86 Mad.",
-        _ => t.ToString()
-    };
+    var genelAyar = (GenelAyar)ViewBag.GenelAyar;
+    var otoparkKategoriSozlugu = (Dictionary<string, OtoparkAracKategorisi>)ViewBag.OtoparkKategoriSozlugu;
 }
 <div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h3>Sorgu - Dosya No: @Model.DosyaNo</h3>
@@ -21,86 +16,123 @@
 </div>
 
 <div id="sorguAlani" class="a4-sayfa">
-    <h4 class="fw-bold mb-0">ANKARA DEFTERDARLIĞI</h4>
-    <div class="small text-muted mb-3">
-        Haczedilen Mallar Ortak Satış Deposu<br />
-        Araç Satış Detayları
+    <div class="letterhead mb-3 pb-2 d-flex align-items-start">
+        <div style="width:90px;"></div>
+        <div class="text-center flex-grow-1">
+            <h4 class="mb-0 fw-bold text-nowrap">ANKARA DEFTERDARLIĞI</h4>
+            <div class="text-muted">Sorgu</div>
+        </div>
+        <div class="text-end small text-muted" style="width:90px;">@DateTime.Today.ToString("dd.MM.yyyy")</div>
     </div>
 
-    <table class="sorgu-tablo mb-2">
-        <tr>
-            <td class="etiket" style="width:15%;">Dosya No:</td><td>@Model.DosyaNo</td>
-            <td class="etiket" style="width:15%;">Durum:</td><td>@Model.GenelDurumGorunen</td>
-        </tr>
-    </table>
+    <div class="belge-bolumu">
+        <div class="d-flex flex-wrap gap-3">
+            <div class="kimlik-kutu">
+                <span class="kimlik-etiket">Dosya No:</span>
+                <span class="kimlik-deger">@Model.DosyaNo</span>
+            </div>
+            <div class="kimlik-kutu">
+                <span class="kimlik-etiket">Durum:</span>
+                <span class="durum-rozet durum-@Model.Durum">@Model.DurumGorunenAd</span>
+            </div>
+            <div class="kimlik-kutu">
+                <span class="kimlik-etiket">Aşama:</span>
+                <span class="badge @Model.AsamaRozetSinifi">@Model.AsamaGorunen</span>
+            </div>
+        </div>
+    </div>
 
-    <div class="sorgu-bolum-baslik">İLGİLİ VERGİ DAİRESİ</div>
-    <table class="sorgu-tablo mb-2">
-        <tr><td class="etiket" style="width:30%;">Vergi Dairesi Adı</td><td>@Model.VergiDairesiAdi</td></tr>
-        <tr><td class="etiket">Vergi Dairesi Yazısı Tarihi</td><td>@(Model.VergiDairesiYaziTarihi?.ToString("dd.MM.yyyy") ?? "-")</td></tr>
-        <tr><td class="etiket">Vergi Dairesi Yazı Sayısı</td><td>@Model.VergiDairesiYaziSayisi</td></tr>
-        <tr><td class="etiket">Alacaklı Vergi Dairesi</td><td>@Model.AlacakliVergiDairesi</td></tr>
-    </table>
-
-    <div class="sorgu-bolum-baslik">BORÇLU MÜKELLEF BİLGİLERİ</div>
-    <table class="sorgu-tablo mb-2">
-        <tr><td class="etiket" style="width:30%;">Vergi Numarası</td><td>@Model.VergiKimlikNumarasi</td></tr>
-        <tr><td class="etiket">TC Kimlik Numarası</td><td>@Model.TCKimlikNumarasi</td></tr>
-        <tr><td class="etiket">Adı Soyadı/Ünvanı</td><td>@Model.AdiSoyadiUnvani</td></tr>
-        <tr><td class="etiket">Sorumlu</td><td>@Model.KanuniTemsilci</td></tr>
-    </table>
-
-    <div class="sorgu-bolum-baslik">ARAÇ ÖZELLİKLERİ</div>
-    <table class="sorgu-tablo mb-2">
-        <tr><td class="etiket" style="width:20%;">Plaka</td><td style="width:30%;">@Model.Plaka</td><td class="etiket" style="width:25%;">Muhammen Bedeli</td><td>@Model.MuhammenBedel.ToString("N2", trTR) TL</td></tr>
-        <tr><td class="etiket">Cinsi</td><td>@Model.AracCinsi</td><td class="etiket">KDV Oranı</td><td>%@Model.KdvOrani.ToString("0.00", trTR)</td></tr>
-        <tr><td class="etiket">Markası</td><td>@Model.AracMarkasi</td><td class="etiket">Damga Vergisi Oranı</td><td>%@((Model.DamgaVergisiOrani / 10m).ToString("0.000", trTR))</td></tr>
-        <tr><td class="etiket">Tipi</td><td>@Model.AracTipi</td><td class="etiket">Ruhsat</td><td>@(Model.RuhsatVar ? "Var" : "Yok")</td></tr>
-        <tr><td class="etiket">Model Yılı</td><td>@Model.ModelYili</td><td class="etiket">Anahtar</td><td>@(Model.AnahtarVar ? "Var" : "Yok")</td></tr>
-        <tr><td class="etiket">Renk</td><td>@Model.Renk</td><td class="etiket">Otopark Adı</td><td>@Model.OtoparkAdi</td></tr>
-        @if (!string.IsNullOrWhiteSpace(Model.HasarDurumu))
-        {
-            <tr><td class="etiket">Hasar Durumu</td><td colspan="3">@Model.HasarDurumu</td></tr>
-        }
-    </table>
-
-    <div class="sorgu-bolum-baslik">SATIŞ BİLGİLERİ</div>
-    <table class="sorgu-tablo">
-        <tr class="baslik-satir">
-            <td>Satış Türü</td><td>Satış Tarihi</td><td>SONUÇ</td><td>Satış Bedeli</td><td>Satın Alan Adı Soyadı/Ünvanı</td>
-        </tr>
-        @foreach (var s in Model.Satislar.OrderBy(s => s.SatisTarihi))
-        {
+    <div class="belge-bolumu">
+        <div class="form-section-title">İlgili Vergi Dairesi</div>
+        <table class="detay-tablo">
+            <tr><td class="etiket">Vergi Dairesi Adı</td><td colspan="3">@Model.VergiDairesiAdi</td></tr>
             <tr>
-                <td>@TurAdi(s.SatisTuru)</td>
-                <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
-                <td>@TurAdi(s.SatisTuru) @s.SonucGorunen</td>
-                <td>@(s.SatisBedeli.HasValue ? s.SatisBedeli.Value.ToString("N2", trTR) + " TL" : "-")</td>
-                <td>@s.AliciAdiSoyadi</td>
+                <td class="etiket">Vergi Dairesi Yazısı Tarihi</td><td>@Model.VergiDairesiYaziTarihi?.ToString("dd.MM.yyyy")</td>
+                <td class="etiket">Vergi Dairesi Yazısı Sayısı</td><td>@Model.VergiDairesiYaziSayisi</td>
             </tr>
-        }
-        @if (!Model.Satislar.Any())
-        {
-            <tr><td colspan="5" class="text-center text-muted">Henüz satış sonucu girilmemiş.</td></tr>
-        }
-    </table>
-</div>
+            <tr><td class="etiket">Alacaklı Vergi Dairesi</td><td colspan="3">@Model.AlacakliVergiDairesi</td></tr>
+        </table>
+    </div>
 
-<style>
-    .sorgu-tablo { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    .sorgu-tablo td { border: 1px solid #93c5fd; padding: 6px 10px; vertical-align: middle; }
-    .sorgu-tablo td.etiket { font-weight: 600; background: #eff6ff; color: #1e3a8a; }
-    .sorgu-tablo tr.baslik-satir td { font-weight: 700; background: #eff6ff; color: #1e3a8a; }
-    .sorgu-bolum-baslik {
-        font-weight: 700;
-        background: #dbeafe;
-        color: #1e3a8a;
-        padding: .4rem .75rem;
-        margin-top: .25rem;
-        border: 1px solid #93c5fd;
-        border-bottom: none;
-    }
-</style>
+    <div class="belge-bolumu">
+        <div class="form-section-title">Borçlu Mükellef</div>
+        <table class="detay-tablo">
+            <tr><td class="etiket">Adı Soyadı / Unvanı</td><td colspan="3">@Model.AdiSoyadiUnvani</td></tr>
+            <tr>
+                <td class="etiket">T.C. Kimlik No</td><td>@Model.TCKimlikNumarasi</td>
+                <td class="etiket">Vergi Kimlik No</td><td>@Model.VergiKimlikNumarasi</td>
+            </tr>
+            <tr><td class="etiket">Kanuni Temsilci</td><td colspan="3">@Model.KanuniTemsilci</td></tr>
+        </table>
+    </div>
+
+    <div class="belge-bolumu">
+        <div class="form-section-title">Araç Bilgileri</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">Plaka</td><td>@Model.Plaka</td>
+                <td class="etiket">Markası</td><td>@Model.AracMarkasi</td>
+            </tr>
+            <tr>
+                <td class="etiket">Cinsi</td><td>@Model.AracCinsi</td>
+                <td class="etiket">Tipi</td><td>@Model.AracTipi</td>
+            </tr>
+            <tr>
+                <td class="etiket">Model Yılı</td><td>@Model.ModelYili</td>
+                <td class="etiket">Renk</td><td>@Model.Renk</td>
+            </tr>
+            <tr>
+                <td class="etiket">Ruhsat</td><td>@(Model.RuhsatVar ? "VAR" : "YOK")</td>
+                <td class="etiket">Anahtar</td><td>@(Model.AnahtarVar ? "VAR" : "YOK")</td>
+            </tr>
+            <tr>
+                <td class="etiket">Çekici</td><td>@(Model.CekiciVar ? "VAR" : "YOK")</td>
+                <td class="etiket">Otopark</td><td>@Model.OtoparkAdi</td>
+            </tr>
+            <tr>
+                <td class="etiket">Otoparka Giriş Tarihi</td><td>@Model.OtoparkaGirisTarihi?.ToString("dd.MM.yyyy")</td>
+                <td class="etiket">Hasar Durumu</td><td>@Model.HasarDurumu</td>
+            </tr>
+            <tr>
+                <td class="etiket">Muhammen Bedel</td><td>@Model.MuhammenBedel.ToString("N2", trTR) TL</td>
+                <td class="etiket">Teminat (%5)</td><td>@Model.Teminat.ToString("N2", trTR) TL</td>
+            </tr>
+            <tr>
+                <td class="etiket">KDV Oranı</td><td>%@Model.KdvOrani.ToString("0.00", trTR)</td>
+                <td class="etiket">Damga Vergisi (Binde @Model.DamgaVergisiOrani.ToString("0.00", trTR))</td><td>@Model.DamgaVergisiTutari.ToString("N2", trTR) TL</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="belge-bolumu">
+        <div class="form-section-title">Satış Bilgileri</div>
+        <table class="satis-tablo">
+            <thead>
+                <tr>
+                    <th>Tür</th><th>Tarih</th><th>Sonuç</th><th>Bedel (TL)</th><th>Vade</th><th>Otopark Ücreti (TL)</th><th>Satın Alan Adı Soyadı/Ünvanı</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Satislar.OrderBy(s => s.SatisTarihi))
+                {
+                    <tr>
+                        <td>@s.SatisTuruGorunen</td>
+                        <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
+                        <td>@s.SonucGorunen</td>
+                        <td>@(s.SatisBedeli?.ToString("N2", trTR) ?? "-")</td>
+                        <td>@s.Vade.ToString("dd.MM.yyyy")</td>
+                        <td>@OtoparkHesaplayici.GercekOtoparkUcreti(s, Model.AracCinsi, otoparkKategoriSozlugu, genelAyar).ToString("N2", trTR)</td>
+                        <td>@s.AliciAdiSoyadi</td>
+                    </tr>
+                }
+                @if (!Model.Satislar.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted">Henüz satış sonucu girilmemiş.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 
 @section Scripts {
     <script>
