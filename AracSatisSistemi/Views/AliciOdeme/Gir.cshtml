@@ -86,6 +86,9 @@
             <div class="col-md-3"><label class="form-label">Çekici Ücreti (TL)</label><input class="form-control" id="cekiciUcretiGoster" readonly /></div>
             <div class="col-md-3"><label class="form-label fw-bold">Toplam (TL)</label><input class="form-control fw-bold" id="toplamGoster" readonly /></div>
         </div>
+        <div class="form-text text-warning mt-2" id="otoparkTavanUyarisi" style="display:none;">
+            Otopark ücreti + çekici ücreti toplamı satış bedelinin %30'unu aşamayacağından otopark ücreti düşürülmüştür.
+        </div>
     </div>
 
     <div class="mt-4">
@@ -152,6 +155,8 @@
         const ilkDonemUcret = @Html.Raw(((decimal)ViewBag.OtoparkIlkDonemUcret).ToString(System.Globalization.CultureInfo.InvariantCulture));
         const ikinciDonemUcret = @Html.Raw(((decimal)ViewBag.OtoparkIkinciDonemUcret).ToString(System.Globalization.CultureInfo.InvariantCulture));
         const satisTarihi = new Date('@Model.SatisTarihi.ToString("yyyy-MM-dd")');
+        // İdare talimatı: otopark + çekici ücreti toplamı satış bedelinin %30'unu aşamaz.
+        const satisBedeli = @Html.Raw(Model.SatisBedeli.HasValue ? Model.SatisBedeli.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null");
 
         function paraGoster(deger) {
             return deger.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -164,19 +169,29 @@
                 const giris = new Date(girisInput);
                 gunSayisi = Math.max(Math.round((satisTarihi - giris) / (1000 * 60 * 60 * 24)), 0);
             }
-            let otoparkUcreti;
+            let otoparkUcretiHam;
             if (gunSayisi <= ALTI_AY_GUN) {
-                otoparkUcreti = gunSayisi * ilkDonemUcret;
+                otoparkUcretiHam = gunSayisi * ilkDonemUcret;
             } else {
-                otoparkUcreti = ALTI_AY_GUN * ilkDonemUcret + (gunSayisi - ALTI_AY_GUN) * ikinciDonemUcret;
+                otoparkUcretiHam = ALTI_AY_GUN * ilkDonemUcret + (gunSayisi - ALTI_AY_GUN) * ikinciDonemUcret;
             }
             const cekiciBedeli = parseFloat(document.getElementById('cekiciBedeli').value) || 0;
+
+            let otoparkUcreti = otoparkUcretiHam;
+            let tavanUygulandi = false;
+            if (satisBedeli !== null) {
+                const tavan = satisBedeli * 0.30;
+                const otoparkIcinKalanTavan = Math.max(0, tavan - cekiciBedeli);
+                otoparkUcreti = Math.min(otoparkUcretiHam, otoparkIcinKalanTavan);
+                tavanUygulandi = otoparkUcreti < otoparkUcretiHam;
+            }
             const toplam = Math.round(otoparkUcreti + cekiciBedeli);
 
             document.getElementById('otoparkGunSayisiGoster').value = gunSayisi;
             document.getElementById('otoparkUcretiGoster').value = paraGoster(otoparkUcreti);
             document.getElementById('cekiciUcretiGoster').value = paraGoster(cekiciBedeli);
             document.getElementById('toplamGoster').value = paraGoster(toplam);
+            document.getElementById('otoparkTavanUyarisi').style.display = tavanUygulandi ? '' : 'none';
         }
 
         document.getElementById('otoparkaGirisTarihi').addEventListener('input', otoparkHesapla);

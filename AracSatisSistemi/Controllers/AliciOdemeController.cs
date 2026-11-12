@@ -62,7 +62,8 @@ namespace AracSatisSistemi.Controllers
             var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
             var aracCinsi = await _db.AracCinsleri.FirstOrDefaultAsync(c => c.Ad == satis.Dosya!.AracCinsi);
             var kategori = aracCinsi?.OtoparkKategorisi ?? OtoparkAracKategorisi.KucukArac;
-            var otoparkUcreti = OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar);
+            var otoparkUcretiHam = OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar);
+            var otoparkUcreti = OtoparkHesaplayici.OtoparkTavaniUygula(otoparkUcretiHam, satis.CekiciBedeli ?? 0m, satis.SatisBedeli);
             var (ilkDonemUcret, ikinciDonemUcret) = genelAyar.OtoparkTarifesi(kategori);
 
             ViewBag.Dosya = satis.Dosya;
@@ -71,8 +72,10 @@ namespace AracSatisSistemi.Controllers
                 ? kategori.Gorunen()
                 : $"{kategori.Gorunen()} (varsayılan - \"{satis.Dosya!.AracCinsi}\" cinsi tanımlı değil)";
             ViewBag.OtoparkGunSayisi = satis.OtoparkGunSayisi;
+            ViewBag.OtoparkUcretiHam = otoparkUcretiHam;
             ViewBag.OtoparkUcretiHesaplanan = otoparkUcreti;
             ViewBag.OtoparkToplamHesaplanan = OtoparkHesaplayici.SonucHesapla(otoparkUcreti, satis.CekiciBedeli ?? 0m);
+            ViewBag.OtoparkTavaniUygulandi = satis.SatisBedeli.HasValue && otoparkUcreti < otoparkUcretiHam;
             ViewBag.OtoparkIlkDonemUcret = ilkDonemUcret;
             ViewBag.OtoparkIkinciDonemUcret = ikinciDonemUcret;
             ViewBag.AliciKayitlariJson = System.Text.Json.JsonSerializer.Serialize(
@@ -123,7 +126,14 @@ namespace AracSatisSistemi.Controllers
                 var genelAyar = (GenelAyar)ViewBag.GenelAyar;
                 var kategori = (OtoparkAracKategorisi)ViewBag.OtoparkKategori;
                 satis.CekiciBedeli = genelAyar.CekiciUcreti(kategori);
-                ViewBag.OtoparkToplamHesaplanan = OtoparkHesaplayici.SonucHesapla((decimal)ViewBag.OtoparkUcretiHesaplanan, satis.CekiciBedeli.Value);
+
+                // Çekici ücreti burada ilk kez belirlendiğinden, %30 tavanı da buna göre
+                // (ViewBagHazirla'dan sonra) yeniden hesaplanır.
+                var otoparkUcretiHam = (decimal)ViewBag.OtoparkUcretiHam;
+                var otoparkUcreti = OtoparkHesaplayici.OtoparkTavaniUygula(otoparkUcretiHam, satis.CekiciBedeli.Value, satis.SatisBedeli);
+                ViewBag.OtoparkUcretiHesaplanan = otoparkUcreti;
+                ViewBag.OtoparkToplamHesaplanan = OtoparkHesaplayici.SonucHesapla(otoparkUcreti, satis.CekiciBedeli.Value);
+                ViewBag.OtoparkTavaniUygulandi = satis.SatisBedeli.HasValue && otoparkUcreti < otoparkUcretiHam;
             }
 
             return View(satis);

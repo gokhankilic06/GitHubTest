@@ -41,7 +41,9 @@ namespace AracSatisSistemi.Data
             decimal dvTutari = Math.Round(satisBedeli * dosya.DamgaVergisiOrani / 1000m, 2);
             decimal toplamTutar = satisBedeli + kdvTutari + dvTutari;
             decimal otoparkTutari = satis != null
-                ? OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar)
+                ? OtoparkHesaplayici.OtoparkTavaniUygula(
+                    OtoparkHesaplayici.OtoparkUcretiHesapla(satis.OtoparkGunSayisi, kategori, genelAyar),
+                    satis.CekiciBedeli ?? 0m, satis.SatisBedeli)
                 : 0m;
             decimal kalanTutar = satisBedeli - otoparkTutari;
 
