@@ -80,12 +80,14 @@
     <div class="form-section-title">Borçlu Mükellef</div>
     <table class="detay-tablo">
         <tr>
-            <td class="etiket">Adı Soyadı / Unvanı</td><td>@Model.AdiSoyadiUnvani</td>
-            <td class="etiket">Kanuni Temsilci</td><td>@Model.KanuniTemsilci</td>
+            <td class="etiket">Adı Soyadı / Unvanı</td><td colspan="3">@Model.AdiSoyadiUnvani</td>
         </tr>
         <tr>
             <td class="etiket">T.C. Kimlik No</td><td>@Model.TCKimlikNumarasi</td>
             <td class="etiket">Vergi Kimlik No</td><td>@Model.VergiKimlikNumarasi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Kanuni Temsilci</td><td colspan="3">@Model.KanuniTemsilci</td>
         </tr>
     </table>
 </div>

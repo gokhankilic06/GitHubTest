@@ -84,10 +84,10 @@
 
     <table class="tutanak-tablo mt-2">
         <tr><td class="baslik" colspan="3">ARAÇ OTOPARK BİLGİLERİ</td></tr>
-        <tr><td class="etiket">Faturayı Kesecek Otopark Adı</td><td class="etiket">Otopark Bedeli</td><td class="etiket">Çekici Bedeli</td></tr>
+        <tr><td class="etiket">Faturayı Kesecek Otopark Adı</td><td class="etiket">Alıcı Adresi</td><td class="etiket">Çekici Bedeli</td></tr>
         <tr>
             <td>@satis.FaturayiKesenOtopark</td>
-            <td>@(Model.OtoparkTutari > 0 ? Model.OtoparkTutari.ToString("N2", trTR) + " TL" : "-")</td>
+            <td>@satis.Adres</td>
             <td>@(satis.CekiciBedeli.HasValue ? satis.CekiciBedeli.Value.ToString("N2", trTR) + " TL" : "-")</td>
         </tr>
     </table>
