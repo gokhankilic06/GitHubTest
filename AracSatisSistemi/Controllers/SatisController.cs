@@ -225,6 +225,14 @@ namespace AracSatisSistemi.Controllers
                 return RedirectToAction(nameof(Listele), new { tur = satis.SatisTuru, tarih = satis.SatisTarihi });
             }
 
+            // İhale günü henüz gelmeden sonucu girilemez (ör. ileri bir tarihe tıklanıp
+            // yanlışlıkla erken sonuç kaydedilmesin diye).
+            if (satis.SatisTarihi.Date > DateTime.Today)
+            {
+                TempData["Hata"] = $"{satis.SatisTarihi:dd.MM.yyyy} tarihi henüz gelmedi; bir satışın sonucu, ihale tarihinden önce girilemez.";
+                return RedirectToAction(nameof(Listele), new { tur = satis.SatisTuru, tarih = satis.SatisTarihi });
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewBag.Dosya = dosya;

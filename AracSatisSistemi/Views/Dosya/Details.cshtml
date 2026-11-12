@@ -5,6 +5,10 @@
     var dosyaNoTemiz = Model.DosyaNo.Replace("/", "_");
     var genelAyar = (GenelAyar)ViewBag.GenelAyar;
     var otoparkKategoriSozlugu = (Dictionary<string, OtoparkAracKategorisi>)ViewBag.OtoparkKategoriSozlugu;
+    // Alıcı Ödeme Bilgileri kaydedilince (satis.VerilenSure dolar - bkz. AliciOdemeController.Gir
+    // POST) "Planlanan İhale Tarihleri" artık anlamsızdır (satış zaten gerçekleşmiştir); bu
+    // noktadan sonra gösterilmez.
+    var aliciOdemeKaydedildi = Model.Satislar.Any(s => s.SatisSonucu == SatisSonucu.Satildi && s.VerilenSure.HasValue);
 }
 <div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h3>Dosya No: @Model.DosyaNo <span class="badge bg-secondary">@Model.DurumGorunenAd</span></h3>
@@ -124,15 +128,18 @@
     </table>
 </div>
 
-<div class="belge-bolumu">
-    <div class="form-section-title">Planlanan İhale Tarihleri</div>
-    <table class="detay-tablo">
-        <tr>
-            <td class="etiket">1. Satış Tarihi</td><td>@Model.Satis1Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
-            <td class="etiket">2. Satış Tarihi</td><td>@Model.Satis2Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
-        </tr>
-    </table>
-</div>
+@if (!aliciOdemeKaydedildi)
+{
+    <div class="belge-bolumu">
+        <div class="form-section-title">Planlanan İhale Tarihleri</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">1. Satış Tarihi</td><td>@Model.Satis1Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
+                <td class="etiket">2. Satış Tarihi</td><td>@Model.Satis2Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
+            </tr>
+        </table>
+    </div>
+}
 
 @if (Model.Satislar.Any())
 {

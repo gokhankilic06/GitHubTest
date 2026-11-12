@@ -69,8 +69,11 @@
 
 <div class="text-center mt-5 mb-1 fw-bold">SATIŞ KOMİSYONU</div>
 <div class="row text-center">
-    <div class="col-3"><div class="imza-cizgi">@Model.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
-    <div class="col-3"><div class="imza-cizgi">@Model.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
-    <div class="col-3"><div class="imza-cizgi">@Model.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
-    <div class="col-3"><div class="imza-cizgi">@Model.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
+    <div class="col"><div class="imza-cizgi">@Model.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
+    <div class="col"><div class="imza-cizgi">@Model.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
+    @if (!string.IsNullOrWhiteSpace(Model.KomisyonUye3))
+    {
+        <div class="col"><div class="imza-cizgi">@Model.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+    }
+    <div class="col"><div class="imza-cizgi">@Model.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
 </div>

@@ -28,8 +28,9 @@ namespace AracSatisSistemi.Models
         public string Uye1 { get; set; } = string.Empty;
         [Required, Display(Name = "2 Nolu Üye")]
         public string Uye2 { get; set; } = string.Empty;
-        [Required, Display(Name = "3 Nolu Üye")]
-        public string Uye3 { get; set; } = string.Empty;
+        // 3 Nolu Üye bilerek zorunlu değil: her oturumda illa 3 üye bulunmayabilir.
+        [Display(Name = "3 Nolu Üye")]
+        public string? Uye3 { get; set; }
 
         [NotMapped]
         public string SatisTuruGorunen => SatisTuru switch

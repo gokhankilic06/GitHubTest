@@ -105,6 +105,15 @@ namespace AracSatisSistemi.Controllers
                 satis.OtoparkaGirisTarihi = satis.Dosya!.OtoparkaGirisTarihi;
             }
 
+            // Faturayı Kesecek Otopark Adı henüz girilmemişse, dosya kaydındaki (Kayıt
+            // İşlemleri ekranında "Aracın Bulunduğu Otopark" olarak girilen) otopark öneri
+            // olarak doldurulur; kullanıcı gerekirse (fatura farklı bir otoparktan kesilecekse)
+            // değiştirebilir - böylece aynı bilgiyi burada tekrar seçmek zorunda kalmaz.
+            if (string.IsNullOrWhiteSpace(satis.FaturayiKesenOtopark))
+            {
+                satis.FaturayiKesenOtopark = satis.Dosya!.OtoparkAdi;
+            }
+
             await ViewBagHazirla(satis);
 
             // Çekici bedeli henüz girilmemişse ve dosyada "Çekici Var" işaretliyse, sabit çekici

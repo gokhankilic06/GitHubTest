@@ -106,7 +106,10 @@
         <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
         <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
         <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
-        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+        @if (!string.IsNullOrWhiteSpace((string?)ViewBag.KomisyonUye3))
+        {
+            <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
+        }
     </div>
 </div>
 

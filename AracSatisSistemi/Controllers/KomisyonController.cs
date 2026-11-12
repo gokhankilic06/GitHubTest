@@ -48,7 +48,7 @@ namespace AracSatisSistemi.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["Hata"] = "Lütfen tüm zorunlu alanları doldurun (Satış Türü, Tarihi, Saati, Başkan ve 3 Üye).";
+                TempData["Hata"] = "Lütfen tüm zorunlu alanları doldurun (Satış Türü, Tarihi, Saati, Başkan, 1 Nolu Üye ve 2 Nolu Üye). 3 Nolu Üye opsiyoneldir.";
                 return RedirectToAction(nameof(Index));
             }
 
