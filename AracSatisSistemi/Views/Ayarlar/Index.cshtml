@@ -41,6 +41,24 @@
             <button class="btn btn-success"><i class="bi bi-calendar-range"></i> Bu Yılın Tüm İhale Programını Ekle</button>
         </div>
     </form>
+
+    <hr />
+    <p class="text-muted small mb-2">
+        İdarenin hazırladığı resmi ihale programı Excel (.xlsx) dosyanız varsa, içindeki tarihleri
+        okuyup doğrudan takvime ekleyebilirsiniz; hangi sütunda veya hangi tarih biçiminde
+        olduğuna bakılmaksızın dosyadaki tüm geçerli tarihler okunur, zaten takvimde olanlar
+        atlanır.
+    </p>
+    <form asp-controller="SatisTakvimi" asp-action="ExcelYukle" method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
+        @Html.AntiForgeryToken()
+        <div class="col-auto">
+            <label class="form-label">İhale Programı Excel Dosyası (.xlsx)</label>
+            <input class="form-control" type="file" name="dosya" accept=".xlsx" required />
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Excel'den Yükle</button>
+        </div>
+    </form>
 </div>
 
 <div class="card p-3 mt-3">

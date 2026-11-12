@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
@@ -131,6 +132,82 @@ namespace AracSatisSistemi.Controllers
             }
             TempData["Basari"] = $"{eklenecekler.Count} yeni tarih (haftalık Çarşamba, resmi tatiller hariç) takvime eklendi.";
             return RedirectToAction(nameof(Index));
+        }
+
+        // POST: /SatisTakvimi/ExcelYukle - idarenin hazırladığı resmi ihale programı Excel
+        // dosyasından (hangi sütunda/biçimde olduğuna bakılmaksızın) tüm geçerli tarihleri
+        // okuyup takvime ekler; zaten kayıtlı olanlar atlanır. Güncellemeler ekranındaki
+        // "Satış Takvimi" bölümünden kullanılır.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ExcelYukle(IFormFile dosya)
+        {
+            if (dosya == null || dosya.Length == 0)
+            {
+                TempData["Hata"] = "Lütfen bir Excel (.xlsx) dosyası seçin.";
+                return RedirectToAction("Index", "Ayarlar");
+            }
+
+            var bulunanTarihler = new HashSet<DateTime>();
+            var trTR = new System.Globalization.CultureInfo("tr-TR");
+            try
+            {
+                using var stream = dosya.OpenReadStream();
+                using var wb = new XLWorkbook(stream);
+                foreach (var ws in wb.Worksheets)
+                {
+                    var kullanilanAlan = ws.RangeUsed();
+                    if (kullanilanAlan == null) continue;
+                    foreach (var hucre in kullanilanAlan.CellsUsed())
+                    {
+                        DateTime? tarih = null;
+                        if (hucre.DataType == XLDataType.DateTime)
+                        {
+                            tarih = hucre.GetDateTime();
+                        }
+                        else
+                        {
+                            var metin = hucre.GetString().Trim();
+                            // Yalnızca tarih ayırıcısı içeren metinler denenir; aksi halde
+                            // sayısal/metin başlıkları ("1. Satış" gibi) yanlışlıkla tarih
+                            // olarak algılanabilir.
+                            if (metin.IndexOfAny(new[] { '.', '/', '-' }) >= 0 &&
+                                (DateTime.TryParse(metin, trTR, System.Globalization.DateTimeStyles.None, out var ayristirilan)
+                                 || DateTime.TryParse(metin, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out ayristirilan)))
+                            {
+                                tarih = ayristirilan;
+                            }
+                        }
+                        if (tarih.HasValue && tarih.Value.Year >= 2000 && tarih.Value.Year <= 2100)
+                        {
+                            bulunanTarihler.Add(tarih.Value.Date);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Hata"] = "Excel dosyası okunamadı: " + ex.Message;
+                return RedirectToAction("Index", "Ayarlar");
+            }
+
+            if (bulunanTarihler.Count == 0)
+            {
+                TempData["Hata"] = "Excel dosyasında okunabilir bir tarih bulunamadı.";
+                return RedirectToAction("Index", "Ayarlar");
+            }
+
+            var mevcutlar = (await _db.SatisTarihleri.Select(t => t.Tarih).ToListAsync()).ToHashSet();
+            var eklenecekler = bulunanTarihler.Where(t => !mevcutlar.Contains(t)).Select(t => new SatisTarihi { Tarih = t }).ToList();
+            if (eklenecekler.Count > 0)
+            {
+                _db.SatisTarihleri.AddRange(eklenecekler);
+                await _db.SaveChangesAsync();
+            }
+
+            var zatenKayitli = bulunanTarihler.Count - eklenecekler.Count;
+            TempData["Basari"] = $"Excel'den {bulunanTarihler.Count} tarih okundu; {eklenecekler.Count} yeni tarih satış takvimine eklendi" +
+                (zatenKayitli > 0 ? $" ({zatenKayitli} tanesi zaten kayıtlıydı)." : ".");
+            return RedirectToAction("Index", "Ayarlar");
         }
 
         [HttpPost, ValidateAntiForgeryToken]
