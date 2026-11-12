@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Models;
 
 namespace AracSatisSistemi.Data
@@ -163,6 +164,32 @@ namespace AracSatisSistemi.Data
                 .Max();
 
             return $"{prefix}{(sonSira + 1):D4}";
+        }
+
+        // Dosya No ataması + kaydı, İKİ KULLANICI AYNI ANDA yeni dosya kaydederse (ör.
+        // iki farklı bilgisayardan neredeyse aynı saniyede "Kaydet"e basarlarsa)
+        // oluşabilecek çakışmaya karşı güvenlidir: YeniDosyaNoUret ile numara üretilip
+        // kaydedilene kadarki kısa pencerede başka biri aynı numarayı almışsa (DosyaNo
+        // üzerindeki UNIQUE index bunu yakalar), numara yeniden üretilip tekrar denenir -
+        // böylece sonradan kaydeden kişi her zaman bir sonraki (büyük) numarayı alır,
+        // hiçbir zaman hataya düşmez veya çakışan bir numara kaydedilmez.
+        public static async Task DosyaNoAtaVeKaydetAsync(AppDbContext context, Dosya dosya)
+        {
+            const int maksimumDeneme = 5;
+            for (var deneme = 1; deneme <= maksimumDeneme; deneme++)
+            {
+                dosya.DosyaNo = YeniDosyaNoUret(context);
+                context.Dosyalar.Add(dosya);
+                try
+                {
+                    await context.SaveChangesAsync();
+                    return;
+                }
+                catch (DbUpdateException) when (deneme < maksimumDeneme)
+                {
+                    context.Entry(dosya).State = EntityState.Detached;
+                }
+            }
         }
     }
 }

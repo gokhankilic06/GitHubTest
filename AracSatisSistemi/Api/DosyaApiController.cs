@@ -60,12 +60,12 @@ namespace AracSatisSistemi.Api
         {
             if (!ModelState.IsValid) return ValidationProblem(ModelState);
 
-            dosya.DosyaNo = SeedData.YeniDosyaNoUret(_db);
             dosya.KayitTarihi = DateTime.Now;
             dosya.Durum = DosyaDurumu.Kayitli;
 
-            _db.Dosyalar.Add(dosya);
-            await _db.SaveChangesAsync();
+            // İki kullanıcı aynı anda yeni dosya kaydederse çakışmaya karşı güvenli -
+            // bkz. SeedData.DosyaNoAtaVeKaydetAsync.
+            await SeedData.DosyaNoAtaVeKaydetAsync(_db, dosya);
             return CreatedAtAction(nameof(Details), new { id = dosya.Id }, dosya);
         }
 

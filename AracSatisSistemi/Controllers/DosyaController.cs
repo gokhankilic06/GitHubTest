@@ -108,7 +108,6 @@ namespace AracSatisSistemi.Controllers
                 return View(dosya);
             }
 
-            dosya.DosyaNo = SeedData.YeniDosyaNoUret(_db);
             dosya.KayitTarihi = DateTime.Now;
             dosya.Durum = DosyaDurumu.Kayitli;
 
@@ -116,8 +115,9 @@ namespace AracSatisSistemi.Controllers
             // gerektiğinde (ör. ihale ertelenirse) elle değiştirebildiği için burada
             // olduğu gibi (dosya.Satis1Tarihi / Satis2Tarihi) kaydedilir.
 
-            _db.Dosyalar.Add(dosya);
-            await _db.SaveChangesAsync();
+            // İki kullanıcı aynı anda yeni dosya kaydederse çakışmaya karşı güvenli -
+            // bkz. SeedData.DosyaNoAtaVeKaydetAsync.
+            await SeedData.DosyaNoAtaVeKaydetAsync(_db, dosya);
 
             TempData["Basari"] = $"Dosya başarıyla oluşturuldu. Dosya No: {dosya.DosyaNo}";
             return RedirectToAction(nameof(Details), new { id = dosya.Id });
