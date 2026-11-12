@@ -147,9 +147,14 @@ namespace AracSatisSistemi.Controllers
             if (satis == null) return NotFound();
 
             vergiNumarasi = vergiNumarasi?.Trim();
-            if (!string.IsNullOrEmpty(vergiNumarasi) && vergiNumarasi.Length != 10 && vergiNumarasi.Length != 11)
+            if (!string.IsNullOrEmpty(vergiNumarasi))
             {
-                ModelState.AddModelError(string.Empty, "Vergi Numarası 10 haneli (VKN) veya 11 haneli (TCKN) olmalıdır.");
+                if (vergiNumarasi.Length == 10 && !VknTcknDogrulayici.VknGecerliMi(vergiNumarasi))
+                    ModelState.AddModelError(string.Empty, "Girilen 10 haneli Vergi Numarası geçerli bir VKN değil (kontrol hanesi tutmuyor).");
+                else if (vergiNumarasi.Length == 11 && !VknTcknDogrulayici.TcknGecerliMi(vergiNumarasi))
+                    ModelState.AddModelError(string.Empty, "Girilen 11 haneli Vergi Numarası geçerli bir T.C. Kimlik No değil (kontrol hanesi tutmuyor).");
+                else if (vergiNumarasi.Length != 10 && vergiNumarasi.Length != 11)
+                    ModelState.AddModelError(string.Empty, "Vergi Numarası 10 haneli (VKN) veya 11 haneli (TCKN) olmalıdır.");
             }
 
             if (!ModelState.IsValid)

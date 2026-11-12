@@ -31,10 +31,12 @@ namespace AracSatisSistemi.Models
         // ---- BORÇLU MÜKELLEF BİLGİLERİ ----
         [Display(Name = "Vergi Kimlik Numarası")]
         [StringLength(10, MinimumLength = 10, ErrorMessage = "Vergi Kimlik Numarası 10 haneli olmalıdır.")]
+        [GecerliVKN]
         public string? VergiKimlikNumarasi { get; set; }
 
         [Display(Name = "T.C. Kimlik Numarası")]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "T.C. Kimlik Numarası 11 haneli olmalıdır.")]
+        [GecerliTCKN]
         public string? TCKimlikNumarasi { get; set; }
 
         [Required, Display(Name = "Adı Soyadı / Unvanı")]

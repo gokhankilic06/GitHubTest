@@ -28,9 +28,13 @@ namespace AracSatisSistemi.Models
         public decimal? SatisBedeli { get; set; }
 
         [Display(Name = "Alıcı T.C. Kimlik No")]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "Alıcı T.C. Kimlik No 11 haneli olmalıdır.")]
+        [GecerliTCKN]
         public string? AliciTCKN { get; set; }
 
         [Display(Name = "Alıcı VKN")]
+        [StringLength(10, MinimumLength = 10, ErrorMessage = "Alıcı VKN 10 haneli olmalıdır.")]
+        [GecerliVKN]
         public string? AliciVKN { get; set; }
 
         [Display(Name = "Alıcı Adı Soyadı")]

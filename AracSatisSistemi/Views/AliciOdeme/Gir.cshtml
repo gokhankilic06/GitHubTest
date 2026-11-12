@@ -35,6 +35,7 @@
                     </button>
                 </div>
                 <div class="form-text">Bu kişi/kurum ilk kez araç alıyorsa alanları elle doldurun; daha önce kayıtlıysa butonla seçebilirsiniz.</div>
+                <div class="form-text text-danger" id="vergiNumarasiUyari" style="display:none;"></div>
             </div>
             <div class="col-md-4"><label class="form-label" asp-for="AliciAdiSoyadi">Satın Alan Adı Soyadı/Ünvanı</label><input class="form-control" asp-for="AliciAdiSoyadi" id="aliciAdiSoyadi" /></div>
             <div class="col-md-4"><label class="form-label" asp-for="AliciVekili">Satın Alan Vekili</label><input class="form-control" asp-for="AliciVekili" id="aliciVekili" /></div>
@@ -115,7 +116,35 @@
 </div>
 
 @section Scripts {
+    <script src="~/js/vkn-tckn-dogrula.js" asp-append-version="true"></script>
     <script>
+        // Vergi Numarası alanı hem VKN (10 hane) hem TCKN (11 hane) kabul ettiğinden,
+        // uzunluğa göre hangi algoritmayla kontrol edileceği burada seçilir.
+        (function () {
+            const vergiNumarasiGirisi = document.getElementById('vergiNumarasi');
+            const vergiNumarasiUyari = document.getElementById('vergiNumarasiUyari');
+            function kontrolEt() {
+                const deger = vergiNumarasiGirisi.value.replace(/\D/g, '');
+                if (deger.length === 10) {
+                    const gecerliMi = vknGecerliMi(deger);
+                    vergiNumarasiUyari.textContent = 'Geçerli bir Vergi Kimlik Numarası değil (kontrol hanesi tutmuyor).';
+                    vergiNumarasiUyari.style.display = gecerliMi ? 'none' : '';
+                    vergiNumarasiGirisi.classList.toggle('is-invalid', !gecerliMi);
+                } else if (deger.length === 11) {
+                    const gecerliMi = tcknGecerliMi(deger);
+                    vergiNumarasiUyari.textContent = 'Geçerli bir T.C. Kimlik Numarası değil (kontrol hanesi tutmuyor).';
+                    vergiNumarasiUyari.style.display = gecerliMi ? 'none' : '';
+                    vergiNumarasiGirisi.classList.toggle('is-invalid', !gecerliMi);
+                } else {
+                    vergiNumarasiUyari.style.display = 'none';
+                    vergiNumarasiGirisi.classList.remove('is-invalid');
+                }
+            }
+            vergiNumarasiGirisi.addEventListener('input', kontrolEt);
+            vergiNumarasiGirisi.addEventListener('blur', kontrolEt);
+            kontrolEt();
+        })();
+
         const aliciKayitlari = @Html.Raw(ViewBag.AliciKayitlariJson);
         const listeEl = document.getElementById('aliciListesi');
         const bosMesajEl = document.getElementById('aliciBosMesaj');
