@@ -21,7 +21,6 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.ResmiTatiller = await _db.ResmiTatiller.OrderBy(t => t.Tarih).ToListAsync();
-            ViewBag.Memurlar = await _db.Memurlar.OrderBy(m => m.AdSoyad).ToListAsync();
             return View();
         }
 
@@ -275,38 +274,6 @@ namespace AracSatisSistemi.Controllers
             }
 
             _db.AracRenkleri.Remove(kayit);
-            await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> MemurEkle(string adSoyad)
-        {
-            if (!string.IsNullOrWhiteSpace(adSoyad)) { _db.Memurlar.Add(new Memur { AdSoyad = adSoyad.Trim() }); await _db.SaveChangesAsync(); }
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> MemurSil(int id)
-        {
-            var kayit = await _db.Memurlar.FindAsync(id);
-            if (kayit == null) return RedirectToAction(nameof(Index));
-
-            // Hem kaydedilmiş Komisyon Oturumları'nda (gerçek ihale komisyonları) hem de
-            // dosyaların kayıt anında kopyaladığı komisyon bilgisinde kullanılıp
-            // kullanılmadığı kontrol edilir.
-            var kullaniliyor = await _db.KomisyonOturumlari.AnyAsync(k =>
-                    k.Baskan == kayit.AdSoyad || k.Uye1 == kayit.AdSoyad || k.Uye2 == kayit.AdSoyad || k.Uye3 == kayit.AdSoyad)
-                || await _db.Dosyalar.AnyAsync(d =>
-                    d.KomisyonBaskani == kayit.AdSoyad || d.KomisyonUye1 == kayit.AdSoyad
-                    || d.KomisyonUye2 == kayit.AdSoyad || d.KomisyonUye3 == kayit.AdSoyad);
-            if (kullaniliyor)
-            {
-                TempData["Hata"] = $"\"{kayit.AdSoyad}\" en az bir komisyon oturumunda/dosyada kayıtlı, bu yüzden silinemez.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _db.Memurlar.Remove(kayit);
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

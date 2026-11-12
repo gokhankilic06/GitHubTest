@@ -65,16 +65,6 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Üye 3")] public string Uye3 { get; set; } = string.Empty;
     }
 
-    // Komisyon başkanlığı/üyeliği yapabilecek memurların listesi. Güncellemeler ekranından
-    // eklenip çıkarılır; Komisyon İşlemleri ekranında ve varsayılan Komisyon Bilgileri
-    // ayarında buradan seçim yapılır.
-    public class Memur
-    {
-        public int Id { get; set; }
-        [Required, Display(Name = "Adı Soyadı")]
-        public string AdSoyad { get; set; } = string.Empty;
-    }
-
     // Genel sistem ayarları (günlük otopark ücreti gibi elden verilen tarifeler)
     public class GenelAyar
     {

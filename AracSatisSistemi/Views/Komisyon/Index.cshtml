@@ -1,7 +1,6 @@
 @model List<KomisyonOturumu>
 @{
     ViewData["Title"] = "Komisyon İşlemleri";
-    var memurlar = (List<Memur>)ViewBag.Memurlar;
     var satisGunleri = (List<DateTime>)ViewBag.SatisGunleri;
     var varsayilanKomisyon = (KomisyonAyari?)ViewBag.VarsayilanKomisyon;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
@@ -41,53 +40,20 @@
         </div>
         <div class="col-md-4">
             <label class="form-label">Komisyon Başkanı</label>
-            <select class="form-select" name="Baskan" required>
-                <option value="">-- Seçiniz --</option>
-                @foreach (var m in memurlar)
-                {
-                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Baskan)">@m.AdSoyad</option>
-                }
-            </select>
+            <input class="form-control" name="Baskan" value="@varsayilanKomisyon?.Baskan" required />
         </div>
         <div class="col-md-4">
             <label class="form-label">1 Nolu Üye</label>
-            <select class="form-select" name="Uye1" required>
-                <option value="">-- Seçiniz --</option>
-                @foreach (var m in memurlar)
-                {
-                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Uye1)">@m.AdSoyad</option>
-                }
-            </select>
+            <input class="form-control" name="Uye1" value="@varsayilanKomisyon?.Uye1" required />
         </div>
         <div class="col-md-4">
             <label class="form-label">2 Nolu Üye</label>
-            <select class="form-select" name="Uye2" required>
-                <option value="">-- Seçiniz --</option>
-                @foreach (var m in memurlar)
-                {
-                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Uye2)">@m.AdSoyad</option>
-                }
-            </select>
+            <input class="form-control" name="Uye2" value="@varsayilanKomisyon?.Uye2" required />
         </div>
         <div class="col-md-4">
             <label class="form-label">3 Nolu Üye <span class="text-muted small">(opsiyonel)</span></label>
-            <select class="form-select" name="Uye3">
-                <option value="">-- Seçiniz --</option>
-                @foreach (var m in memurlar)
-                {
-                    <option value="@m.AdSoyad" selected="@(m.AdSoyad == varsayilanKomisyon?.Uye3)">@m.AdSoyad</option>
-                }
-            </select>
+            <input class="form-control" name="Uye3" value="@varsayilanKomisyon?.Uye3" />
         </div>
-        @if (!memurlar.Any())
-        {
-            <div class="col-12">
-                <div class="alert alert-warning mb-0">
-                    Henüz kayıtlı memur yok. Önce <a asp-controller="Ayarlar" asp-action="Index">Güncellemeler</a>
-                    ekranından "Komisyon Üyesi Olabilecek Memurlar" listesine isim ekleyin.
-                </div>
-            </div>
-        }
         <div class="col-12">
             <button class="btn btn-primary" type="submit"><i class="bi bi-check-circle"></i> Komisyonu Kaydet</button>
         </div>

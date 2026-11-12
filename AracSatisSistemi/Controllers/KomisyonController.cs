@@ -14,8 +14,6 @@ namespace AracSatisSistemi.Controllers
 
         private async Task DoldurListeler()
         {
-            ViewBag.Memurlar = await _db.Memurlar.OrderBy(m => m.AdSoyad).ToListAsync();
-
             // Komisyon oturumu açılabilecek tarihler artık Yıllık Satış Takvimi'nden gelir
             // (bkz. SatisTakvimiController) - idarenin resmen belirlediği ihale günleri.
             var bugun = DateTime.Today;

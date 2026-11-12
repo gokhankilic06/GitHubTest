@@ -39,8 +39,8 @@ using (var scope = app.Services.CreateScope())
     // sürümden kalma, dosyaları kayıtlı mevcut bir AracSatis.db'de modele sonradan
     // eklenen tablolar/indeksler otomatik oluşmaz. Bu yüzden EF'nin o anki modelden
     // ürettiği TÜM "CREATE TABLE"/"CREATE INDEX" ifadeleri burada IF NOT EXISTS ile
-    // tekrar çalıştırılır: modele sonradan eklenen her yeni tablo (ör. Memurlar,
-    // AliciKayitlari, KomisyonOturumlari, AracModelleri) tek tek elle yazılmaya gerek
+    // tekrar çalıştırılır: modele sonradan eklenen her yeni tablo (ör. AliciKayitlari,
+    // KomisyonOturumlari, AracModelleri) tek tek elle yazılmaya gerek
     // kalmadan eski bir AracSatis.db'de de otomatik oluşur; zaten var olan tablolara/
     // verilere dokunulmaz. SeedData.Initialize'daki EnsureCreated'ın (ki o da bu
     // güvenlik ağını tekrar çağırır, zararsız) ve seed sorgularının ÖNÜNDE çalışması
