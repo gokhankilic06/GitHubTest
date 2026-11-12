@@ -1,4 +1,7 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
@@ -27,6 +30,26 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Giriş güvenliği: çerez tabanlı kimlik doğrulama. "Güncellemeler > Kullanıcılar"
+// ekranından eklenen kullanıcı adı/şifre ile giriş yapılır; şifreler PasswordHasher
+// (PBKDF2) ile hash'lenerek saklanır, düz metin hiçbir yerde tutulmaz.
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Hesap/Giris";
+        options.AccessDeniedPath = "/Hesap/Giris";
+        options.ExpireTimeSpan = TimeSpan.FromHours(12);
+        options.SlidingExpiration = true;
+    });
+builder.Services.AddAuthorization(options =>
+{
+    // Varsayılan olarak TÜM ekranlar giriş gerektirir ([AllowAnonymous] ile işaretlenen
+    // Hesap/Giris hariç); her controller'a tek tek [Authorize] eklemeye gerek kalmaz.
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
 
 var app = builder.Build();
 
@@ -113,6 +136,18 @@ using (var scope = app.Services.CreateScope())
     // ve mevcut tüm dosyalara o zamana kadar geçerli olan binde 5,69 değeri atanır.
     try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Dosyalar"" ADD COLUMN ""DamgaVergisiOrani"" decimal(18,2) NOT NULL DEFAULT 5.69;"); }
     catch { /* sütun zaten varsa göz ardı edilir */ }
+
+    // İlk kurulumda hiç kullanıcı yoksa, giriş yapılabilsin diye varsayılan bir "admin"
+    // kullanıcısı oluşturulur. Güncellemeler > Kullanıcılar ekranından şifre değiştirilmeli
+    // ve gerekirse diğer kullanıcılar eklenmelidir.
+    if (!db.Kullanicilar.Any())
+    {
+        var hasher = new PasswordHasher<Kullanici>();
+        var admin = new Kullanici { KullaniciAdi = "admin", AdSoyad = "Yönetici", Aktif = true };
+        admin.SifreHash = hasher.HashPassword(admin, "Admin123!");
+        db.Kullanicilar.Add(admin);
+        db.SaveChanges();
+    }
 }
 
 // Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.
@@ -159,6 +194,7 @@ app.Use(async (context, next) =>
 });
 
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

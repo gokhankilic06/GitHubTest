@@ -9,10 +9,48 @@
     var otoparklar = (List<AracSatisSistemi.Models.OtoparkKaydi>)ViewBag.Otoparklar;
     var renkler = (List<AracSatisSistemi.Models.AracRengi>)ViewBag.Renkler;
     var resmiTatiller = (List<AracSatisSistemi.Models.ResmiTatil>)ViewBag.ResmiTatiller;
+    var kullanicilar = (List<AracSatisSistemi.Models.Kullanici>)ViewBag.Kullanicilar;
 }
 <h3>Güncellemeler</h3>
 
 <div class="card p-3">
+    <div class="form-section-title">Kullanıcılar (Giriş Yetkisi)</div>
+    <p class="text-muted small mb-2">Programa giriş yapabilecek kullanıcı adı/şifreler burada yönetilir. Şifreler güvenli şekilde (hash'lenerek) saklanır; unutulan bir şifre, buradan yeniden belirlenebilir.</p>
+    <form asp-action="KullaniciEkle" method="post" class="row g-2 align-items-end mb-3">
+        @Html.AntiForgeryToken()
+        <div class="col-auto"><label class="form-label">Kullanıcı Adı</label><input class="form-control" name="kullaniciAdi" required /></div>
+        <div class="col-auto"><label class="form-label">Ad Soyad</label><input class="form-control" name="adSoyad" /></div>
+        <div class="col-auto"><label class="form-label">Şifre</label><input class="form-control" type="password" name="sifre" minlength="6" required /></div>
+        <div class="col-auto"><button class="btn btn-success">Kullanıcı Ekle</button></div>
+    </form>
+    <ul class="list-group">
+        @foreach (var k in kullanicilar)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <span><strong>@k.KullaniciAdi</strong>@(string.IsNullOrWhiteSpace(k.AdSoyad) ? "" : $" ({k.AdSoyad})")</span>
+                <div class="d-flex gap-2 align-items-center">
+                    <form asp-action="KullaniciSifreSifirla" method="post" class="d-flex gap-1">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@k.Id" />
+                        <input class="form-control form-control-sm" type="password" name="yeniSifre" placeholder="Yeni şifre" minlength="6" style="width:10rem;" required />
+                        <button class="btn btn-sm btn-outline-secondary">Şifreyi Değiştir</button>
+                    </form>
+                    <form asp-action="KullaniciSil" method="post" onsubmit="return confirm('Silinsin mi?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@k.Id" />
+                        <button class="btn btn-sm btn-outline-danger">Sil</button>
+                    </form>
+                </div>
+            </li>
+        }
+        @if (!kullanicilar.Any())
+        {
+            <li class="list-group-item text-muted text-center">Henüz kullanıcı eklenmedi.</li>
+        }
+    </ul>
+</div>
+
+<div class="card p-3 mt-3">
     <div class="form-section-title">Satış Takvimi</div>
     <p class="text-muted small mb-2">Yıllık 1. ve 2. Satış (ihale) tarihlerini tek tek buradan değil, ayrı <a asp-controller="SatisTakvimi" asp-action="Index">Satış Takvimi</a> ekranından ekleyip yönetirsiniz.</p>
     <a class="btn btn-outline-primary mb-3" asp-controller="SatisTakvimi" asp-action="Index"><i class="bi bi-calendar-week"></i> Satış Takvimine Git</a>

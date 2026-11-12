@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
@@ -21,6 +22,7 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.ResmiTatiller = await _db.ResmiTatiller.OrderBy(t => t.Tarih).ToListAsync();
+            ViewBag.Kullanicilar = await _db.Kullanicilar.OrderBy(k => k.KullaniciAdi).ToListAsync();
             return View();
         }
 
@@ -294,6 +296,79 @@ namespace AracSatisSistemi.Controllers
         {
             var kayit = await _db.ResmiTatiller.FindAsync(id);
             if (kayit != null) { _db.ResmiTatiller.Remove(kayit); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // ---- KULLANICILAR (giriş güvenliği) ----
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> KullaniciEkle(string kullaniciAdi, string sifre, string? adSoyad)
+        {
+            kullaniciAdi = (kullaniciAdi ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(kullaniciAdi) || string.IsNullOrWhiteSpace(sifre))
+            {
+                TempData["Hata"] = "Kullanıcı adı ve şifre zorunludur.";
+                return RedirectToAction(nameof(Index));
+            }
+            if (sifre.Length < 6)
+            {
+                TempData["Hata"] = "Şifre en az 6 karakter olmalıdır.";
+                return RedirectToAction(nameof(Index));
+            }
+            if (await _db.Kullanicilar.AnyAsync(k => k.KullaniciAdi == kullaniciAdi))
+            {
+                TempData["Hata"] = $"\"{kullaniciAdi}\" kullanıcı adı zaten kayıtlı.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var kullanici = new Kullanici { KullaniciAdi = kullaniciAdi, AdSoyad = string.IsNullOrWhiteSpace(adSoyad) ? null : adSoyad.Trim() };
+            var hasher = new PasswordHasher<Kullanici>();
+            kullanici.SifreHash = hasher.HashPassword(kullanici, sifre);
+            _db.Kullanicilar.Add(kullanici);
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"\"{kullaniciAdi}\" kullanıcısı eklendi.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> KullaniciSifreSifirla(int id, string yeniSifre)
+        {
+            var kayit = await _db.Kullanicilar.FindAsync(id);
+            if (kayit == null) return RedirectToAction(nameof(Index));
+            if (string.IsNullOrWhiteSpace(yeniSifre) || yeniSifre.Length < 6)
+            {
+                TempData["Hata"] = "Yeni şifre en az 6 karakter olmalıdır.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var hasher = new PasswordHasher<Kullanici>();
+            kayit.SifreHash = hasher.HashPassword(kayit, yeniSifre);
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"\"{kayit.KullaniciAdi}\" kullanıcısının şifresi değiştirildi.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> KullaniciSil(int id)
+        {
+            var kayit = await _db.Kullanicilar.FindAsync(id);
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            // Kullanıcı kendi hesabını veya sistemdeki son (giriş yapılabilecek tek) aktif
+            // kullanıcıyı silerse, programa bir daha kimse giriş yapamaz hale gelir.
+            if (kayit.KullaniciAdi == User.Identity?.Name)
+            {
+                TempData["Hata"] = "Kendi hesabınızı silemezsiniz.";
+                return RedirectToAction(nameof(Index));
+            }
+            if (kayit.Aktif && await _db.Kullanicilar.CountAsync(k => k.Aktif) <= 1)
+            {
+                TempData["Hata"] = "Son aktif kullanıcı silinemez; aksi halde sisteme kimse giriş yapamaz.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            _db.Kullanicilar.Remove(kayit);
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"\"{kayit.KullaniciAdi}\" kullanıcısı silindi.";
             return RedirectToAction(nameof(Index));
         }
 
