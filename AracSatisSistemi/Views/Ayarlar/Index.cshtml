@@ -405,9 +405,11 @@
         <div class="card p-3">
             <div class="form-section-title">Veri Güvenliği / Yedekleme</div>
             <p class="text-muted small mb-2">
-                Uygulama her başlatıldığında veritabanının bir kopyası otomatik olarak
-                <code>Backups</code> klasörüne alınır. Ayrıca aşağıdaki seçeneklerle istediğiniz an
-                manuel yedek indirebilirsiniz.
+                Veritabanının <strong>günlük</strong> yedeği otomatik olarak <code>Backups/Gunluk</code>
+                klasörüne alınır (son 60 gün tutulur, daha eskileri silinir). Ayrıca her
+                <strong>Cuma</strong> günü <code>Backups/Haftalik</code> klasörüne bir yedek daha alınır
+                ve bu haftalık yedekler <strong>hiçbir zaman silinmez</strong>. Ayrıca aşağıdaki
+                seçeneklerle istediğiniz an manuel yedek de indirebilirsiniz.
             </p>
             <div class="d-flex flex-wrap gap-2">
                 <a class="btn btn-outline-success" asp-action="ExcelYedekIndir">

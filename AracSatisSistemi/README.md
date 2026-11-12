@@ -62,9 +62,11 @@ Visual Studio kullanıyorsanız `.csproj` dosyasını açmanız yeterlidir.
   gerçek .pdf dosyası indirilir - internet bağlantısı gerektirir çünkü kütüphaneler CDN'den yüklenir).
 - **Excel'e aktar**: Dosya Detayı, Listeler ekranı ve Ayarlar > Yedekleme bölümünde Excel (.xlsx)
   indirme seçenekleri (ClosedXML kütüphanesi ile, sunucu tarafında, internet gerektirmez).
-- **Yedekleme**: Uygulama her açıldığında `Backups` klasörüne otomatik `.db` yedeği alınır (son 20
-  yedek saklanır). Ayrıca Ayarlar ekranından istenildiği an "Excel Yedek İndir" (tüm tablolar) veya
-  "Veritabanı Dosyasını İndir (.db)" ile manuel yedek alınabilir.
+- **Yedekleme**: Arka planda sürekli çalışan bir servis (`Services/YedeklemeServisi.cs`), uygulama
+  açık kaldığı sürece saatte bir kontrol ederek `Backups/Gunluk` klasörüne günde bir `.db` yedeği
+  alır (son 60 gün saklanır), ve her Cuma `Backups/Haftalik` klasörüne bir yedek daha alır - bu
+  haftalık yedekler hiçbir zaman silinmez. Ayrıca Ayarlar ekranından istenildiği an "Excel Yedek
+  İndir" (tüm tablolar) veya "Veritabanı Dosyasını İndir (.db)" ile manuel yedek alınabilir.
 - **Vergi Daireleri**: Artık İl + Vergi Dairesi Adı olarak veritabanında tutuluyor; Kayıt İşlemleri
   ekranında önce İl, sonra o ile ait vergi daireleri kademeli (cascading) combobox olarak geliyor.
   Türkiye genelinde ~300 vergi dairesi başlangıç listesi olarak yüklendi; Ayarlar ekranından

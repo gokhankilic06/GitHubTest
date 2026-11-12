@@ -90,6 +90,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
+// Günlük (son 60 gün) ve haftalık (her Cuma, hiç silinmeyen) otomatik veritabanı
+// yedeklemesi - bkz. Services/YedeklemeServisi.cs.
+builder.Services.AddHostedService<AracSatisSistemi.Services.YedeklemeServisi>();
+
 builder.Services.AddCors(options =>
 {
     // React (Vite) geliştirme sunucusu farklı bir origin'den (ör. http://localhost:5173)
@@ -206,29 +210,6 @@ using (var scope = app.Services.CreateScope())
         db.Kullanicilar.Add(admin);
         db.SaveChanges();
     }
-}
-
-// Veri güvenliği: uygulama her başlatıldığında veritabanının otomatik bir yedeğini al.
-try
-{
-    var dbYolu = Path.Combine(Directory.GetCurrentDirectory(), "AracSatis.db");
-    if (File.Exists(dbYolu))
-    {
-        var yedekKlasoru = Path.Combine(Directory.GetCurrentDirectory(), "Backups");
-        Directory.CreateDirectory(yedekKlasoru);
-        var yedekYolu = Path.Combine(yedekKlasoru, $"AracSatis_{DateTime.Now:yyyyMMdd_HHmmss}.db");
-        File.Copy(dbYolu, yedekYolu, overwrite: true);
-
-        // Sadece son 20 yedeği tut, eskileri temizle.
-        var yedekler = Directory.GetFiles(yedekKlasoru, "AracSatis_*.db")
-            .OrderByDescending(f => f)
-            .Skip(20);
-        foreach (var eski in yedekler) File.Delete(eski);
-    }
-}
-catch
-{
-    // Yedekleme başarısız olsa bile uygulamanın açılmasını engelleme.
 }
 
 if (!app.Environment.IsDevelopment())
