@@ -24,12 +24,12 @@
 </div>
 
 <div id="kararAlani" class="a4-sayfa">
-    <div class="text-center mb-2 pb-2 border-bottom">
-        <div class="small">T.C.</div>
-        <h4 class="fw-bold mb-0">GELİR İDARESİ BAŞKANLIĞI</h4>
+    <div class="text-center mb-2 pb-2 border-bottom text-dark">
+        <div>T.C.</div>
+        <div>GELİR İDARESİ BAŞKANLIĞI</div>
         <div>Ankara Defterdarlığı</div>
-        <div class="small text-muted">(Gelir Kanunları Tahsilat Grup Müdürlüğü)</div>
-        <h5 class="fw-bold mt-2 mb-0">ARAÇ SATIŞ KARARI</h5>
+        <div>(Gelir Kanunları Tahsilat Grup Müdürlüğü)</div>
+        <div class="fw-bold mt-2">Araç Satış Kararı</div>
     </div>
 
     <table class="tutanak-tablo">
@@ -103,13 +103,13 @@
     <div class="text-center mt-4 mb-1 fw-bold">SATIŞ EKİBİ</div>
     <div class="row text-center">
         <div class="col"><div class="imza-cizgi">@satis.AliciAdiSoyadi</div><span class="small text-muted">ALICI</span></div>
-        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
         <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
         <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye2</div><span class="small text-muted">ÜYE</span></div>
         @if (!string.IsNullOrWhiteSpace((string?)ViewBag.KomisyonUye3))
         {
             <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye3</div><span class="small text-muted">ÜYE</span></div>
         }
+        <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonBaskani</div><span class="small text-muted">BAŞKAN</span></div>
     </div>
 </div>
 
