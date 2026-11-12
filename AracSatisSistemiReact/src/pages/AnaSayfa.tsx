@@ -27,7 +27,7 @@ const kartlar: MenuKarti[] = [
 export function AnaSayfa() {
   return (
     <div>
-      <div className="text-center mb-4">
+      <div className="mb-4">
         <h2>Araç Satış Programı</h2>
         <p className="text-muted">Haczedilen araçların kayıt, satış ve takip süreçlerini yönetin</p>
         <div className="alert alert-info d-inline-block">
