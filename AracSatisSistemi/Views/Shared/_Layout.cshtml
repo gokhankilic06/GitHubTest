@@ -21,11 +21,10 @@
                 <button class="btn drawer-ac-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCekmecesi" aria-controls="menuCekmecesi">
                     <i class="bi bi-list"></i>
                 </button>
-                <i class="bi bi-car-front-fill marka-ikon"></i>
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="bi bi-car-front-fill marka-ikon"></i> Araç Satış Sistemi
+                </a>
             </div>
-            <a class="navbar-brand navbar-orta" asp-controller="Home" asp-action="Index">
-                ANKARA DEFTERDARLIĞI
-            </a>
             <div class="navbar-sag">
                 <span class="navbar-text small d-none d-md-flex align-items-center gap-1" id="canliSaat">
                     <i class="bi bi-clock"></i> <span id="saatMetni"></span>
