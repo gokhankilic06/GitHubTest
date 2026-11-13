@@ -14,47 +14,56 @@
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark app-navbar mb-4">
+    <nav class="navbar navbar-dark app-navbar mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+            <button class="btn btn-outline-light drawer-ac-btn me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCekmecesi" aria-controls="menuCekmecesi">
+                <i class="bi bi-list"></i>
+            </button>
+            <a class="navbar-brand d-flex align-items-center gap-2 flex-grow-1" asp-controller="Home" asp-action="Index">
                 <i class="bi bi-car-front-fill"></i> Araç Satış Sistemi
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" asp-controller="Dosya" asp-action="Create"><i class="bi bi-file-earmark-plus"></i> Kayıt İşlemleri</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Dosya" asp-action="Index"><i class="bi bi-search"></i> Dosya Ara / Listele</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Dosya" asp-action="IhaleTutanagiAra"><i class="bi bi-file-earmark-text"></i> İhale Tutanağı</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Satis" asp-action="Index"><i class="bi bi-cash-coin"></i> Satış Sonuçlarını Gir</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="AliciOdeme" asp-action="Index"><i class="bi bi-person-check"></i> Alıcı Ödeme Bilgileri</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Komisyon" asp-action="Index"><i class="bi bi-people-fill"></i> Komisyon İşlemleri</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="IptalIade" asp-action="Index"><i class="bi bi-arrow-return-left"></i> İade / İptal / Kapama</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Listeler" asp-action="Index"><i class="bi bi-list-check"></i> Yazışmalar ve Listeler</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="TutanakRapor" asp-action="Index"><i class="bi bi-clipboard-data"></i> Tutanak ve Raporlar</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Yazisma" asp-action="Index"><i class="bi bi-envelope-paper"></i> Yazışma</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="SatisTakvimi" asp-action="Index"><i class="bi bi-calendar-week"></i> Satış Takvimi</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Istatistik" asp-action="Index"><i class="bi bi-bar-chart-line"></i> İstatistik</a></li>
-                    <li class="nav-item"><a class="nav-link" asp-controller="Ayarlar" asp-action="Index"><i class="bi bi-gear"></i> Güncellemeler</a></li>
-                </ul>
-                <span class="navbar-text text-white-50 small d-flex align-items-center gap-1" id="canliSaat">
-                    <i class="bi bi-clock"></i> <span id="saatMetni"></span>
+            <span class="navbar-text text-white-50 small d-none d-md-flex align-items-center gap-1" id="canliSaat">
+                <i class="bi bi-clock"></i> <span id="saatMetni"></span>
+            </span>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <span class="navbar-text text-white-50 small ms-3 d-flex align-items-center gap-2">
+                    <i class="bi bi-person-circle"></i> <span class="d-none d-sm-inline">@(User.FindFirst("AdSoyad")?.Value ?? User.Identity!.Name)</span>
+                    <a class="btn btn-sm btn-outline-light" asp-controller="Hesap" asp-action="SifreDegistir"><i class="bi bi-key"></i> <span class="d-none d-sm-inline">Şifre</span></a>
+                    <form asp-controller="Hesap" asp-action="Cikis" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-sm-inline">Çıkış</span></button>
+                    </form>
                 </span>
-                @if (User.Identity?.IsAuthenticated == true)
-                {
-                    <span class="navbar-text text-white-50 small ms-3 d-flex align-items-center gap-2">
-                        <i class="bi bi-person-circle"></i> @(User.FindFirst("AdSoyad")?.Value ?? User.Identity!.Name)
-                        <a class="btn btn-sm btn-outline-light" asp-controller="Hesap" asp-action="SifreDegistir"><i class="bi bi-key"></i> Şifre</a>
-                        <form asp-controller="Hesap" asp-action="Cikis" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right"></i> Çıkış</button>
-                        </form>
-                    </span>
-                }
-            </div>
+            }
         </div>
     </nav>
+
+    <div class="offcanvas offcanvas-start text-bg-dark menu-cekmecesi" tabindex="-1" id="menuCekmecesi" aria-labelledby="menuCekmecesiBaslik">
+        <div class="offcanvas-header border-bottom border-secondary-subtle">
+            <h5 class="offcanvas-title d-flex align-items-center gap-2" id="menuCekmecesiBaslik">
+                <i class="bi bi-car-front-fill"></i> Araç Satış Sistemi
+            </h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+        </div>
+        <div class="offcanvas-body p-0">
+            <ul class="nav flex-column">
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Dosya" asp-action="Create"><i class="bi bi-file-earmark-plus"></i> Kayıt İşlemleri</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Dosya" asp-action="Index"><i class="bi bi-search"></i> Dosya Ara / Listele</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Dosya" asp-action="IhaleTutanagiAra"><i class="bi bi-file-earmark-text"></i> İhale Tutanağı</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Satis" asp-action="Index"><i class="bi bi-cash-coin"></i> Satış Sonuçlarını Gir</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="AliciOdeme" asp-action="Index"><i class="bi bi-person-check"></i> Alıcı Ödeme Bilgileri</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Komisyon" asp-action="Index"><i class="bi bi-people-fill"></i> Komisyon İşlemleri</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="IptalIade" asp-action="Index"><i class="bi bi-arrow-return-left"></i> İade / İptal / Kapama</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Listeler" asp-action="Index"><i class="bi bi-list-check"></i> Yazışmalar ve Listeler</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="TutanakRapor" asp-action="Index"><i class="bi bi-clipboard-data"></i> Tutanak ve Raporlar</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Yazisma" asp-action="Index"><i class="bi bi-envelope-paper"></i> Yazışma</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="SatisTakvimi" asp-action="Index"><i class="bi bi-calendar-week"></i> Satış Takvimi</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Istatistik" asp-action="Index"><i class="bi bi-bar-chart-line"></i> İstatistik</a></li>
+                <li class="nav-item"><a class="nav-link" data-bs-dismiss="offcanvas" asp-controller="Ayarlar" asp-action="Index"><i class="bi bi-gear"></i> Güncellemeler</a></li>
+            </ul>
+        </div>
+    </div>
 
     <div class="container">
         @if (TempData["Basari"] != null)
