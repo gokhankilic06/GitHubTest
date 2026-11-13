@@ -5,9 +5,3 @@ obj/
 *.db-wal
 .vs/
 Backups/
-jwt-anahtar.key
-
-# AracSatisSistemiReact (React arayüzü)
-node_modules/
-dist/
-.env.local

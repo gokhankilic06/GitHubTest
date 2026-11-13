@@ -1,12 +1,9 @@
 using System.Globalization;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
 
@@ -18,38 +15,12 @@ CultureInfo.DefaultThreadCurrentUICulture = trKultur;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// React arayüzü için kullanılan JWT (bearer token) imza anahtarı kaynak koda/appsettings'e
-// YAZILMAZ: ilk çalıştırmada rastgele üretilip uygulama klasöründeki (.gitignore'da olan,
-// her kurulumda farklı) bir dosyaya yazılır, sonraki çalıştırmalarda aynı dosyadan okunur.
-var jwtAnahtarYolu = Path.Combine(builder.Environment.ContentRootPath, "jwt-anahtar.key");
-string jwtImzaAnahtari;
-if (File.Exists(jwtAnahtarYolu))
-{
-    jwtImzaAnahtari = File.ReadAllText(jwtAnahtarYolu).Trim();
-}
-else
-{
-    var rastgeleBaytlar = new byte[48];
-    System.Security.Cryptography.RandomNumberGenerator.Fill(rastgeleBaytlar);
-    jwtImzaAnahtari = Convert.ToBase64String(rastgeleBaytlar);
-    File.WriteAllText(jwtAnahtarYolu, jwtImzaAnahtari);
-}
-builder.Configuration["Jwt:Key"] = jwtImzaAnahtari;
-
 builder.Services.AddControllersWithViews(options =>
 {
     // bkz. InvariantDecimalModelBinder: tr-TR kültüründe formdan gelen "99.99" gibi
     // noktalı decimal değerlerin yanlış (9999 gibi) ayrıştırılmasını önler.
     options.ModelBinderProviders.Insert(0, new InvariantDecimalModelBinderProvider());
-})
-    // Ayrı React arayüzünün tükettiği JSON API (Api/ klasörü) için: enum'lar sayı yerine
-    // okunabilir metin ("Kayitli" gibi) olarak serileşir; Satis.Dosya <-> Dosya.Satislar
-    // gibi dairesel gezinme referansları sonsuz döngüye girmeden yok sayılır.
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    });
+});
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     options.DefaultRequestCulture = new RequestCulture(trKultur, trKultur);
@@ -70,40 +41,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Hesap/Giris";
         options.ExpireTimeSpan = TimeSpan.FromHours(12);
         options.SlidingExpiration = true;
-    })
-    // Ayrı React arayüzü (bkz. AracSatisSistemiReact/) tarayıcı çerezi yerine JWT (bearer
-    // token) ile kimlik doğrular; API controller'ları (Api/ klasörü) bu şemayı kullanır,
-    // Razor/MVC controller'ları yukarıdaki çerez şemasını kullanmaya devam eder - ikisi
-    // aynı anda, birbirinden bağımsız çalışır.
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-    {
-        var jwt = builder.Configuration.GetSection("Jwt");
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = jwt["Issuer"],
-            ValidateAudience = true,
-            ValidAudience = jwt["Audience"],
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!)),
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.FromMinutes(1)
-        };
     });
 // Günlük (son 60 gün) ve haftalık (her Cuma, hiç silinmeyen) otomatik veritabanı
 // yedeklemesi - bkz. Services/YedeklemeServisi.cs.
 builder.Services.AddHostedService<AracSatisSistemi.Services.YedeklemeServisi>();
 
-builder.Services.AddCors(options =>
-{
-    // React (Vite) geliştirme sunucusu farklı bir origin'den (ör. http://localhost:5173)
-    // API'ye istek atar; tarayıcı bunu CORS izni olmadan engeller.
-    options.AddPolicy("ReactIstemci", policy =>
-        policy.WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials());
-});
 builder.Services.AddAuthorization(options =>
 {
     // Varsayılan olarak TÜM ekranlar giriş gerektirir ([AllowAnonymous] ile işaretlenen
@@ -233,7 +175,6 @@ app.Use(async (context, next) =>
 });
 
 app.UseRouting();
-app.UseCors("ReactIstemci");
 app.UseAuthentication();
 app.UseAuthorization();
 
