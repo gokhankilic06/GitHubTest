@@ -16,34 +16,39 @@
 <body>
     <div class="resmi-serit"></div>
     <nav class="navbar navbar-light app-navbar mb-4">
-        <div class="container-fluid">
-            <button class="btn drawer-ac-btn me-2" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCekmecesi" aria-controls="menuCekmecesi">
-                <i class="bi bi-list"></i>
-            </button>
-            <a class="navbar-brand d-flex align-items-center gap-2 flex-grow-1" asp-controller="Home" asp-action="Index">
-                <span class="marka-rozet"><i class="bi bi-car-front-fill"></i></span> Araç Satış Sistemi
+        <div class="container-fluid navbar-izgara">
+            <div class="navbar-sol">
+                <button class="btn drawer-ac-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuCekmecesi" aria-controls="menuCekmecesi">
+                    <i class="bi bi-list"></i>
+                </button>
+                <i class="bi bi-car-front-fill marka-ikon"></i>
+            </div>
+            <a class="navbar-brand navbar-orta" asp-controller="Home" asp-action="Index">
+                ANKARA DEFTERDARLIĞI
             </a>
-            <span class="navbar-text small d-none d-md-flex align-items-center gap-1" id="canliSaat">
-                <i class="bi bi-clock"></i> <span id="saatMetni"></span>
-            </span>
-            @if (User.Identity?.IsAuthenticated == true)
-            {
-                <span class="navbar-text small ms-3 d-flex align-items-center gap-2">
-                    <i class="bi bi-person-circle"></i> <span class="d-none d-sm-inline">@(User.FindFirst("AdSoyad")?.Value ?? User.Identity!.Name)</span>
-                    <a class="btn btn-sm btn-outline-danger" asp-controller="Hesap" asp-action="SifreDegistir"><i class="bi bi-key"></i> <span class="d-none d-sm-inline">Şifre</span></a>
-                    <form asp-controller="Hesap" asp-action="Cikis" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-sm-inline">Çıkış</span></button>
-                    </form>
+            <div class="navbar-sag">
+                <span class="navbar-text small d-none d-md-flex align-items-center gap-1" id="canliSaat">
+                    <i class="bi bi-clock"></i> <span id="saatMetni"></span>
                 </span>
-            }
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="navbar-text small ms-md-3 d-flex align-items-center gap-2">
+                        <i class="bi bi-person-circle"></i> <span class="d-none d-sm-inline">@(User.FindFirst("AdSoyad")?.Value ?? User.Identity!.Name)</span>
+                        <a class="btn btn-sm btn-outline-danger" asp-controller="Hesap" asp-action="SifreDegistir"><i class="bi bi-key"></i> <span class="d-none d-sm-inline">Şifre</span></a>
+                        <form asp-controller="Hesap" asp-action="Cikis" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-box-arrow-right"></i> <span class="d-none d-sm-inline">Çıkış</span></button>
+                        </form>
+                    </span>
+                }
+            </div>
         </div>
     </nav>
 
     <div class="offcanvas offcanvas-start menu-cekmecesi" tabindex="-1" id="menuCekmecesi" aria-labelledby="menuCekmecesiBaslik">
         <div class="offcanvas-header border-bottom">
             <h5 class="offcanvas-title d-flex align-items-center gap-2" id="menuCekmecesiBaslik">
-                <span class="marka-rozet"><i class="bi bi-car-front-fill"></i></span> Araç Satış Sistemi
+                <i class="bi bi-car-front-fill marka-ikon"></i> Araç Satış Sistemi
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
         </div>
