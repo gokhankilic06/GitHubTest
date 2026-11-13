@@ -21,8 +21,19 @@ export function Giris() {
       await girisYap(kullaniciAdi, sifre);
       const donenYol = (location.state as { from?: string } | null)?.from || '/';
       navigate(donenYol, { replace: true });
-    } catch {
-      setHata('Kullanıcı adı veya şifre hatalı.');
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        setHata('Kullanıcı adı veya şifre hatalı.');
+      } else if (!err?.response) {
+        // Sunucuya hiç ulaşılamadı (çalışmıyor, yanlış adres/port, ağ/CORS engeli vb.) -
+        // bunu "şifre hatalı" diye göstermek yanıltıcı olurdu.
+        setHata(
+          `Sunucuya bağlanılamadı (${import.meta.env.VITE_API_BASE_URL}). ` +
+            'AracSatisSistemi (backend) çalışıyor mu ve adres doğru mu kontrol edin.',
+        );
+      } else {
+        setHata(`Giriş başarısız (sunucu kodu: ${err.response.status}).`);
+      }
     } finally {
       setYukleniyor(false);
     }
