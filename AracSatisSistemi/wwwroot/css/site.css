@@ -78,6 +78,31 @@ a .card:hover, .card.menu-card:hover {
     margin-bottom: .5rem;
 }
 
+/* Listeleme/tablo ekranlarının (Dosya Ara, Yazışmalar ve Listeler vb.) üst başlığı -
+   ikonlu, tutarlı bir çizgiyle diğer "form-section-title" kullanan ekranlarla aynı
+   görsel dile sahip olsun diye. */
+.liste-baslik {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    margin-bottom: 1rem;
+}
+.liste-baslik i {
+    font-size: 1.3rem;
+    color: var(--accent);
+}
+.liste-baslik h3 {
+    margin: 0;
+    font-weight: 700;
+}
+
+/* Listeleme tablolarında satır üzerine gelince hafif vurgu + daha belirgin satır
+   ayrımı; "Dosya No" gibi tanımlayıcı sütunlar taranabilir olsun diye kalın. */
+.table-hover tbody tr:hover {
+    background-color: #eef4ff;
+}
+.tablo-no { font-weight: 700; color: var(--brand-1); }
+
 .form-section-title {
     background: var(--brand-1);
     color: #fff;

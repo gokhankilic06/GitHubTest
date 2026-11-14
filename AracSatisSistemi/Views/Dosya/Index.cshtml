@@ -2,55 +2,66 @@
 @{
     ViewData["Title"] = "Dosya Listesi";
 }
-<h3>Dosya Ara / Listele</h3>
+<div class="liste-baslik">
+    <i class="bi bi-search"></i>
+    <h3>Dosya Ara / Listele</h3>
+</div>
 
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-4">
-        <input class="form-control" name="arama" value="@ViewBag.Arama" placeholder="Dosya No / Plaka / Adı Soyadı" />
-    </div>
-    <div class="col-md-3">
-        <select class="form-select" name="durumFiltre">
-            <option value="">Tümü (Aktif + Pasif)</option>
-            <option value="aktif" selected="@(ViewBag.DurumFiltre == "aktif")">Sadece Aktif</option>
-            <option value="pasif" selected="@(ViewBag.DurumFiltre == "pasif")">Sadece Pasif</option>
-        </select>
-    </div>
-    <div class="col-auto">
-        <button class="btn btn-primary" type="submit">Ara</button>
-        <a asp-action="Create" class="btn btn-success">+ Yeni Dosya</a>
-    </div>
-</form>
+<div class="card p-3 mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label">Ara</label>
+            <input class="form-control" name="arama" value="@ViewBag.Arama" placeholder="Dosya No / Plaka / Adı Soyadı" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Durum</label>
+            <select class="form-select" name="durumFiltre">
+                <option value="">Tümü (Aktif + Pasif)</option>
+                <option value="aktif" selected="@(ViewBag.DurumFiltre == "aktif")">Sadece Aktif</option>
+                <option value="pasif" selected="@(ViewBag.DurumFiltre == "pasif")">Sadece Pasif</option>
+            </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i> Ara</button>
+            <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i> Yeni Dosya</a>
+        </div>
+    </form>
+</div>
 
-<table class="table table-striped table-bordered bg-white">
-    <thead>
-        <tr>
-            <th>Dosya No</th>
-            <th>Kayıt Tarihi</th>
-            <th>Plaka</th>
-            <th>Adı Soyadı / Unvanı</th>
-            <th>Vergi Dairesi</th>
-            <th>Genel Durum</th>
-            <th>Aşama</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var d in Model)
-        {
-            <tr>
-                <td>@d.DosyaNo</td>
-                <td>@d.KayitTarihi.ToString("dd.MM.yyyy HH:mm")</td>
-                <td>@d.Plaka</td>
-                <td>@d.AdiSoyadiUnvani</td>
-                <td>@d.VergiDairesiAdi</td>
-                <td><span class="badge @(d.Aktif ? "bg-success" : "bg-secondary")">@d.GenelDurumGorunen</span></td>
-                <td><span class="badge @d.AsamaRozetSinifi">@d.AsamaGorunen</span></td>
-                <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@d.Id">Görüntüle</a></td>
-            </tr>
-        }
-        @if (!Model.Any())
-        {
-            <tr><td colspan="8" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
-        }
-    </tbody>
-</table>
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya No</th>
+                    <th>Kayıt Tarihi</th>
+                    <th>Plaka</th>
+                    <th>Adı Soyadı / Unvanı</th>
+                    <th>Vergi Dairesi</th>
+                    <th>Genel Durum</th>
+                    <th>Aşama</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model)
+                {
+                    <tr>
+                        <td class="tablo-no">@d.DosyaNo</td>
+                        <td>@d.KayitTarihi.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@d.Plaka</td>
+                        <td>@d.AdiSoyadiUnvani</td>
+                        <td>@d.VergiDairesiAdi</td>
+                        <td><span class="badge @(d.Aktif ? "bg-success" : "bg-secondary")">@d.GenelDurumGorunen</span></td>
+                        <td><span class="badge @d.AsamaRozetSinifi">@d.AsamaGorunen</span></td>
+                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@d.Id"><i class="bi bi-eye"></i> Görüntüle</a></td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted">Kayıt bulunamadı.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
