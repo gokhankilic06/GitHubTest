@@ -1,0 +1,17 @@
+@model List<SatisTarihi>
+@{
+    ViewData["Title"] = "Satış Takvimi";
+}
+<h3 class="mb-2">Satış Takvimi</h3>
+<p class="text-muted">
+    İdarenin bir yıl boyunca uygulayacağı 1. ve 2. Satış (ihale) günlerini önceden belirleyip vergi
+    dairelerine yazıyla bildirdiği resmi takvim. Yeni tarih eklemek, toplu eklemek veya Excel'den
+    yüklemek için <a asp-controller="Ayarlar" asp-action="Index">Güncellemeler</a> ekranını kullanın;
+    buradan ise mevcut takvimi görüntüleyip tek tek silebilirsiniz. Yeni bir dosya kaydedildiğinde
+    1. ve 2. Satış tarihleri buradaki listeden (bugünden sonraki ilk iki tarih) otomatik önerilir;
+    Komisyon İşlemleri ekranındaki Satış Tarihi seçim listesi de buradan gelir. Her tarihin yanındaki
+    sayılar o tarihte sonucu bekleyen dosyaları gösterir; <strong>Satış Sonuçlarını Gir</strong>
+    ekranına doğrudan buradan geçebilirsiniz.
+</p>
+
+@await Html.PartialAsync("_TakvimGorunumu", Model)

@@ -65,9 +65,11 @@
     </form>
 </div>
 
-@{ var satisTarihleri = (List<SatisTarihi>)ViewBag.SatisTarihleri; }
 <div class="card p-3 mt-3">
     <div class="form-section-title">Satış Takvimi</div>
+    <p class="text-muted small mb-2">Buradan yeni tarih ekleyin; eklenen/yüklenen tarihleri görüntülemek ve
+        tek tek silmek için işlem sonrası <a asp-controller="SatisTakvimi" asp-action="Index">Satış Takvimi</a>
+        ekranına yönlendirilirsiniz.</p>
     <form asp-controller="SatisTakvimi" asp-action="Ekle" method="post" class="row g-2 align-items-end mb-3">
         @Html.AntiForgeryToken()
         <div class="col-auto">
@@ -76,7 +78,6 @@
         </div>
         <div class="col-auto"><button class="btn btn-primary"><i class="bi bi-plus-circle"></i> Ekle</button></div>
     </form>
-    @await Html.PartialAsync("~/Views/SatisTakvimi/_TakvimGorunumu.cshtml", satisTarihleri)
 
     <hr />
     <p class="text-muted small mb-2">
