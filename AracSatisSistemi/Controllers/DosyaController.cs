@@ -1,0 +1,310 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using AracSatisSistemi.Data;
+using AracSatisSistemi.Models;
+using ClosedXML.Excel;
+
+namespace AracSatisSistemi.Controllers
+{
+    public class DosyaController : Controller
+    {
+        private readonly AppDbContext _db;
+        public DosyaController(AppDbContext db) => _db = db;
+
+        // GET: /Dosya  -> dosya arama / listeleme
+        public async Task<IActionResult> Index(string? arama, string? durumFiltre)
+        {
+            var sorgu = _db.Dosyalar.Include(d => d.Satislar).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(arama))
+            {
+                sorgu = sorgu.Where(d => d.DosyaNo.Contains(arama)
+                    || d.Plaka.Contains(arama)
+                    || d.AdiSoyadiUnvani.Contains(arama));
+            }
+
+            if (durumFiltre == "aktif")
+            {
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti);
+            }
+            else if (durumFiltre == "pasif")
+            {
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi
+                    || d.Durum == DosyaDurumu.AliciyaTerkEdildi);
+            }
+
+            ViewBag.Arama = arama;
+            ViewBag.DurumFiltre = durumFiltre;
+            var liste = await sorgu.OrderByDescending(d => d.KayitTarihi).ToListAsync();
+            return View(liste);
+        }
+
+        // GET: /Dosya/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var dosya = await _db.Dosyalar
+                .Include(d => d.Satislar)
+                .Include(d => d.IptalIade)
+                .FirstOrDefaultAsync(d => d.Id == id);
+            if (dosya == null) return NotFound();
+
+            // Satış Bilgileri tablosundaki "Otopark Ücreti" sütunu, Alıcı Ödeme Bilgileri /
+            // Satış Sonucu Gir ekranlarındakiyle AYNI kademeli (araç kategorisine göre)
+            // hesaplamayı göstermeli - bkz. OtoparkHesaplayici.GercekOtoparkUcreti.
+            ViewBag.GenelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync() ?? new GenelAyar();
+            ViewBag.OtoparkKategoriSozlugu = await _db.AracCinsleri.ToDictionaryAsync(c => c.Ad, c => c.OtoparkKategorisi);
+
+            return View(dosya);
+        }
+
+        // GET: /Dosya/Create
+        public async Task<IActionResult> Create()
+        {
+            await DoldurListeler();
+            var komisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
+
+            // 1. ve 2. Satış tarihleri önce "Yıllık Satış Takvimi"nden (idarenin önceden
+            // belirleyip vergi dairelerine bildirdiği resmi ihale günleri) önerilir: bugünden
+            // sonraki ilk iki takvim tarihi. Takvimde tarih yoksa/yetmiyorsa, eksik olan(lar)
+            // otomatik olarak "önümüzdeki hafta Çarşamba" (1. Satış) ve "1. Satıştan bir
+            // hafta sonrası" (2. Satış) üzerinden - resmi tatiller atlanarak - hesaplanır.
+            // Her iki durumda da bu tarihler yalnızca öneridir; memur formdan elle değiştirebilir.
+            var bugun = DateTime.Today;
+            var sonrakiTarihler = await _db.SatisTarihleri
+                .Where(t => t.Tarih >= bugun)
+                .OrderBy(t => t.Tarih)
+                .Take(2)
+                .Select(t => t.Tarih)
+                .ToListAsync();
+
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            var satis1Onerisi = sonrakiTarihler.Count > 0
+                ? sonrakiTarihler[0]
+                : IhaleTarihHesaplayici.OnumuzdekiHaftaCarsambasi(bugun, resmiTatiller);
+            var satis2Onerisi = sonrakiTarihler.Count > 1
+                ? sonrakiTarihler[1]
+                : IhaleTarihHesaplayici.SonrakiCarsamba(satis1Onerisi.AddDays(7), resmiTatiller);
+
+            var dosya = new Dosya
+            {
+                ModelYili = DateTime.Now.Year,
+                KomisyonBaskani = komisyon?.Baskan,
+                KomisyonUye1 = komisyon?.Uye1,
+                KomisyonUye2 = komisyon?.Uye2,
+                KomisyonUye3 = komisyon?.Uye3,
+                Satis1Tarihi = satis1Onerisi,
+                Satis2Tarihi = satis2Onerisi
+            };
+            return View(dosya);
+        }
+
+        // POST: /Dosya/Create
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Dosya dosya)
+        {
+            if (!ModelState.IsValid)
+            {
+                await DoldurListeler();
+                return View(dosya);
+            }
+
+            dosya.KayitTarihi = DateTime.Now;
+            dosya.Durum = DosyaDurumu.Kayitli;
+
+            // Satış tarihleri formda otomatik hesaplanmış öneri olarak gelir; kullanıcı
+            // gerektiğinde (ör. ihale ertelenirse) elle değiştirebildiği için burada
+            // olduğu gibi (dosya.Satis1Tarihi / Satis2Tarihi) kaydedilir.
+
+            // İki kullanıcı aynı anda yeni dosya kaydederse çakışmaya karşı güvenli -
+            // bkz. SeedData.DosyaNoAtaVeKaydetAsync.
+            await SeedData.DosyaNoAtaVeKaydetAsync(_db, dosya);
+
+            TempData["Basari"] = $"Dosya başarıyla oluşturuldu. Dosya No: {dosya.DosyaNo}";
+            return RedirectToAction(nameof(Details), new { id = dosya.Id });
+        }
+
+        // GET: /Dosya/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var dosya = await _db.Dosyalar.FindAsync(id);
+            if (dosya == null) return NotFound();
+            await DoldurListeler();
+            return View(dosya);
+        }
+
+        // POST: /Dosya/Edit/5
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Dosya guncel)
+        {
+            if (id != guncel.Id) return NotFound();
+
+            var dosya = await _db.Dosyalar.FindAsync(id);
+            if (dosya == null) return NotFound();
+
+            if (!ModelState.IsValid)
+            {
+                await DoldurListeler();
+                return View(guncel);
+            }
+
+            // Dosya no ve kayıt tarihi değiştirilemez; diğer alanlar güncellenir.
+            dosya.VergiDairesiAdi = guncel.VergiDairesiAdi;
+            dosya.VergiDairesiYaziTarihi = guncel.VergiDairesiYaziTarihi;
+            dosya.VergiDairesiYaziSayisi = guncel.VergiDairesiYaziSayisi;
+            dosya.AlacakliVergiDairesi = guncel.AlacakliVergiDairesi;
+            dosya.VergiKimlikNumarasi = guncel.VergiKimlikNumarasi;
+            dosya.TCKimlikNumarasi = guncel.TCKimlikNumarasi;
+            dosya.AdiSoyadiUnvani = guncel.AdiSoyadiUnvani;
+            dosya.KanuniTemsilci = guncel.KanuniTemsilci;
+            dosya.Plaka = guncel.Plaka;
+            dosya.AracCinsi = guncel.AracCinsi;
+            dosya.AracMarkasi = guncel.AracMarkasi;
+            dosya.AracTipi = guncel.AracTipi;
+            dosya.ModelYili = guncel.ModelYili;
+            dosya.Renk = guncel.Renk;
+            dosya.RuhsatVar = guncel.RuhsatVar;
+            dosya.AnahtarVar = guncel.AnahtarVar;
+            dosya.CekiciVar = guncel.CekiciVar;
+            dosya.OtoparkAdi = guncel.OtoparkAdi;
+            dosya.HasarDurumu = guncel.HasarDurumu;
+            dosya.MuhammenBedel = guncel.MuhammenBedel;
+            dosya.KdvOrani = guncel.KdvOrani;
+            dosya.DamgaVergisiOrani = guncel.DamgaVergisiOrani;
+            dosya.OtoparkaGirisTarihi = guncel.OtoparkaGirisTarihi;
+            dosya.KomisyonBaskani = guncel.KomisyonBaskani;
+            dosya.KomisyonUye1 = guncel.KomisyonUye1;
+            dosya.KomisyonUye2 = guncel.KomisyonUye2;
+            dosya.KomisyonUye3 = guncel.KomisyonUye3;
+            dosya.Satis1Tarihi = guncel.Satis1Tarihi;
+            dosya.Satis2Tarihi = guncel.Satis2Tarihi;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = "Dosya güncellendi.";
+            return RedirectToAction(nameof(Details), new { id = dosya.Id });
+        }
+
+        // GET: /Dosya/IhaleTutanagiAra - Dosya No ile İhale Tutanağı'na erişim (Kayıt İşlemleri
+        // ile Satış Sonuçlarını Gir arasındaki adım: ihaleden önce tutanağı yazdırmak için).
+        public IActionResult IhaleTutanagiAra(string? dosyaNo)
+        {
+            ViewBag.DosyaNo = dosyaNo;
+            return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> IhaleTutanagiBul(string dosyaNo)
+        {
+            var dosya = await _db.Dosyalar.FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            if (dosya == null)
+            {
+                TempData["Hata"] = "Bu dosya numarasına ait kayıt bulunamadı.";
+                return RedirectToAction(nameof(IhaleTutanagiAra), new { dosyaNo });
+            }
+            return RedirectToAction(nameof(IhaleTutanagi), new { id = dosya.Id });
+        }
+
+        // İhale Tutanağı - yazdırılabilir resmi belge. "secilenTarih"/"secilenSaat", dosya
+        // Pazarlık/6183-86 aşamasındaysa (bu ikisinin Satış Takvimi'nde sabit bir tarihi
+        // olmadığından) sayfadaki tarih/saat seçim formundan gelir.
+        public async Task<IActionResult> IhaleTutanagi(int id, DateTime? secilenTarih, TimeSpan? secilenSaat)
+        {
+            var dosya = await _db.Dosyalar
+                .Include(d => d.Satislar)
+                .FirstOrDefaultAsync(d => d.Id == id);
+            if (dosya == null) return NotFound();
+
+            var cozum = IhaleTutanagiCozucu.Coz(dosya, secilenTarih);
+            ViewBag.GosterilecekTur = cozum.Tur;
+            ViewBag.GosterilecekTarih = cozum.Tarih;
+            ViewBag.TarihSeciliyor = cozum.TarihSeciliyor;
+
+            // Gösterilecek tür/tarih için kaydedilmiş bir Komisyon Oturumu (bkz. Komisyon
+            // İşlemleri ekranı) varsa, SATIŞ KOMİSYONU imza bloğunda ve saatte ÖNCELİKLE o
+            // oturumun başkan/üyeleri ve saati kullanılır - dosyanın Kayıt anında bir kerelik
+            // kopyalanan eski (Güncellemeler'deki varsayılan komisyon) bilgisi değil. Hiç
+            // oturum kaydedilmemişse o eski kopya bilgiye geri dönülür.
+            var oturumlar = await _db.KomisyonOturumlari
+                .Where(k => k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date)
+                .ToListAsync();
+
+            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(dosya, cozum.Tur, cozum.Tarih, oturumlar, secilenSaat);
+            ViewBag.KomisyonBaskani = komisyon.Baskan;
+            ViewBag.KomisyonUye1 = komisyon.Uye1;
+            ViewBag.KomisyonUye2 = komisyon.Uye2;
+            ViewBag.KomisyonUye3 = komisyon.Uye3;
+            ViewBag.SatisSaati = komisyon.Saat;
+
+            return View(dosya);
+        }
+
+        // Tek bir dosyanın tüm bilgilerini Excel olarak indirir.
+        public async Task<IActionResult> ExcelIndir(int id)
+        {
+            var dosya = await _db.Dosyalar
+                .Include(d => d.Satislar)
+                .Include(d => d.IptalIade)
+                .FirstOrDefaultAsync(d => d.Id == id);
+            if (dosya == null) return NotFound();
+
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Dosya Bilgileri");
+            var satir = 1;
+            void Yaz(string alan, object? deger)
+            {
+                ws.Cell(satir, 1).Value = alan;
+                ws.Cell(satir, 1).Style.Font.Bold = true;
+                ws.Cell(satir, 2).Value = deger?.ToString() ?? "";
+                satir++;
+            }
+            Yaz("Dosya No", dosya.DosyaNo);
+            Yaz("Kayıt Tarihi", dosya.KayitTarihi.ToString("dd.MM.yyyy HH:mm"));
+            Yaz("Vergi Dairesi", dosya.VergiDairesiAdi);
+            Yaz("Alacaklı Vergi Dairesi", dosya.AlacakliVergiDairesi);
+            Yaz("TCKN", dosya.TCKimlikNumarasi);
+            Yaz("VKN", dosya.VergiKimlikNumarasi);
+            Yaz("Adı Soyadı / Unvanı", dosya.AdiSoyadiUnvani);
+            Yaz("Plaka", dosya.Plaka);
+            Yaz("Marka", dosya.AracMarkasi);
+            Yaz("Cins", dosya.AracCinsi);
+            Yaz("Model Yılı", dosya.ModelYili);
+            Yaz("Muhammen Bedel (TL)", dosya.MuhammenBedel);
+            Yaz("Teminat (TL)", dosya.Teminat);
+            Yaz("Damga Vergisi (TL)", dosya.DamgaVergisiTutari);
+            Yaz("Durum", dosya.Durum);
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            stream.Position = 0;
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"Dosya_{dosya.DosyaNo.Replace("/", "_")}.xlsx");
+        }
+
+        private async Task DoldurListeler()
+        {
+            ViewBag.Cinsler = await _db.AracCinsleri.OrderBy(a => a.Ad).ToListAsync();
+            ViewBag.Markalar = await _db.AracMarkalari.OrderBy(a => a.Ad).ToListAsync();
+            ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
+            ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
+
+            // "Model Yılı" listesinin üst sınırı - Güncellemeler ekranından ayarlanır.
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            ViewBag.MaksimumModelYili = genelAyar?.MaksimumModelYili > 0 ? genelAyar.MaksimumModelYili : 2027;
+
+            var vergiDaireleri = await _db.VergiDaireleri.OrderBy(a => a.Sehir).ThenBy(a => a.Ad).ToListAsync();
+
+            // "İlgili Vergi Dairesi" alanı - sadece Ankara'daki vergi daireleri (il seçimine gerek yok).
+            ViewBag.AnkaraVergiDaireleri = vergiDaireleri.Where(v => v.Sehir == "Ankara").OrderBy(v => v.Ad).ToList();
+
+            // "Alacaklı Vergi Dairesi" alanı - Türkiye geneli, il seçimine göre kademeli (cascading).
+            ViewBag.Sehirler = vergiDaireleri.Select(v => v.Sehir).Distinct().OrderBy(s => s).ToList();
+            ViewBag.VergiDaireleriJson = System.Text.Json.JsonSerializer.Serialize(
+                vergiDaireleri.Select(v => new { v.Id, v.Ad, v.Sehir }));
+
+            // "Araç Tipi" alanı - seçilen markaya göre kademeli (cascading) model listesi;
+            // listede olmayan bir model için "Diğer (elle yaz)" seçeneği kullanılır.
+            var aracModelleri = await _db.AracModelleri.OrderBy(m => m.Ad).ToListAsync();
+            ViewBag.AracModelleriJson = System.Text.Json.JsonSerializer.Serialize(
+                aracModelleri.GroupBy(m => m.MarkaAdi).ToDictionary(g => g.Key, g => g.Select(m => m.Ad).ToList()));
+        }
+    }
+}

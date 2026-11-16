@@ -1,0 +1,15 @@
+[
+  { "Ad": "Otomobil", "Kategori": "KucukArac" },
+  { "Ad": "Kamyonet", "Kategori": "MinibusKamyonet" },
+  { "Ad": "Kamyon", "Kategori": "BuyukArac" },
+  { "Ad": "Tır", "Kategori": "BuyukArac" },
+  { "Ad": "Minibüs", "Kategori": "MinibusKamyonet" },
+  { "Ad": "Midibüs", "Kategori": "BuyukArac" },
+  { "Ad": "Otobüs", "Kategori": "BuyukArac" },
+  { "Ad": "Traktör", "Kategori": "BuyukArac" },
+  { "Ad": "Motosiklet", "Kategori": "Motor" },
+  { "Ad": "Çekici", "Kategori": "BuyukArac" },
+  { "Ad": "Römork", "Kategori": "BuyukArac" },
+  { "Ad": "İş Makinesi", "Kategori": "BuyukArac" },
+  { "Ad": "Diğer", "Kategori": "KucukArac" }
+]

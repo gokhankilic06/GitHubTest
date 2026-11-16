@@ -1,0 +1,61 @@
+@using AracSatisSistemi.Controllers
+@{
+    ViewData["Title"] = "Yedekleme";
+    var gunluk = (List<YedeklemeController.YedekDosyasi>)ViewBag.Gunluk;
+    var haftalik = (List<YedeklemeController.YedekDosyasi>)ViewBag.Haftalik;
+    var aylik = (List<YedeklemeController.YedekDosyasi>)ViewBag.Aylik;
+
+    string Boyut(long bayt) => bayt >= 1024 * 1024
+        ? (bayt / 1024.0 / 1024.0).ToString("N1") + " MB"
+        : (bayt / 1024.0).ToString("N0") + " KB";
+}
+<div class="liste-baslik">
+    <i class="bi bi-hdd-stack"></i>
+    <h3>Yedekleme</h3>
+</div>
+
+<div class="alert alert-info">
+    <i class="bi bi-info-circle"></i>
+    Yedekler otomatik olarak alınır, bu ekrandan elle yedek alınmaz: <strong>günlük</strong> (her gün, 30 günden
+    eskisi otomatik silinir), <strong>haftalık</strong> (her Çarşamba akşamı, hiç silinmez) ve
+    <strong>aylık</strong> (her ayın 1'i, hiç silinmez). Aşağıdan mevcut yedekleri bilgisayarınıza indirebilirsiniz.
+</div>
+
+@{
+    void TabloYaz(string baslik, string klasor, List<YedeklemeController.YedekDosyasi> liste)
+    {
+        <div class="card p-3 mb-4">
+            <div class="form-section-title">@baslik (@liste.Count)</div>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr><th>Dosya Adı</th><th>Tarih</th><th>Boyut</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var y in liste)
+                        {
+                            <tr>
+                                <td class="tablo-no">@y.Ad</td>
+                                <td>@y.Tarih.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@Boyut(y.BoyutBayt)</td>
+                                <td>
+                                    <a class="btn btn-sm btn-outline-primary" href="@Url.Action("Indir", "Yedekleme", new { klasor, dosya = y.Ad })">
+                                        <i class="bi bi-download"></i> İndir
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!liste.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted">Henüz yedek yok.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+}
+
+@{ TabloYaz("Günlük Yedekler", "Gunluk", gunluk); }
+@{ TabloYaz("Haftalık Yedekler (Çarşamba)", "Haftalik", haftalik); }
+@{ TabloYaz("Aylık Yedekler", "Aylik", aylik); }

@@ -1,0 +1,127 @@
+@{
+    ViewData["Title"] = "Açılış Ekranı";
+}
+<div class="mb-4">
+    <h2>Araç Satış Programı</h2>
+    <p class="text-muted">Haczedilen araçların kayıt, satış ve takip süreçlerini yönetin</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+    <div class="col-md-4">
+        <a asp-controller="Dosya" asp-action="Create" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-file-earmark-plus"></i></div>
+                <h5>KAYIT İŞLEMLERİ</h5>
+                <p class="text-muted mb-0">Yeni dosya, vergi dairesi, borçlu ve araç bilgisi girişi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Dosya" asp-action="IhaleTutanagiAra" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-file-earmark-text"></i></div>
+                <h5>İHALE TUTANAĞI</h5>
+                <p class="text-muted mb-0">Dosya no ile ihale öncesi yazdırılacak İhale Tutanağı'na ulaşım</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Satis" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-cash-coin"></i></div>
+                <h5>SATIŞ SONUÇLARINI GİR</h5>
+                <p class="text-muted mb-0">İhale sonrası satış türü/tarihine göre araçları bulup sonuç ve alıcı bilgisi girişi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="AliciOdeme" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-person-check"></i></div>
+                <h5>ALICI ÖDEME BİLGİLERİ</h5>
+                <p class="text-muted mb-0">Satılan araçlar için alıcı kimlik, adres, telefon ve ödeme vadesi girişi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Komisyon" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-people-fill"></i></div>
+                <h5>KOMİSYON İŞLEMLERİ</h5>
+                <p class="text-muted mb-0">Satış türü/tarihi/saatine göre komisyon başkanı ve üyelerinin atanması</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="IptalIade" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-arrow-return-left"></i></div>
+                <h5>İADE KAPAMA İŞLEMLERİ</h5>
+                <p class="text-muted mb-0">Satış iptali, iadesi ve dosya kapatma</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Listeler" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-list-check"></i></div>
+                <h5>YAZIŞMALAR VE LİSTELER</h5>
+                <p class="text-muted mb-0">Araç durum listesi, satış sonuç listesi, yazdır / PDF / Excel</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="TutanakRapor" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-clipboard-data"></i></div>
+                <h5>TUTANAK VE RAPORLAR</h5>
+                <p class="text-muted mb-0">Çok kriterli filtreleme, İhale Tutanağı toplu yazdırma/PDF/Excel</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Yazisma" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-envelope-paper"></i></div>
+                <h5>YAZIŞMA</h5>
+                <p class="text-muted mb-0">Dosya no ile borçlu/alıcı/araç ve mali özet bilgilerinin görüntülenmesi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="SatisTakvimi" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-calendar-week"></i></div>
+                <h5>SATIŞ TAKVİMİ</h5>
+                <p class="text-muted mb-0">Yıllık 1. ve 2. Satış (ihale) tarihlerinin belirlenmesi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Istatistik" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-bar-chart-line"></i></div>
+                <h5>İSTATİSTİK</h5>
+                <p class="text-muted mb-0">Tüm kayıt ve satış sonuçlarının yıl/ay/tarih/tür filtreleriyle analizi</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Ayarlar" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-gear"></i></div>
+                <h5>GÜNCELLEMELER</h5>
+                <p class="text-muted mb-0">Komisyon, tarife ve referans listeleri</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-md-4">
+        <a asp-controller="Yedekleme" asp-action="Index" class="text-decoration-none">
+            <div class="card menu-card text-center p-4 h-100">
+                <div class="menu-icon"><i class="bi bi-hdd-stack"></i></div>
+                <h5>YEDEKLEME</h5>
+                <p class="text-muted mb-0">Günlük, haftalık ve aylık otomatik veritabanı yedeklerini görüntüle/indir</p>
+            </div>
+        </a>
+    </div>
+</div>

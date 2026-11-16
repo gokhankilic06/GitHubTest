@@ -1,0 +1,109 @@
+@model Satis
+@{
+    ViewData["Title"] = "Satış Sonucu Gir";
+    var dosya = (Dosya)ViewBag.Dosya;
+    string TurAdi(SatisTuru t) => t switch
+    {
+        SatisTuru.BirinciSatis => "1. Satış",
+        SatisTuru.IkinciSatis => "2. Satış",
+        SatisTuru.Pazarlik => "Pazarlık",
+        SatisTuru.Madde6183_86 => "6183/86 Mad.",
+        _ => t.ToString()
+    };
+}
+<h3>Satış Sonucu Gir</h3>
+
+<form asp-action="SonucGir" method="post" id="sonucForm">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="DosyaId" value="@Model.DosyaId" />
+    <input type="hidden" name="SatisTuru" value="@((int)Model.SatisTuru)" />
+    <input type="hidden" name="SatisTarihi" value="@Model.SatisTarihi.ToString("yyyy-MM-dd")" />
+
+    <div class="card p-3 mb-3">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Dosya No</label>
+                <input class="form-control" value="@dosya.DosyaNo" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Plaka</label>
+                <input class="form-control" value="@dosya.Plaka" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Satış Türü</label>
+                <input class="form-control" value="@TurAdi(Model.SatisTuru)" readonly />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Satış Tarihi</label>
+                <input class="form-control" value="@Model.SatisTarihi.ToString("dd.MM.yyyy")" readonly />
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-3">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label" asp-for="SatisSonucu"></label>
+                <select class="form-select" asp-for="SatisSonucu" id="satisSonucu">
+                    <option value="">-- Seçiniz --</option>
+                    <option value="1">Satıldı</option>
+                    <option value="2">Alıcı Çıkmadı</option>
+                </select>
+            </div>
+            <div class="col-md-3" id="satisBedeliAlani">
+                <label class="form-label" asp-for="SatisBedeli"></label>
+                <div class="input-group">
+                    <input type="hidden" name="SatisBedeli" id="satisBedeli" />
+                    <input class="form-control" type="text" inputmode="decimal" id="satisBedeliGosterim" placeholder="0,00" autocomplete="off" />
+                    <span class="input-group-text">TL</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted small mt-3">
+        Alıcı kimlik/adres bilgileri, otoparka giriş tarihi, çekici bedeli ve otopark ücreti hesaplaması
+        artık bu ekranda değil; satış "Satıldı" olarak kaydedildikten sonra <strong>Alıcı Ödeme Bilgileri</strong>
+        ekranında girilip hesaplanıyor.
+    </p>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> Kaydet</button>
+        <a asp-action="Listele" asp-route-tur="@((int)Model.SatisTuru)" asp-route-tarih="@Model.SatisTarihi.ToString("yyyy-MM-dd")" class="btn btn-outline-secondary">Vazgeç</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        const sonucSelect = document.getElementById('satisSonucu');
+        function bedelAlaniniAyarla() {
+            document.getElementById('satisBedeliAlani').style.display = sonucSelect.value === '1' ? '' : 'none';
+        }
+        sonucSelect.addEventListener('change', bedelAlaniniAyarla);
+        bedelAlaniniAyarla();
+
+        // Satış Bedeli: okunaklı olsun diye yazarken binlik ayraç (nokta) otomatik eklenir
+        // (ör. 300000 -> 300.000); sunucuya gönderilen gerçek değer ayrı bir gizli alanda
+        // her zaman nokta ondalıklı, gruplamasız kalır (bkz. Kayıt İşlemleri'ndeki Muhammen
+        // Bedel ile aynı yöntem).
+        const satisBedeli = document.getElementById('satisBedeli');
+        const satisBedeliGosterim = document.getElementById('satisBedeliGosterim');
+        function satisBedeliGosterimiGuncelle() {
+            const ham = satisBedeliGosterim.value;
+            const ilkVirgul = ham.indexOf(',');
+            let tamKisim = (ilkVirgul === -1 ? ham : ham.slice(0, ilkVirgul)).replace(/\D/g, '');
+            let ondalikKisim = (ilkVirgul === -1 ? '' : ham.slice(ilkVirgul + 1)).replace(/\D/g, '').slice(0, 2);
+
+            const tamSayi = tamKisim === '' ? 0 : parseInt(tamKisim, 10);
+            satisBedeliGosterim.value = tamSayi.toLocaleString('tr-TR') + (ilkVirgul === -1 ? '' : ',' + ondalikKisim);
+            satisBedeli.value = ondalikKisim ? `${tamSayi}.${ondalikKisim}` : `${tamSayi}`;
+        }
+        satisBedeliGosterim.addEventListener('input', satisBedeliGosterimiGuncelle);
+
+        const satisBedeliBaslangic = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SatisBedeli));
+        if (satisBedeliBaslangic) {
+            satisBedeli.value = satisBedeliBaslangic.toString();
+            satisBedeliGosterim.value = satisBedeliBaslangic.toLocaleString('tr-TR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+        }
+    </script>
+}

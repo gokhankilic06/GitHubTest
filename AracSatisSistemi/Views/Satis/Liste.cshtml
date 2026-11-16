@@ -1,0 +1,146 @@
+@model List<Satis>
+@{
+    ViewData["Title"] = "Satış Listesi";
+    var tur = (SatisTuru)ViewBag.Tur;
+    var tarih = (DateTime)ViewBag.Tarih;
+    var turAdiBuyuk = (string)ViewBag.TurAdiBuyuk;
+    var trTR = new System.Globalization.CultureInfo("tr-TR");
+    string MarkaCinsi(Dosya d) => string.IsNullOrWhiteSpace(d.AracTipi)
+        ? $"{d.AracMarkasi} ({d.AracCinsi})"
+        : $"{d.AracMarkasi} / {d.AracTipi} ({d.AracCinsi})";
+    string ParaFormat(decimal deger) => deger.ToString("N2", trTR);
+    string YuzdeFormat(decimal? satisBedeli, decimal muhammenBedel)
+        => (satisBedeli.HasValue && muhammenBedel != 0)
+            ? $"%{(satisBedeli.Value / muhammenBedel * 100m).ToString("N2", trTR)}"
+            : "";
+}
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3 no-print">
+    <h3>Satış Listesi</h3>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-secondary" asp-action="Listele" asp-route-tur="@((int)tur)" asp-route-tarih="@tarih.ToString("yyyy-MM-dd")"><i class="bi bi-arrow-left"></i> Geri</a>
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-success" asp-action="ListeExcelIndir" asp-route-tur="@((int)tur)" asp-route-tarih="@tarih.ToString("yyyy-MM-dd")"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
+    </div>
+</div>
+
+<div id="yazdirAlani" class="yatay-sayfa">
+    <div class="text-center mb-3 pb-2 border-bottom">
+        <h4 class="mb-0 fw-bold">ANKARA DEFTERDARLIĞI</h4>
+        <h5 class="text-muted mb-0">@turAdiBuyuk LİSTESİ&nbsp;&nbsp;@tarih.ToString("dd.MM.yyyy")</h5>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-sm align-middle satis-listesi-tablo">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th>SIRA<br />NO</th>
+                    <th>DOSYA NO</th>
+                    <th>VERGİ DAİRESİ</th>
+                    <th>PLAKA</th>
+                    <th>MODEL</th>
+                    <th>MARKASI/CİNSİ</th>
+                    <th>KDV</th>
+                    <th>MUAMMEN<br />BEDEL</th>
+                    <th>(%) 75</th>
+                    <th>(%) 40</th>
+                    <th>TEMİNAT</th>
+                    <th>SATIŞ<br />SONUCU</th>
+                    <th>SATIŞ<br />BEDELİ</th>
+                    <th>SB/MB %</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ var sira = 1; decimal muhammenToplam = 0m; decimal satisBedeliToplam = 0m; }
+                @foreach (var s in Model)
+                {
+                    var d = s.Dosya!;
+                    muhammenToplam += d.MuhammenBedel;
+                    satisBedeliToplam += s.SatisBedeli ?? 0m;
+                    <tr>
+                        <td class="text-center">@sira</td>
+                        <td>@d.DosyaNo</td>
+                        <td>@d.VergiDairesiAdi</td>
+                        <td>@d.Plaka</td>
+                        <td class="text-center">@d.ModelYili</td>
+                        <td>@MarkaCinsi(d)</td>
+                        <td class="text-center">%@d.KdvOrani</td>
+                        <td class="text-end">@ParaFormat(d.MuhammenBedel)</td>
+                        <td class="text-end">@ParaFormat(d.MuhammenBedel * 0.75m)</td>
+                        <td class="text-end">@ParaFormat(d.MuhammenBedel * 0.40m)</td>
+                        <td class="text-end">@ParaFormat(d.Teminat)</td>
+                        <td>@s.SatisTuruGorunen @s.SonucGorunen</td>
+                        <td class="text-end">@(s.SatisBedeli.HasValue ? ParaFormat(s.SatisBedeli.Value) : "")</td>
+                        <td class="text-end">@YuzdeFormat(s.SatisBedeli, d.MuhammenBedel)</td>
+                    </tr>
+                    sira++;
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="14" class="text-center text-muted">Bu tarihte / türde girilmiş satış sonucu bulunamadı.</td></tr>
+                }
+            </tbody>
+            @if (Model.Any())
+            {
+                <tfoot class="table-light fw-bold">
+                    <tr>
+                        <td colspan="7" class="text-end">TOPLAM</td>
+                        <td class="text-end">@ParaFormat(muhammenToplam)</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td class="text-end">@ParaFormat(satisBedeliToplam)</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            }
+        </table>
+    </div>
+</div>
+
+<style>
+    /* Bu liste çok sütunlu geniş bir tablo olduğundan (İhale Tutanağı/Satış Detayları'nın
+       aksine) dikey değil yatay (A4 enine) kalır; sadece ekranda/çıktıda kenarlarda
+       makul bir boşluk bırakan hafif bir "sayfa" görünümü eklenir. */
+    .yatay-sayfa {
+        background: #fff;
+        padding: 28px 34px;
+        border: 1px solid #dee2e6;
+    }
+    @@media print {
+        .yatay-sayfa { border: none; padding: 0; }
+    }
+    .satis-listesi-tablo { font-size: 0.82rem; }
+    .satis-listesi-tablo th { vertical-align: middle; font-weight: 700; }
+    .satis-listesi-tablo td, .satis-listesi-tablo th { padding: .45rem .5rem; }
+    .satis-listesi-tablo tfoot td { font-size: 0.85rem; }
+</style>
+
+@section Scripts {
+    <script>
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('yazdirAlani');
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('l', 'mm', 'a4');
+                const kenarBosluk = 8; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
+                const genislik = 297 - (2 * kenarBosluk);
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
+                devamEt(pdf);
+            });
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('SatisListesi_@(turAdiBuyuk.Replace("/", "-").Replace(" ", ""))_@(tarih.ToString("yyyyMMdd")).pdf'));
+        }
+
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+    </script>
+}

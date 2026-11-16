@@ -1,0 +1,245 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using AracSatisSistemi.Data;
+using AracSatisSistemi.Models;
+
+namespace AracSatisSistemi.Controllers
+{
+    public class IptalIadeController : Controller
+    {
+        private readonly AppDbContext _db;
+        public IptalIadeController(AppDbContext db) => _db = db;
+
+        // GET: /IptalIade - Dosya Kapama ve Satış İptali/İadesi için iki liste.
+        public async Task<IActionResult> Index()
+        {
+            ViewBag.AktifDosyalar = await _db.Dosyalar
+                .Include(d => d.Satislar)
+                .Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti)
+                .OrderByDescending(d => d.KayitTarihi)
+                .ToListAsync();
+
+            var satilmisDosyalar = await _db.Dosyalar
+                .Include(d => d.Satislar)
+                .Where(d => d.Durum == DosyaDurumu.Satildi)
+                .OrderByDescending(d => d.KayitTarihi)
+                .ToListAsync();
+            ViewBag.SatilmisDosyalar = satilmisDosyalar;
+
+            // Alıcının (bize gelip "Alıcı Ödeme Bilgileri" kaydını yaptırdıktan sonra)
+            // ilgili vergi dairesindeki işlemlerini tamamlaması için verilen 3 iş günlük
+            // sürenin son günü - bu bilgi süresi geçmiş ama henüz kapatılmamış dosyaları
+            // ekranda işaretleyip memura hatırlatmak için kullanılır (bkz. AliciSuresindeGitmedi).
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            var sonGunler = new Dictionary<int, DateTime>();
+            foreach (var d in satilmisDosyalar)
+            {
+                var satis = d.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+                if (satis != null)
+                {
+                    sonGunler[d.Id] = IhaleTarihHesaplayici.IsGunuEkle(satis.SatisTarihi, 3, resmiTatiller);
+                }
+            }
+            ViewBag.SonGunler = sonGunler;
+
+            return View();
+        }
+
+        // POST: /IptalIade/AliciSuresindeGitmedi - Alıcı bize gelip "Alıcı Ödeme Bilgileri"ni
+        // kaydettirmiş (dosya bu yüzden Pasif/Satıldı durumda) ama memur, kendi sorgulama
+        // sisteminden alıcının ilgili vergi dairesindeki işlemlerini 3 iş günü içinde
+        // tamamlamadığını tespit etmiştir. Bu buton o tespite dayanarak satışı "Alıcı
+        // İşlem Yapmadı"ya çevirir; dosya böylece Dosya.Asama'nın gösterdiği bir sonraki
+        // aşamanın (2. Satış veya doğrudan 6183/86 Tek Satış) listesinde yer alır.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AliciSuresindeGitmedi(int dosyaId)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.Satislar).FirstOrDefaultAsync(d => d.Id == dosyaId);
+            if (dosya == null) return NotFound();
+
+            var satis = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+            if (satis == null)
+            {
+                TempData["Hata"] = "Bu dosya için \"Satıldı\" sonuçlanmış bir satış kaydı bulunamadı.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            // SatisBedeli BİLEREK silinmiyor: kazanılmış ama tamamlanmamış bir ihalenin bedeli,
+            // İki İhale Arası Fark hesabı ve (süreç 6183/86'da da satılamazsa) Alıcıya Terk
+            // formunun otomatik dolması için saklanması gerekir.
+            satis.SatisSonucu = SatisSonucu.AliciIslemYapmadi;
+            dosya.Durum = DosyaDurumu.SatisaCikti;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"{dosya.DosyaNo} nolu dosya, alıcı süresinde ilgili vergi dairesine gitmediği için bir sonraki aşamaya alındı.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /IptalIade/AliciyaTerk?dosyaId=.. - 6183 sayılı Kanun Md. 85/86 uyarınca,
+        // ihaleyi kazanıp işlemini tamamlamayan alıcıya aracın resen terk edilmesi formu.
+        // Yalnızca Dosya.Asama == AliciyaTerkBekliyor olduğunda (bkz. Dosya.cs) uygundur.
+        public async Task<IActionResult> AliciyaTerk(int dosyaId)
+        {
+            var dosya = await _db.Dosyalar
+                .Include(d => d.Satislar)
+                .Include(d => d.IptalIade)
+                .FirstOrDefaultAsync(d => d.Id == dosyaId);
+            if (dosya == null) return NotFound();
+
+            var ilgiliSatis = dosya.TerkEdilecekSatis;
+            if (ilgiliSatis == null)
+            {
+                TempData["Hata"] = "Bu dosya şu anda \"Alıcıya Terk\" işlemi için uygun durumda değil.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.Dosya = dosya;
+            ViewBag.IlgiliSatis = ilgiliSatis;
+
+            var kayit = dosya.IptalIade ?? new IptalIade { DosyaId = dosyaId };
+            kayit.TerkTarihi ??= DateTime.Today;
+            if (string.IsNullOrWhiteSpace(kayit.TerkEdilenAdiSoyadi)) kayit.TerkEdilenAdiSoyadi = ilgiliSatis.AliciAdiSoyadi;
+            if (string.IsNullOrWhiteSpace(kayit.TerkEdilenKimlikNo)) kayit.TerkEdilenKimlikNo = ilgiliSatis.AliciVKN ?? ilgiliSatis.AliciTCKN;
+            if (string.IsNullOrWhiteSpace(kayit.TerkEdilenSatisTuru)) kayit.TerkEdilenSatisTuru = ilgiliSatis.SatisTuruGorunen;
+            kayit.TerkTutari ??= ilgiliSatis.SatisBedeli;
+
+            return View(kayit);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> AliciyaTerk(IptalIade form)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.IptalIade).FirstOrDefaultAsync(d => d.Id == form.DosyaId);
+            if (dosya == null) return NotFound();
+
+            if (dosya.IptalIade == null)
+            {
+                form.AliciyaTerkSecildi = true;
+                dosya.IptalIade = form;
+                _db.IptalIadeler.Add(form);
+            }
+            else
+            {
+                var kayit = dosya.IptalIade;
+                kayit.AliciyaTerkSecildi = true;
+                kayit.TerkTarihi = form.TerkTarihi;
+                kayit.TerkEdilenAdiSoyadi = form.TerkEdilenAdiSoyadi;
+                kayit.TerkEdilenKimlikNo = form.TerkEdilenKimlikNo;
+                kayit.TerkEdilenSatisTuru = form.TerkEdilenSatisTuru;
+                kayit.TerkTutari = form.TerkTutari;
+                kayit.TerkAciklama = form.TerkAciklama;
+            }
+
+            dosya.Durum = DosyaDurumu.AliciyaTerkEdildi;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"{dosya.DosyaNo} nolu dosya için Alıcıya Terk işlemi kaydedildi.";
+            return RedirectToAction("Details", "Dosya", new { id = dosya.Id });
+        }
+
+        // POST: /IptalIade/Kapat - Aktif bir dosyayı doğrudan (onay sonrası) kapatır.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Kapat(int dosyaId)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.IptalIade).FirstOrDefaultAsync(d => d.Id == dosyaId);
+            if (dosya == null) return NotFound();
+
+            if (dosya.IptalIade == null)
+            {
+                dosya.IptalIade = new IptalIade { DosyaId = dosyaId, DosyaKapatildi = true };
+                _db.IptalIadeler.Add(dosya.IptalIade);
+            }
+            else
+            {
+                dosya.IptalIade.DosyaKapatildi = true;
+            }
+            dosya.Durum = DosyaDurumu.Kapandi;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"{dosya.DosyaNo} nolu dosya kapatıldı.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: /IptalIade/Islem?dosyaId=.. - Satılmış bir dosya için iptal/iade formu.
+        public async Task<IActionResult> Islem(int dosyaId)
+        {
+            var dosya = await _db.Dosyalar
+                .Include(d => d.IptalIade)
+                .Include(d => d.Satislar)
+                .FirstOrDefaultAsync(d => d.Id == dosyaId);
+            if (dosya == null) return NotFound();
+
+            var satilanKayit = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+            ViewBag.Dosya = dosya;
+            ViewBag.SatilanKayit = satilanKayit;
+
+            var kayit = dosya.IptalIade ?? new IptalIade { DosyaId = dosyaId };
+            if (kayit.IadeTutari == null && satilanKayit != null)
+            {
+                kayit.IadeTutari = satilanKayit.SatisBedeli;
+            }
+            return View(kayit);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Islem(IptalIade form)
+        {
+            var dosya = await _db.Dosyalar
+                .Include(d => d.IptalIade)
+                .Include(d => d.Satislar)
+                .FirstOrDefaultAsync(d => d.Id == form.DosyaId);
+            if (dosya == null) return NotFound();
+
+            // Satış iptal ediliyorsa: o satışın (dosyayı Satıldı yapan kaydın) özeti
+            // kalıcı olarak IptalIade'ye kopyalanır, ardından o Satış kaydı silinir -
+            // böylece dosya, "Satış Sonuçlarını Gir" ekranında bu tür için yeniden
+            // (Alıcı Çıkmadı imiş gibi) satışa çıkabilir hale gelir.
+            if (form.SatisIptaliSecildi)
+            {
+                var satilanKayit = dosya.Satislar.FirstOrDefault(s => s.SatisSonucu == SatisSonucu.Satildi);
+                if (satilanKayit != null)
+                {
+                    form.IptalEdilenSatisTuru = satilanKayit.SatisTuruGorunen;
+                    form.IptalEdilenSatisBedeli = satilanKayit.SatisBedeli;
+                    form.IptalEdilenAliciAdiSoyadi = satilanKayit.AliciAdiSoyadi;
+                    if (form.IadeTutari == null) form.IadeTutari = satilanKayit.SatisBedeli;
+                    _db.Satislar.Remove(satilanKayit);
+                }
+            }
+
+            if (dosya.IptalIade == null)
+            {
+                dosya.IptalIade = form;
+                _db.IptalIadeler.Add(form);
+            }
+            else
+            {
+                var kayit = dosya.IptalIade;
+                kayit.SatisIptaliSecildi = form.SatisIptaliSecildi;
+                kayit.IptalYaziTarihi = form.IptalYaziTarihi;
+                kayit.IptalYaziSayisi = form.IptalYaziSayisi;
+                kayit.IptalNedeni = form.IptalNedeni;
+                kayit.IptalEdilenSatisTuru = form.IptalEdilenSatisTuru ?? kayit.IptalEdilenSatisTuru;
+                kayit.IptalEdilenSatisBedeli = form.IptalEdilenSatisBedeli ?? kayit.IptalEdilenSatisBedeli;
+                kayit.IptalEdilenAliciAdiSoyadi = form.IptalEdilenAliciAdiSoyadi ?? kayit.IptalEdilenAliciAdiSoyadi;
+                kayit.SatisIadesiSecildi = form.SatisIadesiSecildi;
+                kayit.IadeYaziTarihi = form.IadeYaziTarihi;
+                kayit.IadeYaziSayisi = form.IadeYaziSayisi;
+                kayit.IadeNedeni = form.IadeNedeni;
+                kayit.IadeTutari = form.IadeTutari;
+                kayit.DosyaKapatildi = form.DosyaKapatildi;
+                kayit.KapatmaVergiDairesiYaziTarihi = form.KapatmaVergiDairesiYaziTarihi;
+                kayit.KapatmaVergiDairesiYaziSayisi = form.KapatmaVergiDairesiYaziSayisi;
+            }
+
+            // Satış iptal edildiğinde dosya PASİF değil AKTİF'e döner (yeniden satışa
+            // çıkabilsin); dosya doğrudan kapatılıyorsa bu durumun önüne geçer.
+            if (form.SatisIptaliSecildi) dosya.Durum = DosyaDurumu.SatisaCikti;
+            if (form.DosyaKapatildi) dosya.Durum = DosyaDurumu.Kapandi;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = "İşlem kaydedildi.";
+            return RedirectToAction("Details", "Dosya", new { id = dosya.Id });
+        }
+    }
+}

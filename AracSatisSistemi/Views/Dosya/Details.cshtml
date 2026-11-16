@@ -1,0 +1,280 @@
+@using AracSatisSistemi.Data
+@model Dosya
+@{
+    ViewData["Title"] = "Dosya Detayı";
+    var dosyaNoTemiz = Model.DosyaNo.Replace("/", "_");
+    var genelAyar = (GenelAyar)ViewBag.GenelAyar;
+    var otoparkKategoriSozlugu = (Dictionary<string, OtoparkAracKategorisi>)ViewBag.OtoparkKategoriSozlugu;
+    // Alıcı Ödeme Bilgileri kaydedilince (satis.VerilenSure dolar - bkz. AliciOdemeController.Gir
+    // POST) "Planlanan İhale Tarihleri" artık anlamsızdır (satış zaten gerçekleşmiştir); bu
+    // noktadan sonra gösterilmez.
+    var aliciOdemeKaydedildi = Model.Satislar.Any(s => s.SatisSonucu == SatisSonucu.Satildi && s.VerilenSure.HasValue);
+}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h3>Dosya No: @Model.DosyaNo <span class="badge bg-secondary">@Model.DurumGorunenAd</span></h3>
+    <div class="d-flex flex-wrap gap-2">
+        <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model.Id"><i class="bi bi-pencil"></i> Düzenle</a>
+        <a class="btn btn-outline-dark" asp-controller="Satis" asp-action="DosyaIcinYonlendir" asp-route-dosyaId="@Model.Id"><i class="bi bi-cash-coin"></i> Satış Sonucu Gir</a>
+        @if (Model.Durum == DosyaDurumu.Satildi)
+        {
+            <a class="btn btn-outline-dark" asp-controller="AliciOdeme" asp-action="Goster" asp-route-dosyaId="@Model.Id"><i class="bi bi-person-check"></i> Alıcı Ödeme Bilgileri</a>
+        }
+        <a class="btn btn-outline-danger" asp-controller="IptalIade" asp-action="Islem" asp-route-dosyaId="@Model.Id"><i class="bi bi-arrow-return-left"></i> İptal / İade / Kapama</a>
+        <a class="btn btn-outline-dark" asp-action="IhaleTutanagi" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-text"></i> İhale Tutanağı</a>
+        <a class="btn btn-outline-dark" asp-controller="Yazisma" asp-action="Index" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-envelope-paper"></i> Yazışma</a>
+        <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="Sorgu" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-search"></i> Sorgu</a>
+        @if (Model.Durum == DosyaDurumu.Satildi)
+        {
+            <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="SatisKarari" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-file-earmark-check"></i> Satış Kararı</a>
+        }
+        <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
+        <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-success" asp-action="ExcelIndir" asp-route-id="@Model.Id"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
+    </div>
+</div>
+
+<div id="yazdirAlani" class="a4-sayfa">
+<div class="letterhead mb-3 pb-2 d-flex align-items-start">
+    <div style="width:90px;"></div>
+    <div class="text-center flex-grow-1">
+        <h4 class="mb-0 fw-bold text-nowrap">ANKARA DEFTERDARLIĞI</h4>
+        <div class="text-muted">Araç Kayıt Belgesi</div>
+    </div>
+    <div class="text-end small text-muted" style="width:90px;">@Model.KayitTarihi.ToString("dd.MM.yyyy")</div>
+</div>
+
+<div class="belge-bolumu">
+    <div class="d-flex flex-wrap gap-3">
+        <div class="kimlik-kutu">
+            <span class="kimlik-etiket">Dosya No:</span>
+            <span class="kimlik-deger">@Model.DosyaNo</span>
+        </div>
+        <div class="kimlik-kutu">
+            <span class="kimlik-etiket">Durum:</span>
+            <span class="durum-rozet durum-@Model.Durum">@Model.DurumGorunenAd</span>
+        </div>
+        <div class="kimlik-kutu">
+            <span class="kimlik-etiket">Aşama:</span>
+            <span class="badge @Model.AsamaRozetSinifi">@Model.AsamaGorunen</span>
+        </div>
+    </div>
+</div>
+
+<div class="belge-bolumu">
+    <div class="form-section-title">İlgili Vergi Dairesi</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">Vergi Dairesi Adı</td><td colspan="3">@Model.VergiDairesiAdi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Vergi Dairesi Yazısı Tarihi</td><td>@Model.VergiDairesiYaziTarihi?.ToString("dd.MM.yyyy")</td>
+            <td class="etiket">Vergi Dairesi Yazısı Sayısı</td><td>@Model.VergiDairesiYaziSayisi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Alacaklı Vergi Dairesi</td><td colspan="3">@Model.AlacakliVergiDairesi</td>
+        </tr>
+    </table>
+</div>
+
+<div class="belge-bolumu">
+    <div class="form-section-title">Borçlu Mükellef</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">Adı Soyadı / Unvanı</td><td colspan="3">@Model.AdiSoyadiUnvani</td>
+        </tr>
+        <tr>
+            <td class="etiket">T.C. Kimlik No</td><td>@Model.TCKimlikNumarasi</td>
+            <td class="etiket">Vergi Kimlik No</td><td>@Model.VergiKimlikNumarasi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Kanuni Temsilci</td><td colspan="3">@Model.KanuniTemsilci</td>
+        </tr>
+    </table>
+</div>
+
+<div class="belge-bolumu">
+    <div class="form-section-title">Araç Bilgileri</div>
+    <table class="detay-tablo">
+        <tr>
+            <td class="etiket">Plaka</td><td>@Model.Plaka</td>
+            <td class="etiket">Markası</td><td>@Model.AracMarkasi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Cinsi</td><td>@Model.AracCinsi</td>
+            <td class="etiket">Tipi</td><td>@Model.AracTipi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Model Yılı</td><td>@Model.ModelYili</td>
+            <td class="etiket">Renk</td><td>@Model.Renk</td>
+        </tr>
+        <tr>
+            <td class="etiket">Ruhsat</td><td>@(Model.RuhsatVar ? "VAR" : "YOK")</td>
+            <td class="etiket">Anahtar</td><td>@(Model.AnahtarVar ? "VAR" : "YOK")</td>
+        </tr>
+        <tr>
+            <td class="etiket">Çekici</td><td>@(Model.CekiciVar ? "VAR" : "YOK")</td>
+            <td class="etiket">Otopark</td><td>@Model.OtoparkAdi</td>
+        </tr>
+        <tr>
+            <td class="etiket">Otoparka Giriş Tarihi</td><td>@Model.OtoparkaGirisTarihi?.ToString("dd.MM.yyyy")</td>
+            <td class="etiket">Hasar Durumu</td><td>@Model.HasarDurumu</td>
+        </tr>
+        <tr>
+            <td class="etiket">Muhammen Bedel</td><td>@Model.MuhammenBedel.ToString("N2") TL</td>
+            <td class="etiket">Teminat (%5)</td><td>@Model.Teminat.ToString("N2") TL</td>
+        </tr>
+        <tr>
+            <td class="etiket">KDV Oranı</td><td>%@Model.KdvOrani</td>
+            <td class="etiket">Damga Vergisi (Binde @Model.DamgaVergisiOrani.ToString("0.00"))</td><td>@Model.DamgaVergisiTutari.ToString("N2") TL</td>
+        </tr>
+    </table>
+</div>
+
+@if (!aliciOdemeKaydedildi)
+{
+    <div class="belge-bolumu">
+        <div class="form-section-title">Planlanan İhale Tarihleri</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">1. Satış Tarihi</td><td>@Model.Satis1Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
+                <td class="etiket">2. Satış Tarihi</td><td>@Model.Satis2Tarihi.ToString("dd.MM.yyyy (dddd)", new System.Globalization.CultureInfo("tr-TR"))</td>
+            </tr>
+        </table>
+    </div>
+}
+
+@if (Model.Satislar.Any())
+{
+    <div class="belge-bolumu">
+        <div class="form-section-title">Satış Bilgileri</div>
+        <table class="satis-tablo">
+            <thead>
+                <tr>
+                    <th>Tür</th><th>Tarih</th><th>Sonuç</th><th>Bedel (TL)</th><th>Vade</th><th>Otopark Ücreti (TL)</th><th class="no-print"></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var s in Model.Satislar)
+            {
+                <tr>
+                    <td>@s.SatisTuruGorunen</td>
+                    <td>@s.SatisTarihi.ToString("dd.MM.yyyy")</td>
+                    <td>@s.SonucGorunen</td>
+                    <td>@(s.SatisBedeli?.ToString("N2") ?? "-")</td>
+                    <td>@s.Vade.ToString("dd.MM.yyyy")</td>
+                    <td>@OtoparkHesaplayici.GercekOtoparkUcreti(s, Model.AracCinsi, otoparkKategoriSozlugu, genelAyar).ToString("N2")</td>
+                    <td class="no-print"><a class="btn btn-sm btn-outline-primary" asp-controller="Satis" asp-action="Edit" asp-route-id="@s.Id">Düzenle</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (Model.IkiIhaleArasiFark.HasValue)
+{
+    <div class="alert alert-warning">
+        <strong>İki İhale Arası Fark:</strong> @Model.IkiIhaleArasiFark.Value.FarkTutari.ToString("N2") TL,
+        @Model.IkiIhaleArasiFark.Value.KimdenTahsilEdilecek adlı kişiden (ihaleyi kazanıp işlem yapmadığı için)
+        tahsil edilmesi gerekmektedir (6183 sayılı Kanun Md. 85/86).
+    </div>
+}
+
+@if (Model.IptalIade != null && Model.IptalIade.AliciyaTerkSecildi)
+{
+    <div class="belge-bolumu">
+        <div class="form-section-title">Alıcıya Terk (6183 sayılı Kanun Md. 85/86)</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">Terk Tarihi</td><td>@(Model.IptalIade.TerkTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                <td class="etiket">Terk Edilen Kişi</td><td>@Model.IptalIade.TerkEdilenAdiSoyadi</td>
+            </tr>
+            <tr>
+                <td class="etiket">T.C. Kimlik / VKN</td><td>@Model.IptalIade.TerkEdilenKimlikNo</td>
+                <td class="etiket">İlgili Satış Türü</td><td>@Model.IptalIade.TerkEdilenSatisTuru</td>
+            </tr>
+            <tr>
+                <td class="etiket">Terk Tutarı</td><td>@(Model.IptalIade.TerkTutari?.ToString("N2") ?? "-") TL</td>
+                <td class="etiket">Açıklama</td><td>@Model.IptalIade.TerkAciklama</td>
+            </tr>
+        </table>
+    </div>
+}
+
+@if (Model.IptalIade != null && (Model.IptalIade.SatisIptaliSecildi || Model.IptalIade.SatisIadesiSecildi || Model.IptalIade.DosyaKapatildi))
+{
+    <div class="belge-bolumu">
+        <div class="form-section-title">İptal / İade / Kapama</div>
+        <table class="detay-tablo">
+            <tr>
+                <td class="etiket">Satış İptali</td><td>@(Model.IptalIade.SatisIptaliSecildi ? "Evet" : "Hayır")</td>
+                <td class="etiket">Satış İadesi</td><td>@(Model.IptalIade.SatisIadesiSecildi ? "Evet" : "Hayır")</td>
+                <td class="etiket">Dosya Kapatıldı</td><td>@(Model.IptalIade.DosyaKapatildi ? "Evet" : "Hayır")</td>
+            </tr>
+            @if (Model.IptalIade.SatisIptaliSecildi)
+            {
+                <tr>
+                    <td class="etiket">İptal Edilen Satış</td>
+                    <td>@Model.IptalIade.IptalEdilenSatisTuru - @(Model.IptalIade.IptalEdilenSatisBedeli?.ToString("N2") ?? "-") TL</td>
+                    <td class="etiket">İptal Edilen Alıcı</td>
+                    <td>@Model.IptalIade.IptalEdilenAliciAdiSoyadi</td>
+                    <td class="etiket">İptal Nedeni</td>
+                    <td>@Model.IptalIade.IptalNedeni</td>
+                </tr>
+            }
+            @if (Model.IptalIade.SatisIadesiSecildi)
+            {
+                <tr>
+                    <td class="etiket">İade Edilecek Tutar</td>
+                    <td>@(Model.IptalIade.IadeTutari?.ToString("N2") ?? "-") TL</td>
+                    <td class="etiket">İade Tarihi</td>
+                    <td>@(Model.IptalIade.IadeYaziTarihi?.ToString("dd.MM.yyyy") ?? "-")</td>
+                    <td class="etiket">İade Nedeni</td>
+                    <td>@Model.IptalIade.IadeNedeni</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+
+</div>
+
+<a class="btn btn-secondary mt-3 no-print" asp-action="Index">&larr; Listeye Dön</a>
+
+@section Scripts {
+    <script>
+        // Yakalamadan önce ".no-print" öğelerini (ör. Düzenle butonları) geçici gizler,
+        // canvas'ı üretir, sonra öğeleri geri gösterir. Ortak yardımcı fonksiyon.
+        function _pdfUret(devamEt) {
+            const alan = document.getElementById('yazdirAlani');
+            const gizlenecekler = alan.querySelectorAll('.no-print');
+            gizlenecekler.forEach(el => el.style.display = 'none');
+            html2canvas(alan, { scale: 2 }).then(canvas => {
+                gizlenecekler.forEach(el => el.style.display = '');
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const kenarBosluk = 10; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
+                const genislik = 210 - (2 * kenarBosluk);
+                const yukseklik = (canvas.height * genislik) / canvas.width;
+                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
+                devamEt(pdf);
+            }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
+        }
+
+        function pdfOlarakKaydet() {
+            _pdfUret(pdf => pdf.save('Dosya_@(dosyaNoTemiz).pdf'));
+        }
+
+        // Tarayıcının "Yazdır" penceresi tarih/saat, sayfa başlığı ve adres gibi kendi
+        // üstbilgi/altbilgisini sayfaya ekler ve bu, sayfa CSS'i ile kapatılamaz. Bunu
+        // tamamen atlamak için önce temiz bir PDF üretilip yeni sekmede açılıyor ve o
+        // PDF'in kendi yazdırma penceresi otomatik tetikleniyor - bu şekilde tarayıcı
+        // üstbilgisi hiç eklenmiyor.
+        function yazdirTemiz() {
+            _pdfUret(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+    </script>
+}

@@ -1,0 +1,181 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace AracSatisSistemi.Models
+{
+    // "Güncellemeler" ekranından yönetilebilen basit referans listeleri.
+    // Bu sayede araç markası / cinsi / vergi dairesi / otopark listeleri
+    // koda dokunmadan eklenip çıkarılabilir.
+
+    public class AracMarkasi
+    {
+        public int Id { get; set; }
+        [Required] public string Ad { get; set; } = string.Empty;
+    }
+
+    // Bir markaya bağlı model/tip adı (ör. Volkswagen -> Golf, Tiguan). "Güncellemeler"
+    // ekranından marka bazında eklenip çıkarılır; Kayıt İşlemleri ekranında araç markası
+    // seçilince o markanın modelleri açılır listede gösterilir ("Diğer" seçilirse elle
+    // yazılabilir - bkz. Dosya.AracTipi, hâlâ serbest metin olarak saklanır).
+    public class AracModeli
+    {
+        public int Id { get; set; }
+        [Required, Display(Name = "Markası")] public string MarkaAdi { get; set; } = string.Empty;
+        [Required, Display(Name = "Modeli")] public string Ad { get; set; } = string.Empty;
+    }
+
+    public class AracCinsi
+    {
+        public int Id { get; set; }
+        [Required] public string Ad { get; set; } = string.Empty;
+
+        // Otopark ücret tarifesinde hangi kategoriye (Küçük Araç / Minibüs-Kamyonet /
+        // Büyük Araç / Motor) girdiği. Alıcı Ödeme Bilgileri ekranındaki otopark ücreti
+        // hesaplamasında kullanılır.
+        [Display(Name = "Otopark Ücret Kategorisi")]
+        public OtoparkAracKategorisi OtoparkKategorisi { get; set; } = OtoparkAracKategorisi.KucukArac;
+    }
+
+    public class VergiDairesiKaydi
+    {
+        public int Id { get; set; }
+        [Required] public string Ad { get; set; } = string.Empty;
+        [Required] public string Sehir { get; set; } = string.Empty;
+    }
+
+    public class OtoparkKaydi
+    {
+        public int Id { get; set; }
+        [Required] public string Ad { get; set; } = string.Empty;
+    }
+
+    public class AracRengi
+    {
+        public int Id { get; set; }
+        [Required] public string Ad { get; set; } = string.Empty;
+    }
+
+    // Komisyon üyeleri - tek satırlık ayar; her yeni dosyada bu bilgiler
+    // otomatik gelir, güncelleme yetkisi olan kullanıcı burayı değiştirebilir.
+    public class KomisyonAyari
+    {
+        public int Id { get; set; }
+        [Display(Name = "Komisyon Başkanı")] public string Baskan { get; set; } = string.Empty;
+        [Display(Name = "Üye 1")] public string Uye1 { get; set; } = string.Empty;
+        [Display(Name = "Üye 2")] public string Uye2 { get; set; } = string.Empty;
+        [Display(Name = "Üye 3")] public string Uye3 { get; set; } = string.Empty;
+    }
+
+    // Genel sistem ayarları (günlük otopark ücreti gibi elden verilen tarifeler)
+    public class GenelAyar
+    {
+        public int Id { get; set; }
+
+        // ---- KADEMELİ OTOPARK ÜCRET TARİFESİ (araç kategorisi + süreye göre) ----
+        // İlk 180 gün (6 ay) "6 Aya Kadar" tarifesi, sonraki günler "6 Aydan Sonra"
+        // (genelde ilkin yarısı) tarifesi üzerinden hesaplanır.
+        [Display(Name = "Küçük Araç - 6 Aya Kadar (TL/gün)")]
+        public decimal KucukArac6AyaKadar { get; set; }
+        [Display(Name = "Küçük Araç - 6 Aydan Sonra (TL/gün)")]
+        public decimal KucukArac6AydanSonra { get; set; }
+
+        [Display(Name = "Minibüs/Kamyonet - 6 Aya Kadar (TL/gün)")]
+        public decimal MinibusKamyonet6AyaKadar { get; set; }
+        [Display(Name = "Minibüs/Kamyonet - 6 Aydan Sonra (TL/gün)")]
+        public decimal MinibusKamyonet6AydanSonra { get; set; }
+
+        [Display(Name = "Büyük Araç/Kamyon/Tır - 6 Aya Kadar (TL/gün)")]
+        public decimal BuyukArac6AyaKadar { get; set; }
+        [Display(Name = "Büyük Araç/Kamyon/Tır - 6 Aydan Sonra (TL/gün)")]
+        public decimal BuyukArac6AydanSonra { get; set; }
+
+        [Display(Name = "Motor - 6 Aya Kadar (TL/gün)")]
+        public decimal Motor6AyaKadar { get; set; }
+        [Display(Name = "Motor - 6 Aydan Sonra (TL/gün)")]
+        public decimal Motor6AydanSonra { get; set; }
+
+        // ---- ÇEKİCİ ÜCRETİ (araç kategorisine göre, otopark tarifesi gibi kademeli değil sabit) ----
+        [Display(Name = "Küçük Araç - Çekici Ücreti (TL)")]
+        public decimal KucukAracCekiciUcreti { get; set; }
+        [Display(Name = "Minibüs/Kamyonet - Çekici Ücreti (TL)")]
+        public decimal MinibusKamyonetCekiciUcreti { get; set; }
+        [Display(Name = "Büyük Araç/Kamyon/Tır - Çekici Ücreti (TL)")]
+        public decimal BuyukAracCekiciUcreti { get; set; }
+        [Display(Name = "Motor - Çekici Ücreti (TL)")]
+        public decimal MotorCekiciUcreti { get; set; }
+
+        // Kayıt İşlemleri/Dosya Düzenle ekranlarındaki "Model Yılı" listesinin üst sınırı.
+        // Yıl ilerledikçe burada artırılabilir; kodda sabit bir tarih kalmaz.
+        [Display(Name = "Model Yılı Üst Sınırı")]
+        public int MaksimumModelYili { get; set; } = 2027;
+
+        // "Kayıt Ol" ekranında yeni kullanıcının girmesi gereken davet kodu. Boşsa (admin
+        // henüz bir kod belirlemediyse) kayıt ekranı kapalı kalır - admin onayı olmadan
+        // herkesin kendine hesap açabilmesini önlemek için.
+        [Display(Name = "Kayıt Ol Davet Kodu")]
+        public string? DavetKodu { get; set; }
+
+        // Kategoriye göre (6 aya kadar, 6 aydan sonra) günlük ücret çiftini döner.
+        public (decimal IlkDonem, decimal IkinciDonem) OtoparkTarifesi(OtoparkAracKategorisi kategori) => kategori switch
+        {
+            OtoparkAracKategorisi.KucukArac => (KucukArac6AyaKadar, KucukArac6AydanSonra),
+            OtoparkAracKategorisi.MinibusKamyonet => (MinibusKamyonet6AyaKadar, MinibusKamyonet6AydanSonra),
+            OtoparkAracKategorisi.BuyukArac => (BuyukArac6AyaKadar, BuyukArac6AydanSonra),
+            OtoparkAracKategorisi.Motor => (Motor6AyaKadar, Motor6AydanSonra),
+            _ => (0m, 0m)
+        };
+
+        // Kategoriye göre sabit çekici ücreti.
+        public decimal CekiciUcreti(OtoparkAracKategorisi kategori) => kategori switch
+        {
+            OtoparkAracKategorisi.KucukArac => KucukAracCekiciUcreti,
+            OtoparkAracKategorisi.MinibusKamyonet => MinibusKamyonetCekiciUcreti,
+            OtoparkAracKategorisi.BuyukArac => BuyukAracCekiciUcreti,
+            OtoparkAracKategorisi.Motor => MotorCekiciUcreti,
+            _ => 0m
+        };
+    }
+
+    // Daha önce araç satın almış kişi/kurumların kaydı. Alıcı Ödeme Bilgileri ekranında
+    // Vergi Numarası girilip "Kayıtlı Alıcılardan Seç" ile bulunduğunda kimlik bilgileri
+    // otomatik doldurulur; ilk kez araç alan biri için formdan manuel girilip buraya kaydedilir.
+    public class AliciKaydi
+    {
+        public int Id { get; set; }
+        [Required, Display(Name = "Vergi Numarası (TCKN/VKN)")]
+        public string VergiNumarasi { get; set; } = string.Empty;
+        [Required, Display(Name = "Adı Soyadı / Ünvanı")]
+        public string AdiSoyadiUnvani { get; set; } = string.Empty;
+        [Display(Name = "Vekili")]
+        public string? Vekili { get; set; }
+        [Display(Name = "Adresi")]
+        public string? Adresi { get; set; }
+        [Display(Name = "Telefon")]
+        public string? Telefon { get; set; }
+    }
+
+    // Yıllık Satış Takvimi: idarenin önceden belirleyip vergi dairelerine yazıyla
+    // bildirdiği resmi ihale (satış) günleri. Yeni bir dosya kaydedildiğinde 1. Satış
+    // tarihi bu listedeki ilk gelecek tarih, 2. Satış tarihi ise ondan sonraki tarih
+    // olarak otomatik önerilir (bkz. DosyaController.Create, KomisyonController).
+    public class SatisTarihi
+    {
+        public int Id { get; set; }
+        [Display(Name = "Satış Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime Tarih { get; set; }
+    }
+
+    // Resmi tatil günleri: ihale (satış) tarihi hesaplanırken bu günler atlanır.
+    // Sabit tarihli milli/resmi bayramlar başlangıçta otomatik yüklenir; Ramazan/Kurban
+    // Bayramı gibi dini bayramlar her yıl değiştiğinden Güncellemeler ekranından elle
+    // eklenmelidir.
+    public class ResmiTatil
+    {
+        public int Id { get; set; }
+        [Display(Name = "Tarih")]
+        [DataType(DataType.Date)]
+        public DateTime Tarih { get; set; }
+        [Display(Name = "Açıklama")]
+        public string? Aciklama { get; set; }
+    }
+}
