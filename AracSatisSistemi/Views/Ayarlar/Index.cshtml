@@ -48,6 +48,21 @@
             <li class="list-group-item text-muted text-center">Henüz kullanıcı eklenmedi.</li>
         }
     </ul>
+
+    <hr />
+    <p class="text-muted small mb-2">
+        Kullanıcıların kendi hesaplarını <a asp-controller="Hesap" asp-action="KayitOl">Kayıt Ol</a> ekranından
+        kendileri oluşturabilmesi için burada bir davet kodu belirleyin; bu kodu bilmeyen kayıt olamaz.
+        Alan boş bırakılırsa "Kayıt Ol" ekranı tamamen kapalı olur.
+    </p>
+    <form asp-action="DavetKoduGuncelle" method="post" class="row g-2 align-items-end">
+        @Html.AntiForgeryToken()
+        <div class="col-auto">
+            <label class="form-label">Davet Kodu</label>
+            <input class="form-control" name="davetKodu" value="@genelAyar?.DavetKodu" placeholder="ör. ANKARA2027" />
+        </div>
+        <div class="col-auto"><button class="btn btn-outline-primary">Kaydet</button></div>
+    </form>
 </div>
 
 <div class="card p-3 mt-3">

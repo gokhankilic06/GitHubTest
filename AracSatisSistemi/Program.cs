@@ -143,6 +143,10 @@ using (var scope = app.Services.CreateScope())
     try { db.Database.ExecuteSqlRaw(@"UPDATE ""GenelAyarlar"" SET ""MaksimumModelYili"" = 2027 WHERE ""MaksimumModelYili"" = 0;"); }
     catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
 
+    // "Kayıt Ol Davet Kodu" ayarı sonradan eklendi; eski veritabanlarında sütun yoksa eklenir.
+    try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""GenelAyarlar"" ADD COLUMN ""DavetKodu"" TEXT NULL;"); }
+    catch { /* sütun zaten varsa göz ardı edilir */ }
+
     // "Damga Vergisi Oranı" artık dosya bazında saklanıp düzenlenebiliyor (eskiden hep
     // sabit binde 5,69 olarak hesaplanıyordu); eski veritabanlarında sütun yoksa eklenir
     // ve mevcut tüm dosyalara o zamana kadar geçerli olan binde 5,69 değeri atanır.

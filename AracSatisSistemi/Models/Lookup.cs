@@ -108,6 +108,12 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Model Yılı Üst Sınırı")]
         public int MaksimumModelYili { get; set; } = 2027;
 
+        // "Kayıt Ol" ekranında yeni kullanıcının girmesi gereken davet kodu. Boşsa (admin
+        // henüz bir kod belirlemediyse) kayıt ekranı kapalı kalır - admin onayı olmadan
+        // herkesin kendine hesap açabilmesini önlemek için.
+        [Display(Name = "Kayıt Ol Davet Kodu")]
+        public string? DavetKodu { get; set; }
+
         // Kategoriye göre (6 aya kadar, 6 aydan sonra) günlük ücret çiftini döner.
         public (decimal IlkDonem, decimal IkinciDonem) OtoparkTarifesi(OtoparkAracKategorisi kategori) => kategori switch
         {

@@ -60,6 +60,78 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        // Yeni kullanıcıların admin onayı almadan, sadece Güncellemeler'de belirlenen davet
+        // kodunu bilerek kendi hesaplarını oluşturabilmesi için. GenelAyar.DavetKodu boşsa
+        // (admin hiç kod belirlemediyse) ekran tamamen kapalı kalır.
+        [AllowAnonymous]
+        public async Task<IActionResult> KayitOl()
+        {
+            if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            ViewBag.KayitAcikMi = !string.IsNullOrWhiteSpace(genelAyar?.DavetKodu);
+            return View();
+        }
+
+        [HttpPost, ValidateAntiForgeryToken, AllowAnonymous]
+        public async Task<IActionResult> KayitOl(string kullaniciAdi, string adSoyad, string sifre, string sifreTekrar, string davetKodu)
+        {
+            var genelAyar = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            ViewBag.KayitAcikMi = !string.IsNullOrWhiteSpace(genelAyar?.DavetKodu);
+            if (!ViewBag.KayitAcikMi)
+            {
+                TempData["Hata"] = "Kayıt Ol ekranı şu anda kapalı; yöneticinizden Güncellemeler ekranından bir davet kodu belirlemesini isteyin.";
+                return RedirectToAction(nameof(Giris));
+            }
+
+            kullaniciAdi = (kullaniciAdi ?? string.Empty).Trim();
+            ViewBag.KullaniciAdi = kullaniciAdi;
+            ViewBag.AdSoyad = adSoyad;
+
+            if (davetKodu != genelAyar!.DavetKodu)
+            {
+                ModelState.AddModelError(string.Empty, "Davet kodu hatalı.");
+                return View();
+            }
+            if (string.IsNullOrWhiteSpace(kullaniciAdi))
+            {
+                ModelState.AddModelError(string.Empty, "Kullanıcı adı zorunludur.");
+                return View();
+            }
+            if (await _db.Kullanicilar.AnyAsync(k => k.KullaniciAdi == kullaniciAdi))
+            {
+                ModelState.AddModelError(string.Empty, $"\"{kullaniciAdi}\" kullanıcı adı zaten alınmış.");
+                return View();
+            }
+            if (string.IsNullOrWhiteSpace(sifre) || sifre.Length < 6)
+            {
+                ModelState.AddModelError(string.Empty, "Şifre en az 6 karakter olmalıdır.");
+                return View();
+            }
+            if (sifre != sifreTekrar)
+            {
+                ModelState.AddModelError(string.Empty, "Şifre ve tekrarı birbiriyle uyuşmuyor.");
+                return View();
+            }
+
+            var yeniKullanici = new Kullanici { KullaniciAdi = kullaniciAdi, AdSoyad = string.IsNullOrWhiteSpace(adSoyad) ? null : adSoyad.Trim() };
+            var hasher = new PasswordHasher<Kullanici>();
+            yeniKullanici.SifreHash = hasher.HashPassword(yeniKullanici, sifre);
+            _db.Kullanicilar.Add(yeniKullanici);
+            await _db.SaveChangesAsync();
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, yeniKullanici.KullaniciAdi),
+                new Claim("AdSoyad", yeniKullanici.AdSoyad ?? yeniKullanici.KullaniciAdi),
+            };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                new AuthenticationProperties { IsPersistent = true });
+
+            TempData["Basari"] = "Hesabınız oluşturuldu, hoş geldiniz!";
+            return RedirectToAction("Index", "Home");
+        }
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Cikis()
         {

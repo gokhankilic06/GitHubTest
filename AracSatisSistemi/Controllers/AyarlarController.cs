@@ -77,6 +77,19 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> DavetKoduGuncelle(string? davetKodu)
+        {
+            var kayit = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            if (kayit == null) { kayit = new GenelAyar(); _db.GenelAyarlar.Add(kayit); }
+            kayit.DavetKodu = string.IsNullOrWhiteSpace(davetKodu) ? null : davetKodu.Trim();
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = kayit.DavetKodu == null
+                ? "Davet kodu kaldırıldı; \"Kayıt Ol\" ekranı artık kapalı."
+                : "Davet kodu güncellendi.";
+            return RedirectToAction(nameof(Index));
+        }
+
         // ---- Basit liste ekle/sil işlemleri (marka, cins, vergi dairesi, otopark) ----
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> MarkaEkle(string ad)
