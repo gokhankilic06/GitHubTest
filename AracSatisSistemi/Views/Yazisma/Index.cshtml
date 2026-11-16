@@ -54,7 +54,7 @@
     <div class="d-flex flex-wrap gap-2 mb-3 no-print">
         <a class="btn btn-outline-secondary" asp-controller="Dosya" asp-action="Details" asp-route-id="@dosya.Id"><i class="bi bi-arrow-left"></i> Geri</a>
         <a class="btn btn-outline-dark" asp-action="VergiDairesiYazisiIndir" asp-route-dosyaNo="@dosya.DosyaNo">
-            <i class="bi bi-envelope"></i> @dosya.VergiDairesiAdi
+            <i class="bi bi-envelope"></i> İç Yazışma
         </a>
         <a class="btn btn-outline-dark" asp-action="UstYaziIndir" asp-route-dosyaNo="@dosya.DosyaNo"><i class="bi bi-file-earmark-word"></i> Üst Yazı</a>
         <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
