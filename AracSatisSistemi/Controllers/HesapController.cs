@@ -10,15 +10,18 @@ using AracSatisSistemi.Models;
 
 namespace AracSatisSistemi.Controllers
 {
-    // Giriş/çıkış işlemleri. Tüm diğer controller'lar Program.cs'teki FallbackPolicy
-    // sayesinde otomatik olarak [Authorize]; bu controller [AllowAnonymous] olduğundan
-    // giriş yapmamış kullanıcı yalnızca buraya erişebilir.
-    [AllowAnonymous]
+    // Giriş/çıkış işlemleri. Tüm diğer controller'lar (ve bu controller'daki Çıkış/Şifre
+    // Değiştir dahil) Program.cs'teki FallbackPolicy sayesinde otomatik olarak [Authorize];
+    // yalnızca Giriş ekranı [AllowAnonymous] olduğundan giriş yapmamış kullanıcı oraya
+    // erişebilir. [AllowAnonymous] kasıtlı olarak sınıf değil, yalnızca Giriş action'larına
+    // uygulanır: sınıf genelinde olsaydı Şifre Değiştir/Çıkış da (ASP0026 analizörünün de
+    // işaret ettiği gibi) yanlışlıkla kimlik doğrulamasız erişilebilir hale gelirdi.
     public class HesapController : Controller
     {
         private readonly AppDbContext _db;
         public HesapController(AppDbContext db) => _db = db;
 
+        [AllowAnonymous]
         public IActionResult Giris(string? returnUrl = null)
         {
             if (User.Identity?.IsAuthenticated == true) return RedirectToAction("Index", "Home");
@@ -26,7 +29,7 @@ namespace AracSatisSistemi.Controllers
             return View();
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken, AllowAnonymous]
         public async Task<IActionResult> Giris(string kullaniciAdi, string sifre, string? returnUrl = null)
         {
             ViewBag.ReturnUrl = returnUrl;
@@ -65,10 +68,11 @@ namespace AracSatisSistemi.Controllers
         }
 
         // Giriş yapmış herhangi bir kullanıcının kendi şifresini değiştirmesi için.
-        [Authorize]
+        // Ayrı bir [Authorize] gerekmez; global FallbackPolicy (Program.cs) zaten
+        // [AllowAnonymous] işaretlenmemiş her action için kimlik doğrulaması zorunlu kılar.
         public IActionResult SifreDegistir() => View();
 
-        [HttpPost, ValidateAntiForgeryToken, Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> SifreDegistir(string mevcutSifre, string yeniSifre, string yeniSifreTekrar)
         {
             var kullanici = await _db.Kullanicilar.FirstOrDefaultAsync(k => k.KullaniciAdi == User.Identity!.Name);

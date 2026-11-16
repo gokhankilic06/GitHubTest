@@ -80,7 +80,11 @@ using (var scope = app.Services.CreateScope())
         if (ifade.Length == 0) continue;
         ifade = System.Text.RegularExpressions.Regex.Replace(ifade, @"^CREATE TABLE ", "CREATE TABLE IF NOT EXISTS ");
         ifade = System.Text.RegularExpressions.Regex.Replace(ifade, @"^CREATE (UNIQUE )?INDEX ", "CREATE $1INDEX IF NOT EXISTS ");
+        // EF1003: "ifade" kullanıcı girdisi değil, doğrudan EF'nin kendi modelinden
+        // ürettiği GenerateCreateScript() çıktısıdır; SQL enjeksiyon riski yoktur.
+#pragma warning disable EF1003
         try { db.Database.ExecuteSqlRaw(ifade + ";"); } catch { /* zaten varsa veya bağımlı tablo henüz yoksa göz ardı edilir */ }
+#pragma warning restore EF1003
     }
 
     // Araç cinsi/marka/model, vergi dairesi, otopark ve renk referans listeleri artık
@@ -103,11 +107,15 @@ using (var scope = app.Services.CreateScope())
     // Çekici ücreti artık (otopark tarifesi gibi) araç kategorisine göre 4 ayrı sütunda
     // tutuluyor (eski tek "CekiciUcretiSabit" sütunu yerine). SQLite'ta "ADD COLUMN IF NOT
     // EXISTS" olmadığından her biri ayrı ayrı denenip zaten varsa oluşan hata yutulur.
+    // EF1003: "sutun" kullanıcı girdisi değil, yukarıdaki sabit dizideki bilinen sütun
+    // adlarından biridir; SQL enjeksiyon riski yoktur.
+#pragma warning disable EF1003
     foreach (var sutun in new[] { "KucukAracCekiciUcreti", "MinibusKamyonetCekiciUcreti", "BuyukAracCekiciUcreti", "MotorCekiciUcreti" })
     {
         try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""GenelAyarlar"" ADD COLUMN """ + sutun + @""" decimal(18,2) NOT NULL DEFAULT 0;"); }
         catch { /* sütun zaten varsa göz ardı edilir */ }
     }
+#pragma warning restore EF1003
 
     // Yukarıdaki ALTER TABLE ile sütunlar 0 TL olarak eklenmiş olabilir (henüz hiç
     // "Güncellemeler" ekranından değiştirilmemiş kayıtlar için); bu durumda araç
