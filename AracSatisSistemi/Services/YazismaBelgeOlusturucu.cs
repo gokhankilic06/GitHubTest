@@ -7,22 +7,18 @@ using DocumentFormat.OpenXml.Wordprocessing;
 namespace AracSatisSistemi.Services
 {
     // Yazışma ekranındaki iki belge üretim butonu için Word (.docx) çıktısı oluşturur:
-    // 1) "[Vergi Dairesi Adı]" butonu -> doğrudan mükellefin bağlı olduğu vergi dairesine yazı,
-    // 2) "Üst Yazı" butonu -> Gelir İdaresi Başkanlığı antetli, alacaklı vergi dairesine yazı.
-    // İkisi de kullanıcının paylaştığı örnek belge görüntülerinden birebir uyarlanmıştır.
+    // 1) "İç Yazışma" butonu, 2) "Üst Yazı" butonu. İkisi de başlık/hitap bloğu ve "İlgi"
+    // satırı olmadan, yalnızca açılış cümlesi + gövde metninden oluşur.
     public static class YazismaBelgeOlusturucu
     {
         private static readonly CultureInfo TrTR = new("tr-TR");
 
         public static byte[] VergiDairesiYazisiOlustur(Dosya dosya, Satis? satis, decimal kdvTutari, decimal dvTutari, decimal toplamTutar, decimal otoparkTutari)
         {
+            // Not: Belgede başlık (hitap/adres bloğu) ve "İlgi" satırı kasıtlı olarak yok -
+            // yalnızca açılış cümlesi ve gövde metni kullanılır.
             var acilisParagraflari = new List<Paragraph>
             {
-                Baslik(HitapSekli(dosya.VergiDairesiAdi)),
-                Baslik("ANKARA"),
-                Bos(),
-                Par($"İlgi : {IlgiYaziSayisi(dosya)} sayılı yazınız.", JustificationValues.Left),
-                Bos(),
                 Par(AcilisCumlesiDogrudan(dosya, satis, kdvTutari, dvTutari, toplamTutar), ilkSatirGirinti: 567)
             };
 
@@ -31,40 +27,15 @@ namespace AracSatisSistemi.Services
 
         public static byte[] UstYaziOlustur(Dosya dosya, Satis? satis, decimal kdvTutari, decimal dvTutari, decimal toplamTutar, decimal otoparkTutari)
         {
+            // Not: Belgede başlık (T.C./Gelir İdaresi Başkanlığı/hitap bloğu), "Sayı"/"Konu"
+            // ve "İlgi" satırları kasıtlı olarak yok - yalnızca açılış cümlesi ve gövde metni
+            // kullanılır.
             var acilisParagraflari = new List<Paragraph>
             {
-                Baslik("T.C."),
-                Baslik("GELİR İDARESİ BAŞKANLIĞI"),
-                Baslik("Ankara"),
-                Bos(),
-                Par($"Sayı : {dosya.DosyaNo}", JustificationValues.Left),
-                Par("Konu : Araç Satışı", JustificationValues.Left),
-                Bos(),
-                Baslik(HitapSekli(dosya.AlacakliVergiDairesi)),
-                Baslik("ANKARA"),
-                Bos(),
-                Par($"İlgi : {IlgiYaziSayisi(dosya)} sayılı yazınız.", JustificationValues.Left),
-                Bos(),
                 Par(AcilisCumlesiUstYazi(dosya, satis, kdvTutari, dvTutari, toplamTutar), ilkSatirGirinti: 567)
             };
 
             return BelgeOlustur(acilisParagraflari, GovdeParagraflari(dosya, satis, kdvTutari, dvTutari, otoparkTutari));
-        }
-
-        private static string IlgiYaziSayisi(Dosya dosya) =>
-            string.IsNullOrWhiteSpace(dosya.VergiDairesiYaziSayisi) ? "……………………………" : dosya.VergiDairesiYaziSayisi;
-
-        // "X Vergi Dairesi Müdürlüğü" adını resmi yazı hitabına çevirir: "X VERGİ DAİRESİ MÜDÜRLÜĞÜNE".
-        // Vergi dairesi listesi adı zaten "... Müdürlüğü" ile bittiğinden ek olarak bu ibare
-        // tekrar eklenmez, yalnızca "-ne" hâl eki uygulanır.
-        private static string HitapSekli(string vergiDairesiAdi)
-        {
-            if (string.IsNullOrWhiteSpace(vergiDairesiAdi)) return "……………………………… VERGİ DAİRESİ MÜDÜRLÜĞÜNE";
-            var ad = vergiDairesiAdi.Trim();
-            var hitap = ad.EndsWith("Müdürlüğü", StringComparison.OrdinalIgnoreCase)
-                ? ad[..^"Müdürlüğü".Length] + "Müdürlüğüne"
-                : ad + " Müdürlüğüne";
-            return hitap.ToUpper(TrTR);
         }
 
         private static (string borcluNo, string borcluNoTuru) BorcluNo(Dosya dosya)
@@ -149,8 +120,6 @@ namespace AracSatisSistemi.Services
         }
 
         private static Paragraph Bos() => Par(string.Empty);
-
-        private static Paragraph Baslik(string metin) => Par(metin, JustificationValues.Center, kalin: true);
 
         private static Paragraph Par(string metin, JustificationValues? hiza = null, bool kalin = false, int? ilkSatirGirinti = null)
         {
