@@ -18,20 +18,6 @@ namespace AracSatisSistemi.Controllers
         private readonly AppDbContext _db;
         public SatisTakvimiController(AppDbContext db) => _db = db;
 
-        public async Task<IActionResult> Index()
-        {
-            var tumTarihler = await _db.SatisTarihleri.OrderBy(t => t.Tarih).ToListAsync();
-            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
-            ViewBag.TakvimTatilTarihleri = resmiTatiller;
-            ViewBag.Bugun = DateTime.Today;
-
-            var (birinci, ikinci) = await SatisTakvimiYardimcisi.PlanliDosyaSayilariGetir(_db);
-            ViewBag.BirinciSatisSayilari = birinci;
-            ViewBag.IkinciSatisSayilari = ikinci;
-
-            return View(tumTarihler);
-        }
-
         // Takvimi, her tarihteki planlı dosya sayılarıyla birlikte Excel olarak indirir.
         public async Task<IActionResult> ExcelIndir()
         {
@@ -84,7 +70,7 @@ namespace AracSatisSistemi.Controllers
             {
                 TempData["Hata"] = $"{gun:dd.MM.yyyy} zaten takvimde kayıtlı.";
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Ayarlar");
         }
 
         // POST: /SatisTakvimi/TopluEkle - başlangıç/bitiş arasındaki tüm Çarşambaları
@@ -95,7 +81,7 @@ namespace AracSatisSistemi.Controllers
             if (bitis < baslangic)
             {
                 TempData["Hata"] = "Bitiş tarihi başlangıçtan önce olamaz.";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Ayarlar");
             }
 
             var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
@@ -113,7 +99,7 @@ namespace AracSatisSistemi.Controllers
                 await _db.SaveChangesAsync();
             }
             TempData["Basari"] = $"{eklenecekler.Count} yeni tarih (haftalık Çarşamba, resmi tatiller hariç) takvime eklendi.";
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Ayarlar");
         }
 
         // POST: /SatisTakvimi/ExcelYukle - idarenin hazırladığı resmi ihale programı Excel
@@ -202,7 +188,7 @@ namespace AracSatisSistemi.Controllers
                 await _db.SaveChangesAsync();
                 TempData["Basari"] = $"{kayit.Tarih:dd.MM.yyyy} takvimden silindi.";
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Ayarlar");
         }
     }
 }
