@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
+using AracSatisSistemi.Services;
 using ClosedXML.Excel;
 
 namespace AracSatisSistemi.Controllers
@@ -17,33 +18,14 @@ namespace AracSatisSistemi.Controllers
         private readonly AppDbContext _db;
         public SatisTakvimiController(AppDbContext db) => _db = db;
 
-        // Her takvim tarihi için o tarihte 1./2. Satış'ını BEKLEYEN (henüz sonucu
-        // girilmemiş) dosya sayısını hesaplar; takvimi "Satış Sonuçlarını Gir" akışına
-        // doğrudan bağlayan sayaç + bağlantı burada üretilir (bkz. Index.cshtml).
-        private async Task<(Dictionary<DateTime, int> Birinci, Dictionary<DateTime, int> Ikinci)> PlanliDosyaSayilariGetir()
-        {
-            var aktifDosyalar = await _db.Dosyalar.Include(d => d.Satislar)
-                .Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti)
-                .ToListAsync();
-
-            var birinci = aktifDosyalar.Where(d => d.Asama == Dosya.SurecAsamasi.BirinciSatisBekliyor)
-                .GroupBy(d => d.Satis1Tarihi.Date)
-                .ToDictionary(g => g.Key, g => g.Count());
-            var ikinci = aktifDosyalar.Where(d => d.Asama == Dosya.SurecAsamasi.IkinciSatisBekliyor)
-                .GroupBy(d => d.Satis2Tarihi.Date)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            return (birinci, ikinci);
-        }
-
         public async Task<IActionResult> Index()
         {
             var tumTarihler = await _db.SatisTarihleri.OrderBy(t => t.Tarih).ToListAsync();
             var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
-            ViewBag.ResmiTatiller = resmiTatiller;
+            ViewBag.TakvimTatilTarihleri = resmiTatiller;
             ViewBag.Bugun = DateTime.Today;
 
-            var (birinci, ikinci) = await PlanliDosyaSayilariGetir();
+            var (birinci, ikinci) = await SatisTakvimiYardimcisi.PlanliDosyaSayilariGetir(_db);
             ViewBag.BirinciSatisSayilari = birinci;
             ViewBag.IkinciSatisSayilari = ikinci;
 
@@ -57,7 +39,7 @@ namespace AracSatisSistemi.Controllers
             var resmiTatiller = (await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync()).ToHashSet();
             var bugun = DateTime.Today;
             var trTR = new System.Globalization.CultureInfo("tr-TR");
-            var (birinci, ikinci) = await PlanliDosyaSayilariGetir();
+            var (birinci, ikinci) = await SatisTakvimiYardimcisi.PlanliDosyaSayilariGetir(_db);
 
             using var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add("Satış Takvimi");

@@ -65,10 +65,10 @@
     </form>
 </div>
 
+@{ var satisTarihleri = (List<SatisTarihi>)ViewBag.SatisTarihleri; }
 <div class="card p-3 mt-3">
     <div class="form-section-title">Satış Takvimi</div>
-    <p class="text-muted small mb-2">Yıllık 1. ve 2. Satış (ihale) tarihlerini tek tek buradan değil, ayrı <a asp-controller="SatisTakvimi" asp-action="Index">Satış Takvimi</a> ekranından ekleyip yönetirsiniz.</p>
-    <a class="btn btn-outline-primary mb-3" asp-controller="SatisTakvimi" asp-action="Index"><i class="bi bi-calendar-week"></i> Satış Takvimine Git</a>
+    @await Html.PartialAsync("~/Views/SatisTakvimi/_TakvimGorunumu.cshtml", satisTarihleri)
 
     <hr />
     <p class="text-muted small mb-2">

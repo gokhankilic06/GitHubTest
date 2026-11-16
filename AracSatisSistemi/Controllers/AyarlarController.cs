@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
+using AracSatisSistemi.Services;
 
 namespace AracSatisSistemi.Controllers
 {
@@ -23,6 +24,15 @@ namespace AracSatisSistemi.Controllers
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.ResmiTatiller = await _db.ResmiTatiller.OrderBy(t => t.Tarih).ToListAsync();
             ViewBag.Kullanicilar = await _db.Kullanicilar.OrderBy(k => k.KullaniciAdi).ToListAsync();
+
+            // Gömülü Satış Takvimi görünümü (bkz. Views/SatisTakvimi/_TakvimGorunumu.cshtml) için.
+            ViewBag.SatisTarihleri = await _db.SatisTarihleri.OrderBy(t => t.Tarih).ToListAsync();
+            ViewBag.TakvimTatilTarihleri = ((List<ResmiTatil>)ViewBag.ResmiTatiller).Select(t => t.Tarih.Date).ToList();
+            ViewBag.Bugun = DateTime.Today;
+            var (birinci, ikinci) = await SatisTakvimiYardimcisi.PlanliDosyaSayilariGetir(_db);
+            ViewBag.BirinciSatisSayilari = birinci;
+            ViewBag.IkinciSatisSayilari = ikinci;
+
             return View();
         }
 
