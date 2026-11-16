@@ -23,9 +23,9 @@ namespace AracSatisSistemi.Controllers
         private static List<YedekDosyasi> KlasorYedekleri(string klasorYolu)
         {
             if (!Directory.Exists(klasorYolu)) return new List<YedekDosyasi>();
-            return Directory.GetFiles(klasorYolu, "*.db")
+            return Directory.GetFiles(klasorYolu, "*.db").Concat(Directory.GetFiles(klasorYolu, "*.xlsx"))
                 .Select(f => new FileInfo(f))
-                .OrderByDescending(f => f.LastWriteTime)
+                .OrderByDescending(f => f.LastWriteTime).ThenBy(f => f.Name)
                 .Select(f => new YedekDosyasi { Ad = f.Name, Tarih = f.LastWriteTime, BoyutBayt = f.Length })
                 .ToList();
         }
