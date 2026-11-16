@@ -18,6 +18,23 @@ namespace AracSatisSistemi.Controllers
         private readonly AppDbContext _db;
         public SatisTakvimiController(AppDbContext db) => _db = db;
 
+        // Takvimin görüntülendiği/düzenlendiği (tarih silme) ayrı sayfa. Güncellemeler
+        // ekranındaki ekleme formları (Tek Tarih Ekle, Toplu Ekle, Excel Yükle) işlemden
+        // sonra buraya yönlendirir; ekleme/yükleme orada, görüntüleme/düzenleme burada.
+        public async Task<IActionResult> Index()
+        {
+            var tumTarihler = await _db.SatisTarihleri.OrderBy(t => t.Tarih).ToListAsync();
+            var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
+            ViewBag.TakvimTatilTarihleri = resmiTatiller;
+            ViewBag.Bugun = DateTime.Today;
+
+            var (birinci, ikinci) = await SatisTakvimiYardimcisi.PlanliDosyaSayilariGetir(_db);
+            ViewBag.BirinciSatisSayilari = birinci;
+            ViewBag.IkinciSatisSayilari = ikinci;
+
+            return View(tumTarihler);
+        }
+
         // Takvimi, her tarihteki planlı dosya sayılarıyla birlikte Excel olarak indirir.
         public async Task<IActionResult> ExcelIndir()
         {
@@ -70,7 +87,7 @@ namespace AracSatisSistemi.Controllers
             {
                 TempData["Hata"] = $"{gun:dd.MM.yyyy} zaten takvimde kayıtlı.";
             }
-            return RedirectToAction("Index", "Ayarlar");
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: /SatisTakvimi/TopluEkle - başlangıç/bitiş arasındaki tüm Çarşambaları
@@ -81,7 +98,7 @@ namespace AracSatisSistemi.Controllers
             if (bitis < baslangic)
             {
                 TempData["Hata"] = "Bitiş tarihi başlangıçtan önce olamaz.";
-                return RedirectToAction("Index", "Ayarlar");
+                return RedirectToAction(nameof(Index));
             }
 
             var resmiTatiller = await _db.ResmiTatiller.Select(t => t.Tarih.Date).ToListAsync();
@@ -99,7 +116,7 @@ namespace AracSatisSistemi.Controllers
                 await _db.SaveChangesAsync();
             }
             TempData["Basari"] = $"{eklenecekler.Count} yeni tarih (haftalık Çarşamba, resmi tatiller hariç) takvime eklendi.";
-            return RedirectToAction("Index", "Ayarlar");
+            return RedirectToAction(nameof(Index));
         }
 
         // POST: /SatisTakvimi/ExcelYukle - idarenin hazırladığı resmi ihale programı Excel
@@ -112,7 +129,7 @@ namespace AracSatisSistemi.Controllers
             if (dosya == null || dosya.Length == 0)
             {
                 TempData["Hata"] = "Lütfen bir Excel (.xlsx) dosyası seçin.";
-                return RedirectToAction("Index", "Ayarlar");
+                return RedirectToAction(nameof(Index));
             }
 
             var bulunanTarihler = new HashSet<DateTime>();
@@ -155,13 +172,13 @@ namespace AracSatisSistemi.Controllers
             catch (Exception ex)
             {
                 TempData["Hata"] = "Excel dosyası okunamadı: " + ex.Message;
-                return RedirectToAction("Index", "Ayarlar");
+                return RedirectToAction(nameof(Index));
             }
 
             if (bulunanTarihler.Count == 0)
             {
                 TempData["Hata"] = "Excel dosyasında okunabilir bir tarih bulunamadı.";
-                return RedirectToAction("Index", "Ayarlar");
+                return RedirectToAction(nameof(Index));
             }
 
             var mevcutlar = (await _db.SatisTarihleri.Select(t => t.Tarih).ToListAsync()).ToHashSet();
@@ -175,7 +192,7 @@ namespace AracSatisSistemi.Controllers
             var zatenKayitli = bulunanTarihler.Count - eklenecekler.Count;
             TempData["Basari"] = $"Excel'den {bulunanTarihler.Count} tarih okundu; {eklenecekler.Count} yeni tarih satış takvimine eklendi" +
                 (zatenKayitli > 0 ? $" ({zatenKayitli} tanesi zaten kayıtlıydı)." : ".");
-            return RedirectToAction("Index", "Ayarlar");
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
@@ -188,7 +205,7 @@ namespace AracSatisSistemi.Controllers
                 await _db.SaveChangesAsync();
                 TempData["Basari"] = $"{kayit.Tarih:dd.MM.yyyy} takvimden silindi.";
             }
-            return RedirectToAction("Index", "Ayarlar");
+            return RedirectToAction(nameof(Index));
         }
     }
 }
