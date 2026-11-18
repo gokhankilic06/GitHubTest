@@ -331,16 +331,13 @@ else
 
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF('p', 'mm', 'a4');
-            const kenarBosluk = 10; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
-            const genislik = 210 - (2 * kenarBosluk);
 
             let zincir = Promise.resolve();
             bloklar.forEach((blok, i) => {
-                zincir = zincir.then(() => html2canvas(blok, { scale: 2 }).then(canvas => {
+                zincir = zincir.then(() => {
                     if (i > 0) pdf.addPage();
-                    const yukseklik = (canvas.height * genislik) / canvas.width;
-                    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
-                }));
+                    return alanDanPdfOlustur(blok, pdf, { kenarBosluk: 10 });
+                });
             });
             zincir.then(() => {
                 alan.style.display = 'none';
