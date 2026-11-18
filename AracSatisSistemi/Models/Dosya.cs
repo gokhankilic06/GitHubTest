@@ -47,9 +47,10 @@ namespace AracSatisSistemi.Models
 
         // ---- ARAÇ BİLGİ GİRİŞİ ----
         // Geçerli bir Türkiye plaka formatı: 2 haneli il kodu (01-81) + 1-3 harf (Q, W, X
-        // kullanılmaz) + duruma göre 2-4 haneli rakam (ör. 34A1234, 34AB123, 34ABC12).
+        // kullanılmaz) + 2-4 haneli rakam, harf/rakam sayısı herhangi bir kombinasyonda
+        // olabilir (ör. 34A1234, 34AB12, 34AB123, 34AB1234, 34ABC12, 34ABC123).
         [Required, Display(Name = "Plaka")]
-        [RegularExpression(@"^(0[1-9]|[1-7][0-9]|8[01])([A-PR-VYZ]\d{4}|[A-PR-VYZ]{2}\d{3,4}|[A-PR-VYZ]{3}\d{2})$",
+        [RegularExpression(@"^(0[1-9]|[1-7][0-9]|8[01])[A-PR-VYZ]{1,3}\d{2,4}$",
             ErrorMessage = "Geçerli bir plaka giriniz (ör. 34ABC123; il kodu 01-81 olmalı, Q/W/X harfleri kullanılmaz).")]
         public string Plaka { get; set; } = string.Empty;
 
