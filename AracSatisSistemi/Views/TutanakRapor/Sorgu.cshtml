@@ -11,6 +11,7 @@
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
         <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-success" asp-action="SorguExcelIndir" asp-route-dosyaNo="@Model.DosyaNo"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
         <a class="btn btn-outline-dark" asp-controller="TutanakRapor" asp-action="Index" asp-route-tutanakTuru="sorgu"><i class="bi bi-arrow-left"></i> Geri</a>
     </div>
 </div>

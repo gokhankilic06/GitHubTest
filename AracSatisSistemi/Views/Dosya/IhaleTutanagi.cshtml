@@ -20,6 +20,7 @@
     <div class="d-flex gap-2">
         <button type="button" class="btn btn-outline-secondary" onclick="yazdirTemiz()"><i class="bi bi-printer"></i> Yazdır</button>
         <button type="button" class="btn btn-outline-secondary" onclick="pdfOlarakKaydet()"><i class="bi bi-file-earmark-pdf"></i> PDF Olarak Kaydet</button>
+        <a class="btn btn-outline-success" asp-action="IhaleTutanagiExcelIndir" asp-route-id="@Model.Id" asp-route-secilenTarih="@(tarihSeciliyor ? gosterilecekTarih.ToString("yyyy-MM-dd") : null)" asp-route-secilenSaat="@(satisSaati?.ToString(@"hh\:mm"))"><i class="bi bi-file-earmark-excel"></i> Excel'e Aktar</a>
         <a class="btn btn-outline-dark" asp-action="Details" asp-route-id="@Model.Id"><i class="bi bi-arrow-left"></i> Dosyaya Dön</a>
     </div>
 </div>

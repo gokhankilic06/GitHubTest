@@ -232,20 +232,143 @@ namespace AracSatisSistemi.Controllers
 
             using var wb = new XLWorkbook();
             var ws = wb.Worksheets.Add("Tutanak ve Raporlar");
-            string[] baslik = { "Dosya No", "Plaka", "Cinsi", "Markası", "M.Bedel", "Satış Türü", "Satış Tarih", "SONUÇ" };
+            string[] baslik = {
+                "Dosya No", "Adı Soyadı/Ünvanı", "Vergi Dairesi", "Alacaklı Vergi Dairesi",
+                "VKN", "TCKN", "Plaka", "Cinsi", "Markası", "Model Yılı", "M.Bedel",
+                "Satış Türü", "Satış Tarih", "SONUÇ",
+                "Komisyon Başkanı", "Komisyon Üye 1", "Komisyon Üye 2", "Komisyon Üye 3"
+            };
             for (int i = 0; i < baslik.Length; i++) ws.Cell(1, i + 1).Value = baslik[i];
 
             var satir = 2;
             foreach (var s in veri)
             {
                 ws.Cell(satir, 1).Value = s.DosyaNo;
-                ws.Cell(satir, 2).Value = s.Plaka;
-                ws.Cell(satir, 3).Value = s.AracCinsi;
-                ws.Cell(satir, 4).Value = s.AracMarkasi;
-                ws.Cell(satir, 5).Value = s.MuhammenBedel;
-                ws.Cell(satir, 6).Value = s.SatisTuruGorunen;
-                ws.Cell(satir, 7).Value = s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "";
-                ws.Cell(satir, 8).Value = s.SonucGorunen;
+                ws.Cell(satir, 2).Value = s.AdiSoyadiUnvani;
+                ws.Cell(satir, 3).Value = s.VergiDairesiAdi;
+                ws.Cell(satir, 4).Value = s.AlacakliVergiDairesi;
+                ws.Cell(satir, 5).Value = s.VergiKimlikNumarasi;
+                ws.Cell(satir, 6).Value = s.TCKimlikNumarasi;
+                ws.Cell(satir, 7).Value = s.Plaka;
+                ws.Cell(satir, 8).Value = s.AracCinsi;
+                ws.Cell(satir, 9).Value = s.AracMarkasi;
+                ws.Cell(satir, 10).Value = s.ModelYili;
+                ws.Cell(satir, 11).Value = s.MuhammenBedel;
+                ws.Cell(satir, 12).Value = s.SatisTuruGorunen;
+                ws.Cell(satir, 13).Value = s.SatisTarihi?.ToString("dd.MM.yyyy") ?? "";
+                ws.Cell(satir, 14).Value = s.SonucGorunen;
+                ws.Cell(satir, 15).Value = s.KomisyonBaskani;
+                ws.Cell(satir, 16).Value = s.KomisyonUye1;
+                ws.Cell(satir, 17).Value = s.KomisyonUye2;
+                ws.Cell(satir, 18).Value = s.KomisyonUye3;
+                satir++;
+            }
+            ws.Row(1).Style.Font.Bold = true;
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            stream.Position = 0;
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"TutanakRapor_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+        }
+
+        // Tek bir dosyanın Araç Satış Kararı / Sorgu belgesini Excel olarak indirir
+        // (ekrandaki belgeyle aynı alan/değer çiftleri - bkz. DosyaController.ExcelIndir).
+        public async Task<IActionResult> SatisKarariExcelIndir(string dosyaNo)
+        {
+            var veri = await SatisMaliOzetHesaplayici.Getir(_db, dosyaNo);
+            if (veri == null || veri.Satis == null || veri.Satis.SatisSonucu != SatisSonucu.Satildi) return NotFound();
+            var d = veri.Dosya;
+            var satis = veri.Satis;
+            var trTR = new System.Globalization.CultureInfo("tr-TR");
+
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Araç Satış Kararı");
+            var satir = 1;
+            void Yaz(string alan, object? deger)
+            {
+                ws.Cell(satir, 1).Value = alan;
+                ws.Cell(satir, 1).Style.Font.Bold = true;
+                ws.Cell(satir, 2).Value = deger?.ToString() ?? "";
+                satir++;
+            }
+            Yaz("Dosya No", d.DosyaNo);
+            Yaz("Adı Soyadı/Ünvanı", d.AdiSoyadiUnvani);
+            Yaz("Vergi Numarası", d.VergiKimlikNumarasi);
+            Yaz("TC Kimlik Numarası", d.TCKimlikNumarasi);
+            Yaz("Vergi Dairesi Adı", d.VergiDairesiAdi);
+            Yaz("Alacaklı Vergi Dairesi", d.AlacakliVergiDairesi);
+            Yaz("Plaka", d.Plaka);
+            Yaz("Cinsi", d.AracCinsi);
+            Yaz("Markası", d.AracMarkasi);
+            Yaz("Tipi", d.AracTipi);
+            Yaz("Model Yılı", d.ModelYili);
+            Yaz("Renk", d.Renk);
+            Yaz("Muhammen Bedeli (TL)", d.MuhammenBedel);
+            Yaz("Satış Bedeli (TL)", veri.SatisBedeli);
+            Yaz("KDV Tutarı (TL)", veri.KdvTutari);
+            Yaz("Damga Vergisi Tutarı (TL)", veri.DvTutari);
+            Yaz("Toplam Tutar (TL)", veri.ToplamTutar);
+            Yaz("Satış Türü", satis.SatisTuruGorunen);
+            Yaz("Satış Tarihi", satis.SatisTarihi.ToString("dd.MM.yyyy"));
+            Yaz("Alıcı Adı Soyadı", satis.AliciAdiSoyadi);
+            Yaz("Alıcı Adresi", satis.Adres);
+            Yaz("Alıcı Vergi Kimlik No", satis.AliciVKN);
+            Yaz("Alıcı TC Kimlik No", satis.AliciTCKN);
+            Yaz("Vade Tarihi", satis.VerilenSure?.ToString("dd.MM.yyyy"));
+            Yaz("Faturayı Kesecek Otopark", satis.FaturayiKesenOtopark);
+            Yaz("Çekici Bedeli (TL)", satis.CekiciBedeli);
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            stream.Position = 0;
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"AracSatisKarari_{dosyaNo.Replace("/", "_")}.xlsx");
+        }
+
+        // Tek bir dosyanın Sorgu belgesini Excel olarak indirir.
+        public async Task<IActionResult> SorguExcelIndir(string dosyaNo)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.Satislar).FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            if (dosya == null) return NotFound();
+
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("Sorgu");
+            var satir = 1;
+            void Yaz(string alan, object? deger)
+            {
+                ws.Cell(satir, 1).Value = alan;
+                ws.Cell(satir, 1).Style.Font.Bold = true;
+                ws.Cell(satir, 2).Value = deger?.ToString() ?? "";
+                satir++;
+            }
+            Yaz("Dosya No", dosya.DosyaNo);
+            Yaz("Kayıt Tarihi", dosya.KayitTarihi.ToString("dd.MM.yyyy"));
+            Yaz("Adı Soyadı/Ünvanı", dosya.AdiSoyadiUnvani);
+            Yaz("Vergi Dairesi Adı", dosya.VergiDairesiAdi);
+            Yaz("Alacaklı Vergi Dairesi", dosya.AlacakliVergiDairesi);
+            Yaz("Plaka", dosya.Plaka);
+            Yaz("Markası", dosya.AracMarkasi);
+            Yaz("Cinsi", dosya.AracCinsi);
+            Yaz("Muhammen Bedel (TL)", dosya.MuhammenBedel);
+            Yaz("Durum", dosya.GenelDurumGorunen);
+            satir++;
+            ws.Cell(satir, 1).Value = "SATIŞ GEÇMİŞİ";
+            ws.Cell(satir, 1).Style.Font.Bold = true;
+            satir++;
+            string[] altBaslik = { "Satış Türü", "Satış Tarihi", "Sonuç", "Satış Bedeli", "Alıcı" };
+            for (int i = 0; i < altBaslik.Length; i++) ws.Cell(satir, i + 1).Value = altBaslik[i];
+            ws.Row(satir).Style.Font.Bold = true;
+            satir++;
+            foreach (var s in dosya.Satislar.OrderBy(s => s.SatisTarihi))
+            {
+                ws.Cell(satir, 1).Value = s.SatisTuruGorunen;
+                ws.Cell(satir, 2).Value = s.SatisTarihi.ToString("dd.MM.yyyy");
+                ws.Cell(satir, 3).Value = s.SonucGorunen;
+                ws.Cell(satir, 4).Value = s.SatisBedeli;
+                ws.Cell(satir, 5).Value = s.AliciAdiSoyadi;
                 satir++;
             }
             ws.Columns().AdjustToContents();
@@ -254,7 +377,7 @@ namespace AracSatisSistemi.Controllers
             wb.SaveAs(stream);
             stream.Position = 0;
             return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                $"TutanakRapor_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx");
+                $"Sorgu_{dosyaNo.Replace("/", "_")}.xlsx");
         }
 
         // GET: /TutanakRapor/SatisKarari?dosyaNo=.. - "Satış Kararı" türü için tekil belge.

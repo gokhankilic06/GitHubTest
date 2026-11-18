@@ -319,13 +319,15 @@ else
         saatiGoster();
         setInterval(saatiGoster, 1000);
 
-        function yazdir() {
-            window.print();
-        }
-
-        function pdfKaydet() {
+        // Her iki buton da aynı çok sayfalı PDF'i üretir; sadece sonunda ne yapıldığı
+        // değişir (indirme / otomatik yazdırma). Tarayıcının kendi "Yazdır" penceresini
+        // (window.print()) doğrudan kullanmıyoruz çünkü o, sayfa CSS'i ile kapatılamayan
+        // kendi üstbilgi/altbilgisini (tarih/saat, sayfa başlığı, adres) her sayfaya ekler -
+        // diğer tüm çıktı ekranlarında olduğu gibi burada da önce temiz bir PDF üretilip
+        // yeni sekmede açılıyor ve o PDF'in kendi yazdırma penceresi tetikleniyor.
+        function _topluPdfOlustur() {
             const bloklar = document.querySelectorAll('#yazdirmaAlani .tutanak-blok');
-            if (bloklar.length === 0) { alert('Yazdırılacak kayıt bulunamadı.'); return; }
+            if (bloklar.length === 0) { alert('Yazdırılacak kayıt bulunamadı.'); return null; }
             const alan = document.getElementById('yazdirmaAlani');
             alan.style.display = 'block';
 
@@ -339,10 +341,25 @@ else
                     return alanDanPdfOlustur(blok, pdf, { kenarBosluk: 10 });
                 });
             });
-            zincir.then(() => {
+            return zincir.then(() => {
                 alan.style.display = 'none';
-                pdf.save('IhaleTutanaklari_@(DateTime.Now.ToString("yyyyMMdd_HHmmss")).pdf');
+                return pdf;
             });
+        }
+
+        function yazdir() {
+            const sonuc = _topluPdfOlustur();
+            if (!sonuc) return;
+            sonuc.then(pdf => {
+                pdf.autoPrint();
+                window.open(pdf.output('bloburl'), '_blank');
+            });
+        }
+
+        function pdfKaydet() {
+            const sonuc = _topluPdfOlustur();
+            if (!sonuc) return;
+            sonuc.then(pdf => pdf.save('IhaleTutanaklari_@(DateTime.Now.ToString("yyyyMMdd_HHmmss")).pdf'));
         }
     </script>
 }

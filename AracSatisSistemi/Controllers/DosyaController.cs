@@ -237,6 +237,65 @@ namespace AracSatisSistemi.Controllers
             return View(dosya);
         }
 
+        // İhale Tutanağı'nı (ekrandaki belgeyle aynı alan/değerleri) Excel olarak indirir.
+        public async Task<IActionResult> IhaleTutanagiExcelIndir(int id, DateTime? secilenTarih, TimeSpan? secilenSaat)
+        {
+            var dosya = await _db.Dosyalar.Include(d => d.Satislar).FirstOrDefaultAsync(d => d.Id == id);
+            if (dosya == null) return NotFound();
+
+            var cozum = IhaleTutanagiCozucu.Coz(dosya, secilenTarih);
+            var oturumlar = await _db.KomisyonOturumlari
+                .Where(k => k.SatisTuru == cozum.Tur && k.SatisTarihi.Date == cozum.Tarih.Date)
+                .ToListAsync();
+            var komisyon = IhaleTutanagiCozucu.KomisyonBilgisi(dosya, cozum.Tur, cozum.Tarih, oturumlar, secilenSaat);
+            string turAdi = cozum.Tur switch
+            {
+                SatisTuru.BirinciSatis => "1. Satış",
+                SatisTuru.IkinciSatis => "2. Satış",
+                SatisTuru.Pazarlik => "Pazarlık",
+                SatisTuru.Madde6183_86 => "6183/86 Mad.",
+                _ => cozum.Tur.ToString()
+            };
+
+            using var wb = new XLWorkbook();
+            var ws = wb.Worksheets.Add("İhale Tutanağı");
+            var satir = 1;
+            void Yaz(string alan, object? deger)
+            {
+                ws.Cell(satir, 1).Value = alan;
+                ws.Cell(satir, 1).Style.Font.Bold = true;
+                ws.Cell(satir, 2).Value = deger?.ToString() ?? "";
+                satir++;
+            }
+            Yaz("Dosya No", dosya.DosyaNo);
+            Yaz("Adı Soyadı/Ünvanı", dosya.AdiSoyadiUnvani);
+            Yaz("Vergi Kimlik No", dosya.VergiKimlikNumarasi);
+            Yaz("T.C. Kimlik No", dosya.TCKimlikNumarasi);
+            Yaz("Vergi Dairesi Adı", dosya.VergiDairesiAdi);
+            Yaz("Alacaklı Vergi Dairesi", dosya.AlacakliVergiDairesi);
+            Yaz("Plaka", dosya.Plaka);
+            Yaz("Cinsi", dosya.AracCinsi);
+            Yaz("Tipi", dosya.AracTipi);
+            Yaz("Markası", dosya.AracMarkasi);
+            Yaz("Model Yılı", dosya.ModelYili);
+            Yaz("Renk", dosya.Renk);
+            Yaz("Muhammen Bedel (TL)", dosya.MuhammenBedel);
+            Yaz("Satış Türü", turAdi);
+            Yaz("İhale Tarihi", cozum.Tarih.ToString("dd.MM.yyyy"));
+            Yaz("İhale Saati", komisyon.Saat?.ToString(@"hh\:mm"));
+            Yaz("Komisyon Başkanı", komisyon.Baskan);
+            Yaz("Komisyon Üye 1", komisyon.Uye1);
+            Yaz("Komisyon Üye 2", komisyon.Uye2);
+            Yaz("Komisyon Üye 3", komisyon.Uye3);
+            ws.Columns().AdjustToContents();
+
+            using var stream = new MemoryStream();
+            wb.SaveAs(stream);
+            stream.Position = 0;
+            return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"IhaleTutanagi_{dosya.DosyaNo.Replace("/", "_")}.xlsx");
+        }
+
         // Tek bir dosyanın tüm bilgilerini Excel olarak indirir.
         public async Task<IActionResult> ExcelIndir(int id)
         {
