@@ -233,8 +233,14 @@ namespace AracSatisSistemi.Controllers
             }
 
             // Satış iptal edildiğinde dosya PASİF değil AKTİF'e döner (yeniden satışa
-            // çıkabilsin); dosya doğrudan kapatılıyorsa bu durumun önüne geçer.
+            // çıkabilsin - ör. ihaleyi kazanan alıcıyla ilgili bir sorun oldu, araç hâlâ
+            // satılacak). Satış İADESİ ise İPTAL OLMADAN TEK BAŞINA işaretlendiğinde farklı
+            // bir senaryoyu temsil eder: mükellef borcunu başka bir yoldan (doğrudan vergi
+            // dairesine) ödemiştir, araç artık hiç satılmayacaktır - dosya bu durumda kalıcı
+            // olarak PASİF'e (İade Edildi) geçer ve hiçbir aktif/satış ekranında görünmez.
+            // Dosya doğrudan kapatılıyorsa bu durumların önüne geçer.
             if (form.SatisIptaliSecildi) dosya.Durum = DosyaDurumu.SatisaCikti;
+            else if (form.SatisIadesiSecildi) dosya.Durum = DosyaDurumu.IadeEdildi;
             if (form.DosyaKapatildi) dosya.Durum = DosyaDurumu.Kapandi;
 
             await _db.SaveChangesAsync();

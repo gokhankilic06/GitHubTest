@@ -252,10 +252,10 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: /Ayarlar/OtoparkExcelYukle - Excel (.xlsx) dosyasındaki tüm hücrelerden
-        // (hangi sütunda/satırda olduğuna bakılmaksızın) dolu metin hücrelerini otopark adı
-        // olarak okuyup listeye ekler; zaten kayıtlı olanlar (büyük/küçük harf farkı
-        // gözetmeksizin) atlanır. Satış Takvimi'nin Excel yükleme mantığıyla aynı yaklaşım.
+        // POST: /Ayarlar/OtoparkExcelYukle - Excel (.xlsx) dosyasının İLK SAYFASINDAKİ
+        // 1. SÜTUNUN 2. SATIRINDAN İTİBAREN (1. satır başlık kabul edilir, atlanır) dolu
+        // hücrelerini otopark adı olarak okuyup listeye ekler; zaten kayıtlı olanlar
+        // (büyük/küçük harf farkı gözetmeksizin) atlanır.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> OtoparkExcelYukle(IFormFile dosya)
         {
@@ -270,15 +270,14 @@ namespace AracSatisSistemi.Controllers
             {
                 using var stream = dosya.OpenReadStream();
                 using var wb = new XLWorkbook(stream);
-                foreach (var ws in wb.Worksheets)
+                var ws = wb.Worksheet(1);
+                var kullanilanAlan = ws.RangeUsed();
+                if (kullanilanAlan != null)
                 {
-                    var kullanilanAlan = ws.RangeUsed();
-                    if (kullanilanAlan == null) continue;
-                    foreach (var hucre in kullanilanAlan.CellsUsed())
+                    var sonSatir = kullanilanAlan.LastRow().RowNumber();
+                    for (var satir = 2; satir <= sonSatir; satir++)
                     {
-                        // Sıra no sütunu gibi salt sayısal hücreler otopark adı olamayacağından atlanır.
-                        if (hucre.DataType == XLDataType.Number) continue;
-                        var metin = hucre.GetString().Trim();
+                        var metin = ws.Cell(satir, 1).GetString().Trim();
                         if (!string.IsNullOrWhiteSpace(metin) && metin.Length <= 200)
                         {
                             bulunanAdlar.Add(metin);
