@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
+using ClosedXML.Excel;
 
 namespace AracSatisSistemi.Controllers
 {
@@ -248,6 +249,70 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> OtoparkEkle(string ad)
         {
             if (!string.IsNullOrWhiteSpace(ad)) { _db.Otoparklar.Add(new OtoparkKaydi { Ad = ad.Trim() }); await _db.SaveChangesAsync(); }
+            return RedirectToAction(nameof(Index));
+        }
+
+        // POST: /Ayarlar/OtoparkExcelYukle - Excel (.xlsx) dosyasındaki tüm hücrelerden
+        // (hangi sütunda/satırda olduğuna bakılmaksızın) dolu metin hücrelerini otopark adı
+        // olarak okuyup listeye ekler; zaten kayıtlı olanlar (büyük/küçük harf farkı
+        // gözetmeksizin) atlanır. Satış Takvimi'nin Excel yükleme mantığıyla aynı yaklaşım.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> OtoparkExcelYukle(IFormFile dosya)
+        {
+            if (dosya == null || dosya.Length == 0)
+            {
+                TempData["Hata"] = "Lütfen bir Excel (.xlsx) dosyası seçin.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var bulunanAdlar = new List<string>();
+            try
+            {
+                using var stream = dosya.OpenReadStream();
+                using var wb = new XLWorkbook(stream);
+                foreach (var ws in wb.Worksheets)
+                {
+                    var kullanilanAlan = ws.RangeUsed();
+                    if (kullanilanAlan == null) continue;
+                    foreach (var hucre in kullanilanAlan.CellsUsed())
+                    {
+                        // Sıra no sütunu gibi salt sayısal hücreler otopark adı olamayacağından atlanır.
+                        if (hucre.DataType == XLDataType.Number) continue;
+                        var metin = hucre.GetString().Trim();
+                        if (!string.IsNullOrWhiteSpace(metin) && metin.Length <= 200)
+                        {
+                            bulunanAdlar.Add(metin);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Hata"] = "Excel dosyası okunamadı: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (bulunanAdlar.Count == 0)
+            {
+                TempData["Hata"] = "Excel dosyasında okunabilir bir otopark adı bulunamadı.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var mevcutlar = (await _db.Otoparklar.Select(o => o.Ad).ToListAsync())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var eklenecekler = bulunanAdlar
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .Where(ad => !mevcutlar.Contains(ad))
+                .Select(ad => new OtoparkKaydi { Ad = ad })
+                .ToList();
+
+            if (eklenecekler.Count > 0)
+            {
+                _db.Otoparklar.AddRange(eklenecekler);
+                await _db.SaveChangesAsync();
+            }
+            TempData["Basari"] = $"{eklenecekler.Count} yeni otopark eklendi" +
+                (bulunanAdlar.Count - eklenecekler.Count > 0 ? $" ({bulunanAdlar.Count - eklenecekler.Count} tanesi zaten kayıtlı olduğundan atlandı)." : ".");
             return RedirectToAction(nameof(Index));
         }
 

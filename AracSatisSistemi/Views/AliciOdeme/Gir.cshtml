@@ -66,10 +66,35 @@
             <div class="col-md-3"><label class="form-label" asp-for="OtoparkaGirisTarihi">Aracın Otoparka Giriş Tarihi</label><input class="form-control" asp-for="OtoparkaGirisTarihi" type="date" id="otoparkaGirisTarihi" /></div>
             <div class="col-md-3">
                 <label class="form-label" asp-for="CekiciBedeli"></label>
-                <div class="input-group">
-                    <input class="form-control" asp-for="CekiciBedeli" type="number" step="0.01" min="0" id="cekiciBedeli" />
-                    <span class="input-group-text">TL</span>
-                </div>
+                @{
+                    var cekiciGenelAyar = (GenelAyar)ViewBag.GenelAyar;
+                    var cekiciKategori = (OtoparkAracKategorisi)ViewBag.OtoparkKategori;
+                    var cekiciSecenekleri = new (OtoparkAracKategorisi Kategori, decimal Tutar)[]
+                    {
+                        (OtoparkAracKategorisi.KucukArac, cekiciGenelAyar.KucukAracCekiciUcreti),
+                        (OtoparkAracKategorisi.MinibusKamyonet, cekiciGenelAyar.MinibusKamyonetCekiciUcreti),
+                        (OtoparkAracKategorisi.BuyukArac, cekiciGenelAyar.BuyukAracCekiciUcreti),
+                        (OtoparkAracKategorisi.Motor, cekiciGenelAyar.MotorCekiciUcreti),
+                    };
+                    var cekiciMevcutDeger = Model.CekiciBedeli ?? 0m;
+                    var cekiciKategoriTarifesi = cekiciGenelAyar.CekiciUcreti(cekiciKategori);
+                    // Birden fazla araç kategorisi aynı tutarı paylaşabildiğinden (ör. hepsi
+                    // 2.000 TL), seçili seçenek TUTARA göre değil dosyanın KENDİ kategorisine
+                    // göre belirlenir - aksi halde yanlış kategori adı seçili görünebilirdi.
+                    var standartMi = cekiciMevcutDeger == 0m || cekiciMevcutDeger == cekiciKategoriTarifesi;
+                }
+                <select class="form-select" name="CekiciBedeli" id="cekiciBedeli">
+                    <option value="0" selected="@(cekiciMevcutDeger == 0m)">Çekici Yok - 0,00 TL</option>
+                    @if (!standartMi)
+                    {
+                        <option value="@cekiciMevcutDeger.ToString(System.Globalization.CultureInfo.InvariantCulture)" selected>Mevcut (özel) - @cekiciMevcutDeger.ToString("N2") TL</option>
+                    }
+                    @foreach (var s in cekiciSecenekleri)
+                    {
+                        <option value="@s.Tutar.ToString(System.Globalization.CultureInfo.InvariantCulture)" selected="@(standartMi && cekiciMevcutDeger != 0m && s.Kategori == cekiciKategori)">@s.Kategori.Gorunen() - @s.Tutar.ToString("N2") TL</option>
+                    }
+                </select>
+                <div class="form-text">Tutarlar Güncellemeler ekranındaki araç grubu çekici ücretlerinden gelir; değiştirmek için oradan güncelleyin.</div>
             </div>
         </div>
     </div>
@@ -224,7 +249,7 @@
         }
 
         document.getElementById('otoparkaGirisTarihi').addEventListener('input', otoparkHesapla);
-        document.getElementById('cekiciBedeli').addEventListener('input', otoparkHesapla);
+        document.getElementById('cekiciBedeli').addEventListener('change', otoparkHesapla);
         otoparkHesapla();
     </script>
 }

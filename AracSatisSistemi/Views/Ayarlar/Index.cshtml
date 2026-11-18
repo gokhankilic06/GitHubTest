@@ -376,7 +376,7 @@
                 <input class="form-control" name="ad" placeholder="Yeni otopark" required />
                 <button class="btn btn-success">Ekle</button>
             </form>
-            <ul class="list-group">
+            <ul class="list-group mb-3">
                 @foreach (var o in otoparklar)
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -389,6 +389,22 @@
                     </li>
                 }
             </ul>
+            <hr />
+            <p class="text-muted small mb-2">
+                Tüm yediemin otopark listesini tek seferde yüklemek için bir Excel (.xlsx) dosyası
+                seçin; hangi sütunda/satırda olduğuna bakılmaksızın dosyadaki tüm dolu metin
+                hücreleri otopark adı olarak okunur, zaten listede olanlar atlanır.
+            </p>
+            <form asp-action="OtoparkExcelYukle" method="post" enctype="multipart/form-data" class="row g-2 align-items-end">
+                @Html.AntiForgeryToken()
+                <div class="col-auto">
+                    <label class="form-label">Otopark Listesi Excel Dosyası (.xlsx)</label>
+                    <input class="form-control" type="file" name="dosya" accept=".xlsx" required />
+                </div>
+                <div class="col-auto">
+                    <button class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Excel'den Yükle</button>
+                </div>
+            </form>
         </div>
     </div>
 
