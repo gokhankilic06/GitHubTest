@@ -138,15 +138,9 @@
     <script>
         function _pdfUret(devamEt) {
             const alan = document.getElementById('sorguAlani');
-            html2canvas(alan, { scale: 2 }).then(canvas => {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const kenarBosluk = 10;
-                const genislik = 210 - (2 * kenarBosluk);
-                const yukseklik = (canvas.height * genislik) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
-                devamEt(pdf);
-            });
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            alanDanPdfOlustur(alan, pdf, { kenarBosluk: 10 }).then(devamEt);
         }
 
         function pdfOlarakKaydet() {

@@ -67,7 +67,7 @@
     .tutanak-tablo td.etiket { font-weight: 600; background: #f8f9fa; width: 22%; }
     .tutanak-tablo td.baslik { font-weight: 700; background: #eaeaea; }
     .tutanak-paragraf { font-size: 0.85rem; }
-    .imza-cizgi { border-top: 1px solid #333; margin-top: 3rem; padding-top: .25rem; min-height: 1.2rem; }
+    .imza-cizgi { border-top: 1px solid #333; margin-top: 4rem; padding-top: .25rem; min-height: 1.2rem; }
 </style>
 
 @section Scripts {
@@ -76,14 +76,10 @@
             const alan = document.getElementById('tutanakAlani');
             const gizlenecekler = alan.querySelectorAll('.no-print');
             gizlenecekler.forEach(el => el.style.display = 'none');
-            html2canvas(alan, { scale: 2 }).then(canvas => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            alanDanPdfOlustur(alan, pdf, { kenarBosluk: 10 }).then(pdf => {
                 gizlenecekler.forEach(el => el.style.display = '');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const kenarBosluk = 10; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
-                const genislik = 210 - (2 * kenarBosluk);
-                const yukseklik = (canvas.height * genislik) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
                 devamEt(pdf);
             }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
         }

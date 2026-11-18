@@ -128,14 +128,10 @@
             const alan = document.getElementById('kararAlani');
             const gizlenecekler = alan.querySelectorAll('.no-print');
             gizlenecekler.forEach(el => el.style.display = 'none');
-            html2canvas(alan, { scale: 2 }).then(canvas => {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            alanDanPdfOlustur(alan, pdf, { kenarBosluk: 10 }).then(pdf => {
                 gizlenecekler.forEach(el => el.style.display = '');
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const kenarBosluk = 10;
-                const genislik = 210 - (2 * kenarBosluk);
-                const yukseklik = (canvas.height * genislik) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
                 devamEt(pdf);
             }).catch(() => gizlenecekler.forEach(el => el.style.display = ''));
         }

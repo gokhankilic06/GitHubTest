@@ -121,15 +121,9 @@
     <script>
         function _pdfUret(devamEt) {
             const alan = document.getElementById('yazdirAlani');
-            html2canvas(alan, { scale: 2 }).then(canvas => {
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('l', 'mm', 'a4');
-                const kenarBosluk = 8; // mm - sayfa kenarında boşluk bıraksın diye, resim köşeden köşeye yapıştırılmasın
-                const genislik = 297 - (2 * kenarBosluk);
-                const yukseklik = (canvas.height * genislik) / canvas.width;
-                pdf.addImage(canvas.toDataURL('image/png'), 'PNG', kenarBosluk, kenarBosluk, genislik, yukseklik);
-                devamEt(pdf);
-            });
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('l', 'mm', 'a4');
+            alanDanPdfOlustur(alan, pdf, { kenarBosluk: 8 }).then(devamEt);
         }
 
         function pdfOlarakKaydet() {
