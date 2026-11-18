@@ -36,6 +36,16 @@ namespace AracSatisSistemi.Data
             var aracCinsi = await db.AracCinsleri.FirstOrDefaultAsync(c => c.Ad == dosya.AracCinsi);
             var kategori = aracCinsi?.OtoparkKategorisi ?? OtoparkAracKategorisi.KucukArac;
 
+            // Çekici bedeli henüz Alıcı Ödeme Bilgileri ekranından girilmemişse (bu ekran
+            // satıştan sonra, Yazışma/Araç Satış Kararı'ndan DAHA GEÇ doldurulabilir), dosyada
+            // "Çekici Var" işaretliyse sabit kategori ücreti geçici olarak (DB'ye kaydetmeden,
+            // yalnızca bu istek için) kullanılır - aksi halde buradan üretilen otopark tutarı
+            // ve Yazışma belgelerindeki çekici ücreti satırı hep 0 TL görünürdü.
+            if (satis != null && satis.CekiciBedeli == null && dosya.CekiciVar)
+            {
+                satis.CekiciBedeli = genelAyar.CekiciUcreti(kategori);
+            }
+
             decimal satisBedeli = satis?.SatisBedeli ?? 0m;
             decimal kdvTutari = Math.Round(satisBedeli * dosya.KdvOrani / 100m, 2);
             decimal dvTutari = Math.Round(satisBedeli * dosya.DamgaVergisiOrani / 1000m, 2);

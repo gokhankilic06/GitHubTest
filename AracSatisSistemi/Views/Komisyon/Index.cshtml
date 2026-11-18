@@ -24,14 +24,15 @@
         </div>
         <div class="col-md-3">
             <label class="form-label">Satış Tarihi</label>
-            <select class="form-select" name="SatisTarihi" required>
+            <select class="form-select" name="SatisTarihi" id="satisTarihiTakvimden" required>
                 <option value="">-- Seçiniz --</option>
                 @foreach (var gun in satisGunleri)
                 {
                     <option value="@gun.ToString("yyyy-MM-dd")">@gun.ToString("dd.MM.yyyy (dddd)", trTR)</option>
                 }
             </select>
-            <div class="form-text">Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir.</div>
+            <input class="form-control" type="date" name="SatisTarihi" id="satisTarihiSerbest" style="display:none;" disabled />
+            <div class="form-text" id="tarihAciklama">Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir.</div>
         </div>
         <div class="col-md-2">
             <label class="form-label">Satış Saati</label>
@@ -127,5 +128,27 @@
         }
         satisTuruSecim.addEventListener('change', saatModunuAyarla);
         saatModunuAyarla();
+
+        // 1. ve 2. Satış'ın Satış Takvimi'nde sabit, önceden belirlenmiş tarihleri vardır -
+        // bu yüzden o türlerde tarih, takvimdeki günlerden seçilir. Pazarlık ve 6183/86 Tek
+        // Satış'ın ise böyle sabit bir takvimi yoktur (bkz. IhaleTutanagiCozucu); bu ikisi
+        // seçilince takvim listesi yerine serbest bir tarih seçici gösterilir.
+        const satisTarihiTakvimden = document.getElementById('satisTarihiTakvimden');
+        const satisTarihiSerbest = document.getElementById('satisTarihiSerbest');
+        const tarihAciklama = document.getElementById('tarihAciklama');
+        function tarihModunuAyarla() {
+            const takvimDisi = satisTuruSecim.value === '3' || satisTuruSecim.value === '4';
+            satisTarihiTakvimden.style.display = takvimDisi ? 'none' : '';
+            satisTarihiTakvimden.disabled = takvimDisi;
+            satisTarihiTakvimden.required = !takvimDisi;
+            satisTarihiSerbest.style.display = takvimDisi ? '' : 'none';
+            satisTarihiSerbest.disabled = !takvimDisi;
+            satisTarihiSerbest.required = takvimDisi;
+            tarihAciklama.textContent = takvimDisi
+                ? "Pazarlık/6183-86 Tek Satış'ın Satış Takvimi'nde sabit bir tarihi olmadığından, bu oturumun yapılacağı tarihi doğrudan seçin."
+                : "Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir.";
+        }
+        satisTuruSecim.addEventListener('change', tarihModunuAyarla);
+        tarihModunuAyarla();
     </script>
 }
