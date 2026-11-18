@@ -196,9 +196,10 @@ namespace AracSatisSistemi.Models
                     var pazarlik = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.Pazarlik);
                     if (pazarlik == null) return SurecAsamasi.PazarlikBekliyor;
 
-                    if (pazarlik.SatisSonucu == SatisSonucu.AliciCikmadi) return SurecAsamasi.SurecTamamlandi;
-
-                    if (pazarlik.SatisSonucu == SatisSonucu.AliciIslemYapmadi)
+                    // Pazarlık'ta da (ister hiç alıcı çıkmasın, ister alıcı çıkıp işlemini
+                    // tamamlamasın) son çare olarak 6183 sayılı Kanun Md. 85/86 uyarınca
+                    // 6183/86 Tek Satış denenir; o da sonuçsuz kalırsa Alıcıya Terk'e gidilir.
+                    if (pazarlik.SatisSonucu == SatisSonucu.AliciCikmadi || pazarlik.SatisSonucu == SatisSonucu.AliciIslemYapmadi)
                     {
                         var tek = Satislar.FirstOrDefault(s => s.SatisTuru == SatisTuru.Madde6183_86);
                         return tek == null ? SurecAsamasi.Madde6183_86Bekliyor : SurecAsamasi.AliciyaTerkBekliyor;
