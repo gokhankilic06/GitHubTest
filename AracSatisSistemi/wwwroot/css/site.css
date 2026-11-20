@@ -78,6 +78,24 @@ a .card:hover, .card.menu-card:hover {
     margin-bottom: .5rem;
 }
 
+/* Ana sayfadaki menü kartları, aynı tonun tekrarı yerine işlev grubuna göre (satış
+   süreci / planlama / iptal-iade / belge-rapor / yönetim) farklı vurgu renkleriyle
+   ayrılır - yalnızca görsel; davranışa hiçbir etkisi yoktur. */
+.menu-card-yesil { border-top-color: #16a34a; }
+.menu-card-yesil .menu-icon { color: #16a34a; }
+
+.menu-card-mor { border-top-color: #7c3aed; }
+.menu-card-mor .menu-icon { color: #7c3aed; }
+
+.menu-card-kirmizi { border-top-color: #dc2626; }
+.menu-card-kirmizi .menu-icon { color: #dc2626; }
+
+.menu-card-turkuaz { border-top-color: #0d9488; }
+.menu-card-turkuaz .menu-icon { color: #0d9488; }
+
+.menu-card-gri { border-top-color: #64748b; }
+.menu-card-gri .menu-icon { color: #64748b; }
+
 /* Listeleme/tablo ekranlarının (Dosya Ara, Yazışmalar ve Listeler vb.) üst başlığı -
    ikonlu, tutarlı bir çizgiyle diğer "form-section-title" kullanan ekranlarla aynı
    görsel dile sahip olsun diye. */

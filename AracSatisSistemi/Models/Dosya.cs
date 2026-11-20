@@ -344,5 +344,19 @@ namespace AracSatisSistemi.Models
 
         [NotMapped]
         public string GenelDurumGorunen => Aktif ? "Aktif" : "Pasif";
+
+        // DurumGorunenAd rozetinin (badge) rengi - AsamaRozetSinifi ile aynı mantıkla,
+        // tüm listelerde/detay sayfasında tek, tutarlı bir görünüm için tek noktadan
+        // hesaplanır (ör. "Aktif" yeşil, "Satıldı" mavi, "İptal/İade Edildi" kırmızı).
+        [NotMapped]
+        public string DurumRozetSinifi => Durum switch
+        {
+            DosyaDurumu.Kayitli or DosyaDurumu.SatisaCikti => "bg-success",
+            DosyaDurumu.Satildi => "bg-primary",
+            DosyaDurumu.IptalEdildi or DosyaDurumu.IadeEdildi => "bg-danger",
+            DosyaDurumu.Kapandi => "bg-secondary",
+            DosyaDurumu.AliciyaTerkEdildi => "bg-dark",
+            _ => "bg-secondary"
+        };
     }
 }
