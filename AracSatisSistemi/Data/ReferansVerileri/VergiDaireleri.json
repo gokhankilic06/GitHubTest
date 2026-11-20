@@ -1996,30 +1996,6 @@
     "Sehir": "Kayseri"
   },
   {
-    "Ad": "Delice Vergi Dairesi Müdürlüğü",
-    "Sehir": "Kırıkkale"
-  },
-  {
-    "Ad": "Keskin Vergi Dairesi Müdürlüğü",
-    "Sehir": "Kırıkkale"
-  },
-  {
-    "Ad": "Kırıkkale Vergi Dairesi Balışeyh Şubesi",
-    "Sehir": "Kırıkkale"
-  },
-  {
-    "Ad": "Kırıkkale Vergi Dairesi Çelebi Şubesi",
-    "Sehir": "Kırıkkale"
-  },
-  {
-    "Ad": "Kırıkkale Vergi Dairesi Karakeçili Şubesi",
-    "Sehir": "Kırıkkale"
-  },
-  {
-    "Ad": "Kırıkkale Vergi Dairesi Sulakyurt Şubesi",
-    "Sehir": "Kırıkkale"
-  },
-  {
     "Ad": "Babaeski Vergi Dairesi Müdürlüğü",
     "Sehir": "Kırklareli"
   },
@@ -2550,26 +2526,6 @@
   {
     "Ad": "Ürgüp Vergi Dairesi Müdürlüğü",
     "Sehir": "Nevşehir"
-  },
-  {
-    "Ad": "Altunhisar Vergi Dairesi Müdürlüğü",
-    "Sehir": "Niğde"
-  },
-  {
-    "Ad": "Bor Vergi Dairesi Müdürlüğü",
-    "Sehir": "Niğde"
-  },
-  {
-    "Ad": "Çamardı Vergi Dairesi Müdürlüğü",
-    "Sehir": "Niğde"
-  },
-  {
-    "Ad": "Çiftlik Vergi Dairesi Müdürlüğü",
-    "Sehir": "Niğde"
-  },
-  {
-    "Ad": "Ulukışla Vergi Dairesi Müdürlüğü",
-    "Sehir": "Niğde"
   },
   {
     "Ad": "Akkuş Vergi Dairesi Müdürlüğü",
@@ -3458,5 +3414,49 @@
   {
     "Ad": "Sivrihisar Vergi Dairesi Müdürlüğü",
     "Sehir": "Eskişehir"
+  },
+  {
+    "Ad": "Delice Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Irmak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Kaletepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Keskin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Kırıkkale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Altunhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Bor Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Çamardı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Çiftlik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Niğde Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Ulukışla Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
   }
 ]
