@@ -129,7 +129,7 @@
                             <td>@tekilDosya.DosyaNo</td>
                             <td>@tekilDosya.Plaka</td>
                             <td>@tekilDosya.AdiSoyadiUnvani</td>
-                            <td>@tekilDosya.GenelDurumGorunen</td>
+                            <td><span class="badge @tekilDosya.DurumRozetSinifi">@tekilDosya.GenelDurumGorunen</span></td>
                             <td class="d-flex gap-2">
                                 <a class="btn btn-sm btn-outline-primary" asp-action="@turAction" asp-route-dosyaNo="@tekilDosya.DosyaNo"><i class="bi bi-eye"></i> Görüntüle</a>
                                 <a class="btn btn-sm btn-outline-secondary" asp-action="@turAction" asp-route-dosyaNo="@tekilDosya.DosyaNo" asp-route-otomatikYazdir="true"><i class="bi bi-printer"></i> Yazdır</a>
