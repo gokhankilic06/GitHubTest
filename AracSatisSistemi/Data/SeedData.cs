@@ -23,6 +23,14 @@ namespace AracSatisSistemi.Data
         public List<string> Modeller { get; set; } = new();
     }
 
+    public class OtoparkVerisi
+    {
+        public string Ad { get; set; } = string.Empty;
+        public string? Adres { get; set; }
+        public string? YetkiliCalisani { get; set; }
+        public string? Telefon { get; set; }
+    }
+
     public static class SeedData
     {
         private static readonly string VeriKlasoru = Path.Combine(AppContext.BaseDirectory, "Data", "ReferansVerileri");
@@ -66,9 +74,9 @@ namespace AracSatisSistemi.Data
                 .Select(v => new VergiDairesiKaydi { Ad = v.Ad, Sehir = v.Sehir }));
 
             var mevcutOtoparklar = context.Otoparklar.Select(o => o.Ad).ToHashSet();
-            context.Otoparklar.AddRange(JsonOku<string>("Otoparklar.json")
-                .Where(o => !mevcutOtoparklar.Contains(o))
-                .Select(o => new OtoparkKaydi { Ad = o }));
+            context.Otoparklar.AddRange(JsonOku<OtoparkVerisi>("Otoparklar.json")
+                .Where(o => !mevcutOtoparklar.Contains(o.Ad))
+                .Select(o => new OtoparkKaydi { Ad = o.Ad, Adres = o.Adres, YetkiliCalisani = o.YetkiliCalisani, Telefon = o.Telefon }));
 
             var mevcutRenkler = context.AracRenkleri.Select(r => r.Ad).ToHashSet();
             context.AracRenkleri.AddRange(JsonOku<string>("AracRenkleri.json")

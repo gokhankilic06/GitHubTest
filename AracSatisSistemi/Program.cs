@@ -153,6 +153,14 @@ using (var scope = app.Services.CreateScope())
     try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Dosyalar"" ADD COLUMN ""DamgaVergisiOrani"" decimal(18,2) NOT NULL DEFAULT 5.69;"); }
     catch { /* sütun zaten varsa göz ardı edilir */ }
 
+    // Otopark kayıtlarına Adres/Yetkili-Çalışanı/Telefon alanları sonradan eklendi; eski
+    // veritabanlarında sütun yoksa eklenir.
+    foreach (var sutun in new[] { "Adres", "YetkiliCalisani", "Telefon" })
+    {
+        try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Otoparklar"" ADD COLUMN """ + sutun + @""" TEXT NULL;"); }
+        catch { /* sütun zaten varsa göz ardı edilir */ }
+    }
+
     // İlk kurulumda hiç kullanıcı yoksa, giriş yapılabilsin diye varsayılan bir "admin"
     // kullanıcısı oluşturulur. Güncellemeler > Kullanıcılar ekranından şifre değiştirilmeli
     // ve gerekirse diğer kullanıcılar eklenmelidir.

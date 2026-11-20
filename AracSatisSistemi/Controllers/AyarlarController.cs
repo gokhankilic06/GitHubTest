@@ -20,7 +20,6 @@ namespace AracSatisSistemi.Controllers
             ViewBag.AracModelleri = await _db.AracModelleri.OrderBy(a => a.MarkaAdi).ThenBy(a => a.Ad).ToListAsync();
             ViewBag.Cinsler = await _db.AracCinsleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.VergiDaireleri = await _db.VergiDaireleri.OrderBy(a => a.Sehir).ThenBy(a => a.Ad).ToListAsync();
-            ViewBag.Otoparklar = await _db.Otoparklar.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.Renkler = await _db.AracRenkleri.OrderBy(a => a.Ad).ToListAsync();
             ViewBag.ResmiTatiller = await _db.ResmiTatiller.OrderBy(t => t.Tarih).ToListAsync();
             ViewBag.Kullanicilar = await _db.Kullanicilar.OrderBy(k => k.KullaniciAdi).ToListAsync();
@@ -241,95 +240,6 @@ namespace AracSatisSistemi.Controllers
             }
 
             _db.VergiDaireleri.Remove(kayit);
-            await _db.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> OtoparkEkle(string ad)
-        {
-            if (!string.IsNullOrWhiteSpace(ad)) { _db.Otoparklar.Add(new OtoparkKaydi { Ad = ad.Trim() }); await _db.SaveChangesAsync(); }
-            return RedirectToAction(nameof(Index));
-        }
-
-        // POST: /Ayarlar/OtoparkExcelYukle - Excel (.xlsx) dosyasının İLK SAYFASINDAKİ
-        // 1. SÜTUNUN 2. SATIRINDAN İTİBAREN (1. satır başlık kabul edilir, atlanır) dolu
-        // hücrelerini otopark adı olarak okuyup listeye ekler; zaten kayıtlı olanlar
-        // (büyük/küçük harf farkı gözetmeksizin) atlanır.
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> OtoparkExcelYukle(IFormFile dosya)
-        {
-            if (dosya == null || dosya.Length == 0)
-            {
-                TempData["Hata"] = "Lütfen bir Excel (.xlsx) dosyası seçin.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var bulunanAdlar = new List<string>();
-            try
-            {
-                using var stream = dosya.OpenReadStream();
-                using var wb = new XLWorkbook(stream);
-                var ws = wb.Worksheet(1);
-                var kullanilanAlan = ws.RangeUsed();
-                if (kullanilanAlan != null)
-                {
-                    var sonSatir = kullanilanAlan.LastRow().RowNumber();
-                    for (var satir = 2; satir <= sonSatir; satir++)
-                    {
-                        var metin = ws.Cell(satir, 1).GetString().Trim();
-                        if (!string.IsNullOrWhiteSpace(metin) && metin.Length <= 200)
-                        {
-                            bulunanAdlar.Add(metin);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["Hata"] = "Excel dosyası okunamadı: " + ex.Message;
-                return RedirectToAction(nameof(Index));
-            }
-
-            if (bulunanAdlar.Count == 0)
-            {
-                TempData["Hata"] = "Excel dosyasında okunabilir bir otopark adı bulunamadı.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            var mevcutlar = (await _db.Otoparklar.Select(o => o.Ad).ToListAsync())
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
-            var eklenecekler = bulunanAdlar
-                .Distinct(StringComparer.OrdinalIgnoreCase)
-                .Where(ad => !mevcutlar.Contains(ad))
-                .Select(ad => new OtoparkKaydi { Ad = ad })
-                .ToList();
-
-            if (eklenecekler.Count > 0)
-            {
-                _db.Otoparklar.AddRange(eklenecekler);
-                await _db.SaveChangesAsync();
-            }
-            TempData["Basari"] = $"{eklenecekler.Count} yeni otopark eklendi" +
-                (bulunanAdlar.Count - eklenecekler.Count > 0 ? $" ({bulunanAdlar.Count - eklenecekler.Count} tanesi zaten kayıtlı olduğundan atlandı)." : ".");
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> OtoparkSil(int id)
-        {
-            var kayit = await _db.Otoparklar.FindAsync(id);
-            if (kayit == null) return RedirectToAction(nameof(Index));
-
-            var kullaniliyor = await _db.Dosyalar.AnyAsync(d => d.OtoparkAdi == kayit.Ad)
-                || await _db.Satislar.AnyAsync(s => s.FaturayiKesenOtopark == kayit.Ad);
-            if (kullaniliyor)
-            {
-                TempData["Hata"] = $"\"{kayit.Ad}\" otoparkı en az bir dosyada kullanılıyor, bu yüzden silinemez.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            _db.Otoparklar.Remove(kayit);
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
