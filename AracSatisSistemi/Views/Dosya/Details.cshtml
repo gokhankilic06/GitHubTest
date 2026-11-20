@@ -118,15 +118,14 @@
         </tr>
         <tr>
             <td class="etiket">Otoparka Giriş Tarihi</td><td>@Model.OtoparkaGirisTarihi?.ToString("dd.MM.yyyy")</td>
-            <td class="etiket">Hasar Durumu</td><td>@Model.HasarDurumu</td>
-        </tr>
-        <tr>
             <td class="etiket">Muhammen Bedel</td><td>@Model.MuhammenBedel.ToString("N2") TL</td>
-            <td class="etiket">Teminat (%5)</td><td>@Model.Teminat.ToString("N2") TL</td>
         </tr>
         <tr>
+            <td class="etiket">Teminat (%5)</td><td>@Model.Teminat.ToString("N2") TL</td>
             <td class="etiket">KDV Oranı</td><td>%@Model.KdvOrani</td>
-            <td class="etiket">Damga Vergisi (Binde @Model.DamgaVergisiOrani.ToString("0.00"))</td><td>@Model.DamgaVergisiTutari.ToString("N2") TL</td>
+        </tr>
+        <tr>
+            <td class="etiket">Hasar Durumu</td><td colspan="3">@Model.HasarDurumu</td>
         </tr>
     </table>
 </div>
