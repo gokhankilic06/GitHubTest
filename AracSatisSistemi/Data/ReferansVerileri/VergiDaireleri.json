@@ -1,1 +1,3426 @@
-[]
+[
+  {
+    "Ad": "Aladağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Ceyhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Çukurova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Feke Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "İmamoğlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Karaisalı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Karataş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Kozan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Pozantı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Saimbeyli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Seyhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Tufanbeyli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Yumurtalık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Yüreğir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Ziyapaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "5 Ocak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adana"
+  },
+  {
+    "Ad": "Adıyaman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Besni Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Çelikhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Gölbaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Kahta Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Karakuş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Sincik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Adıyaman"
+  },
+  {
+    "Ad": "Başmakçı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Bolvadin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Çay Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Çiğiltepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Çobanlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Dazkırı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Dinar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Emirdağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Evciler Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "İhsaniye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "İscehisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Kocatepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Sandıklı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Sinanpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Sultandağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Şuhut Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Tınaztepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Afyonkarahisar"
+  },
+  {
+    "Ad": "Ağrı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "Diyadin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "Doğubayazıt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "Eleşkirt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "İshak Paşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "Patnos Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "Tutak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ağrı"
+  },
+  {
+    "Ad": "Ağaçören Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Aksaray Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Eskil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Gülağaç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Güzelyurt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Ortaköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Sultanhanı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aksaray"
+  },
+  {
+    "Ad": "Amasya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Amasya"
+  },
+  {
+    "Ad": "Göynücek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Amasya"
+  },
+  {
+    "Ad": "Gümüşhacıköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Amasya"
+  },
+  {
+    "Ad": "Merzifon Vergi Dairesi Müdürlüğü",
+    "Sehir": "Amasya"
+  },
+  {
+    "Ad": "Suluova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Amasya"
+  },
+  {
+    "Ad": "Taşova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Amasya"
+  },
+  {
+    "Ad": "Akyurt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Anadolu İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Ankara İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Ankara Kurumlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Ayaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Bala Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Başkent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Beypazarı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Beytepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Cumhuriyet Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Çankaya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Çubuk Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Dışkapı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Dikimevi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Doğanbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Elmadağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Etimesgut Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Gölbaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Harçlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Haymana Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Hitit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "İvedik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Kahramankazan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Kalecik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Kavaklıdere Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Keçiören Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Kızılbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Kızılcahamam Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Maltepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Mithatpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "M.Karagüzel Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Nallıhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Ostim Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Polatlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Seğmenler Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Sincan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Şereflikoçhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Ulus Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Veraset ve İntikal Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Yeğenbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Yenimahalle Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Yıldırımbeyazıt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Y.Galip Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "100. Yıl İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ankara"
+  },
+  {
+    "Ad": "Akseki Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Alanya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Demre Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Düden Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Elmalı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Falez Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Finike Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Gazipaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Kalekapı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Kaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Kemer Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Korkuteli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Kumluca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Kurumlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Manavgat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Muratpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Serik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Üçkapılar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Antalya"
+  },
+  {
+    "Ad": "Ardahan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ardahan"
+  },
+  {
+    "Ad": "Göle Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ardahan"
+  },
+  {
+    "Ad": "Ardanuç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Arhavi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Artvin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Borçka Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Hopa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Şavşat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Yusufeli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Artvin"
+  },
+  {
+    "Ad": "Bozdoğan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Buharkent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Çine Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Didim Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Efeler Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Germencik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Güzelhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "İncirliova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Karacasu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Karpuzlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Koçarlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Köşk Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Kuşadası Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Kuyucak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Nazilli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Söke Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Sultanhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Yenipazar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Aydın"
+  },
+  {
+    "Ad": "Ayvalık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Bandırma Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Bigadiç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Burhaniye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Dursunbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Edremit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Erdek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Gömeç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Gönen Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Havran Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "İvrindi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Karesi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Kepsut Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Koca Seyit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Kurtdereli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Manyas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Marmara Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Savaştepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Sındırgı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Susurluk Vergi Dairesi Müdürlüğü",
+    "Sehir": "Balıkesir"
+  },
+  {
+    "Ad": "Amasra Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bartın"
+  },
+  {
+    "Ad": "Bartın Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bartın"
+  },
+  {
+    "Ad": "Ulus Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bartın"
+  },
+  {
+    "Ad": "Batman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Batman"
+  },
+  {
+    "Ad": "Kozluk Vergi Dairesi Müdürlüğü",
+    "Sehir": "Batman"
+  },
+  {
+    "Ad": "Raman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Batman"
+  },
+  {
+    "Ad": "Bayburt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bayburt"
+  },
+  {
+    "Ad": "Bilecik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bilecik"
+  },
+  {
+    "Ad": "Bozüyük Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bilecik"
+  },
+  {
+    "Ad": "Gölpazarı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bilecik"
+  },
+  {
+    "Ad": "Kayı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bilecik"
+  },
+  {
+    "Ad": "Osmaneli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bilecik"
+  },
+  {
+    "Ad": "Söğüt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bilecik"
+  },
+  {
+    "Ad": "Bingöl Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bingöl"
+  },
+  {
+    "Ad": "Genç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bingöl"
+  },
+  {
+    "Ad": "Karlıova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bingöl"
+  },
+  {
+    "Ad": "Solhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bingöl"
+  },
+  {
+    "Ad": "Yüzen Ada Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bingöl"
+  },
+  {
+    "Ad": "Adilcevaz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bitlis"
+  },
+  {
+    "Ad": "Ahlat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bitlis"
+  },
+  {
+    "Ad": "Bitlis Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bitlis"
+  },
+  {
+    "Ad": "Güroymak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bitlis"
+  },
+  {
+    "Ad": "Hizan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bitlis"
+  },
+  {
+    "Ad": "Tatvan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bitlis"
+  },
+  {
+    "Ad": "Bolu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Gerede Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Göynük Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Köroğlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Mengen Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Mudurnu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Yeniçağa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bolu"
+  },
+  {
+    "Ad": "Bucak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Burdur Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Çavdır Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Gölhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Karamanlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Salda Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Tefenni Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Yeşilova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Burdur"
+  },
+  {
+    "Ad": "Bursa İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Bursa Veraset ve Harçlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Çekirge Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Ertuğrulgazi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Gemlik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Gökdere Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "İnegöl Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "İznik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Karacabey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Kozahan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Mudanya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Mustafakemalpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Nilüfer Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Orhaneli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Orhangazi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Osmangazi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Setbaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Uludağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Yenişehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Yeşil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Yıldırım Vergi Dairesi Müdürlüğü",
+    "Sehir": "Bursa"
+  },
+  {
+    "Ad": "Acıpayam Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Babadağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Bayramyeri Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Bekilli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Bozkurt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Buldan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Çal Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Çameli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Çardak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Çınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Çivril Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Denizli İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Gökpınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Güney Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Honaz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Kale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Pamukkale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Sarayköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Saraylar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Serinhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Tavas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Denizli"
+  },
+  {
+    "Ad": "Akçakoca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Cumayeri Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Çilimli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Düzce Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Gölyaka Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Gümüşova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Kaynaşlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Yığılca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Düzce"
+  },
+  {
+    "Ad": "Bismil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Cahit Sıtkı Tarancı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Çermik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Çınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Ergani Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Gökalp Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Hani Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Kayapınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Lice Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Silvan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Süleyman Nazif Vergi Dairesi Müdürlüğü",
+    "Sehir": "Diyarbakır"
+  },
+  {
+    "Ad": "Arda Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Enez Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Havsa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "İpsala Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Keşan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Kırkpınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Meriç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Tunca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Uzunköprü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Edirne"
+  },
+  {
+    "Ad": "Elazığ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Elazığ"
+  },
+  {
+    "Ad": "Harput Vergi Dairesi Müdürlüğü",
+    "Sehir": "Elazığ"
+  },
+  {
+    "Ad": "Hazar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Elazığ"
+  },
+  {
+    "Ad": "Karakoçan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Elazığ"
+  },
+  {
+    "Ad": "Kovancılar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Elazığ"
+  },
+  {
+    "Ad": "Palu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Elazığ"
+  },
+  {
+    "Ad": "Aşkale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Aziziye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Hınıs Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Horasan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "İspir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Karayazı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Kazım Karabekir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Oltu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Palandöken Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Pasinler Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzurum"
+  },
+  {
+    "Ad": "Ergan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzincan"
+  },
+  {
+    "Ad": "Fevzipaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzincan"
+  },
+  {
+    "Ad": "Tercan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Erzincan"
+  },
+  {
+    "Ad": "Araban Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Gaziantep İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Gazikent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "İslahiye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Kozanlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Nizip Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Nurdağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Oğuzeli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Suburcu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Şahinbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Şehitkamil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Yavuzeli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gaziantep"
+  },
+  {
+    "Ad": "Gümüşhane Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gümüşhane"
+  },
+  {
+    "Ad": "Kelkit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gümüşhane"
+  },
+  {
+    "Ad": "Kürtün Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gümüşhane"
+  },
+  {
+    "Ad": "Şiran Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gümüşhane"
+  },
+  {
+    "Ad": "Torul Vergi Dairesi Müdürlüğü",
+    "Sehir": "Gümüşhane"
+  },
+  {
+    "Ad": "Ada Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Bulancak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Dereli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Espiye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Eynesil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Giresun Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Görele Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Keşap Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Şebinkarahisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Tirebolu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Yağlıdere Vergi Dairesi Müdürlüğü",
+    "Sehir": "Giresun"
+  },
+  {
+    "Ad": "Akdeniz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Altınözü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Antakya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Asım Gündüz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Belen Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Dörtyol Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Erzin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Hassa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Kırıkhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Kumlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Reyhanlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Sahil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Samandağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Şükrü Kanatlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Yayladağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "23 Temmuz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hatay"
+  },
+  {
+    "Ad": "Davraz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Eğirdir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Gelendost Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Gülkent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Kaymakkapı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Keçiborlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Senirkent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Şarkikaraağaç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Yalvaç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Isparta"
+  },
+  {
+    "Ad": "Aras Vergi Dairesi Müdürlüğü",
+    "Sehir": "Iğdır"
+  },
+  {
+    "Ad": "Iğdır Vergi Dairesi Müdürlüğü",
+    "Sehir": "Iğdır"
+  },
+  {
+    "Ad": "Tuzluca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Iğdır"
+  },
+  {
+    "Ad": "Adalar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Alemdağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Anadolu Kurumlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Atışalanı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Avcılar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Bakırköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Başakşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Bayrampaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Beşiktaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Beyazıt Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Beykoz Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Beylikdüzü Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Beyoğlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Boğaziçi Kurumlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Büyükçekmece Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Büyükmükellefler Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Çamlıca Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Davutpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Erenköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Esenler Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Esenyurt Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Fatih Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Gaziosmanpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Göztepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Güneşli Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Güngören Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Haliç İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Halkalı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Hisar Veraset ve Harçlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Hocapaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "İkitelli Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Kadıköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Kağıthane Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Kartal Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Kasımpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Kocasinan Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Kozyatağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Küçükçekmece Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Küçükköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Küçükyalı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Marmara Kurumlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Maslak Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Mecidiyeköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Merter Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Nakil Vasıtaları Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Pendik Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Rıhtım Veraset ve Harçlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Sarıgazi Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Sarıyer Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Silivri Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Sultanbeyli Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Şile Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Şişli Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Tuna Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Tuzla Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Ümraniye Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Üsküdar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Vatan İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Yakacık Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Yeditepe Veraset ve Harçlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Yenibosna Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Yenikapı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Zeytinburnu Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Zincirlikuyu Vergi Dairesi Müdürlüğü",
+    "Sehir": "İstanbul"
+  },
+  {
+    "Ad": "Aliağa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Balçova Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Bayındır Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Belkahve Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Bergama Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Beydağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Bornova Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Çakabey İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Çeşme Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Çiğli Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Dikili Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Ege Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Foça Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Gaziemir Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Hasan Tahsin Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "İzmir İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Kadifekale Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Karaburun Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Karşıyaka Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Kemalpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Kemeraltı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Kınık Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Kiraz Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Konak Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Kordon Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Menderes Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Menemen Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Ödemiş Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Seferihisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Selçuk Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Şirinyer Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Taştılar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Tire Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Torbalı Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Urla Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Yamanlar Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "9 Eylül Vergi Dairesi Müdürlüğü",
+    "Sehir": "İzmir"
+  },
+  {
+    "Ad": "Afşin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Aksu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Andırın Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Aslanbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Çağlayancerit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Elbistan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Göksun Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Nurhak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Pazarcık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Türkoğlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kahramanmaraş"
+  },
+  {
+    "Ad": "Ermenek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karaman"
+  },
+  {
+    "Ad": "Karaman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karaman"
+  },
+  {
+    "Ad": "Larende Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karaman"
+  },
+  {
+    "Ad": "Kafkas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kars"
+  },
+  {
+    "Ad": "Kağızman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kars"
+  },
+  {
+    "Ad": "Kars Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kars"
+  },
+  {
+    "Ad": "Sarıkamış Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kars"
+  },
+  {
+    "Ad": "Selim Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kars"
+  },
+  {
+    "Ad": "Araç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Atabey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Azdavay Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Bozkurt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Cide Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Daday Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Devrekani Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "İnebolu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Kastamonu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Taşköprü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Tosya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kastamonu"
+  },
+  {
+    "Ad": "Bünyan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Develi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Erciyes Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Gevher Nesibe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "İncesu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Kaleönü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Kültepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Mimarsinan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Pınarbaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Sarız Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Tomarza Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Yahyalı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Yeşilhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kayseri"
+  },
+  {
+    "Ad": "Delice Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Keskin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Kırıkkale Vergi Dairesi Balışeyh Şubesi",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Kırıkkale Vergi Dairesi Çelebi Şubesi",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Kırıkkale Vergi Dairesi Karakeçili Şubesi",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Kırıkkale Vergi Dairesi Sulakyurt Şubesi",
+    "Sehir": "Kırıkkale"
+  },
+  {
+    "Ad": "Babaeski Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Demirköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Kırklareli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Kırk Şehitler Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Lüleburgaz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Pınarhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Vize Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırklareli"
+  },
+  {
+    "Ad": "Cacabey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırşehir"
+  },
+  {
+    "Ad": "Çiçekdağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırşehir"
+  },
+  {
+    "Ad": "Kaman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırşehir"
+  },
+  {
+    "Ad": "Kırşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırşehir"
+  },
+  {
+    "Ad": "Mucur Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kırşehir"
+  },
+  {
+    "Ad": "Acısu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Alemdar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Derince Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Gebze İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Gölcük Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "İlyasbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Kandıra Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Karamürsel Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Kocaeli İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Körfez Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Tepecik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Uluçınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kocaeli"
+  },
+  {
+    "Ad": "Akşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Alaaddin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Altınekin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Beyşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Bozkır Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Cihanbeyli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Çumra Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Doğanhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Emirgazi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Ereğli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Hüyük Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Ilgın Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Kadınhanı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Karapınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Karatay Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Konya İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Kulu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Meram Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Mevlana Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Sarayönü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Selçuk Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Seydişehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Yunak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Konya"
+  },
+  {
+    "Ad": "Altıntaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Çaltepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Çinili Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Domaniç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Emet Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Gediz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Hisarcık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Simav Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Tavşanlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "30 Ağustos Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kütahya"
+  },
+  {
+    "Ad": "Akçadağ Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Arapgir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Battalgazi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Beydağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Darende Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Doğanşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Fırat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Hekimhan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Malatya"
+  },
+  {
+    "Ad": "Ahmetli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Akhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Alaşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Demirci Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Gölmarmara Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Gördes Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Kırkağaç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Köprübaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Kula Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Manisa İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Mesir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Salihli Adil Oral Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Sarıgöl Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Saruhanlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Selendi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Soma Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Şehit Cihan Güneş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Turgutlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Manisa"
+  },
+  {
+    "Ad": "Dargeçit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Derik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Kızıltepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Mardin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Mazıdağı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Midyat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Nusaybin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Ömerli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Savur Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mardin"
+  },
+  {
+    "Ad": "Anamur Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Aydıncık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Bozyazı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Erdemli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Gülnar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "İstiklal Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Kızılmurat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Liman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Mut Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Silifke Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Şehitkerim Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Toros Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Uray Vergi Dairesi Müdürlüğü",
+    "Sehir": "Mersin"
+  },
+  {
+    "Ad": "Bodrum Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Dalaman Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Datça Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Fethiye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Kavaklıdere Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Köyceğiz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Marmaris Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Milas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Muğla Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Ortaca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Seydikemer Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Ula Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Yatağan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muğla"
+  },
+  {
+    "Ad": "Bulanık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muş"
+  },
+  {
+    "Ad": "Hasköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muş"
+  },
+  {
+    "Ad": "Korkut Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muş"
+  },
+  {
+    "Ad": "Malazgirt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muş"
+  },
+  {
+    "Ad": "Muş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muş"
+  },
+  {
+    "Ad": "Varto Vergi Dairesi Müdürlüğü",
+    "Sehir": "Muş"
+  },
+  {
+    "Ad": "Acıgöl Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Avanos Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Derinkuyu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Gülşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Hacıbektaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Kozaklı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Nevşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Ürgüp Vergi Dairesi Müdürlüğü",
+    "Sehir": "Nevşehir"
+  },
+  {
+    "Ad": "Altunhisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Bor Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Çamardı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Çiftlik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Ulukışla Vergi Dairesi Müdürlüğü",
+    "Sehir": "Niğde"
+  },
+  {
+    "Ad": "Akkuş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Altınordu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Aybastı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Boztepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Çatalpınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Çaybaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Fatsa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Gölköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Gürgentepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Kabataş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Korgan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Köprübaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Kumru Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Perşembe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Ulubey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Ünye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Ordu"
+  },
+  {
+    "Ad": "Bahçe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Osmaniye"
+  },
+  {
+    "Ad": "Düziçi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Osmaniye"
+  },
+  {
+    "Ad": "Kadirli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Osmaniye"
+  },
+  {
+    "Ad": "Osmaniye Amanos Vergi Dairesi Müdürlüğü",
+    "Sehir": "Osmaniye"
+  },
+  {
+    "Ad": "Osmaniye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Osmaniye"
+  },
+  {
+    "Ad": "Toprakkale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Osmaniye"
+  },
+  {
+    "Ad": "Ardeşen Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Çamlıhemşin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Çayeli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Fındıklı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Kaçkar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Pazar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Rize Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Yeşilçay Vergi Dairesi Müdürlüğü",
+    "Sehir": "Rize"
+  },
+  {
+    "Ad": "Akyazı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Ali Fuat Cebesoy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Geyve Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Gümrükönü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Hendek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Karapürçek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Karasu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Kaynarca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Kocaali Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Pamukova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Sakarya İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Sapanca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sakarya"
+  },
+  {
+    "Ad": "Alaçam Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Asarcık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Bafra Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Çarşamba Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Gaziler Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Havza Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Kavak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Ladik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Salıpazarı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Terme Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Vezirköprü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Yakakent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Zafer Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "19 Mayıs Ballıca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "19 Mayıs Vergi Dairesi Müdürlüğü",
+    "Sehir": "Samsun"
+  },
+  {
+    "Ad": "Baykan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Siirt"
+  },
+  {
+    "Ad": "Deliklitaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Siirt"
+  },
+  {
+    "Ad": "Kurtalan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Siirt"
+  },
+  {
+    "Ad": "Siirt Vergi Dairesi Müdürlüğü",
+    "Sehir": "Siirt"
+  },
+  {
+    "Ad": "Ayancık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Boyabat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Durağan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Erfelek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Gerze Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Sinop Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Türkeli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sinop"
+  },
+  {
+    "Ad": "Divriği Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Gemerek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Gürün Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Kale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Kangal Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Site Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Suşehri Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Şarkışla Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Yıldızeli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Zara Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "4 Eylül Vergi Dairesi Müdürlüğü",
+    "Sehir": "Sivas"
+  },
+  {
+    "Ad": "Çerkezköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Çorlu İhtisas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Çorlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Hayrabolu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Kapaklı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Malkara Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Marmaraereğlisi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Muratlı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Namık Kemal Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Saray Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Süleymanpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Şarköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tekirdağ"
+  },
+  {
+    "Ad": "Almus Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Erbaa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Niksar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Pazar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Reşadiye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Tokat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Topçam Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Turhal Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Zile Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tokat"
+  },
+  {
+    "Ad": "Akçaabat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Araklı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Arsin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Beşikdüzü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Çarşıbaşı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Çaykara Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Düzköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Hızırbey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Karadeniz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Maçka Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Of Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Ortahisar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Sürmene Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Şalpazarı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Tonya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Vakfikebir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Yomra Vergi Dairesi Müdürlüğü",
+    "Sehir": "Trabzon"
+  },
+  {
+    "Ad": "Munzur Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tunceli"
+  },
+  {
+    "Ad": "Tunceli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Tunceli"
+  },
+  {
+    "Ad": "Banaz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Uşak"
+  },
+  {
+    "Ad": "Eşme Vergi Dairesi Müdürlüğü",
+    "Sehir": "Uşak"
+  },
+  {
+    "Ad": "Karahallı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Uşak"
+  },
+  {
+    "Ad": "Sivaslı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Uşak"
+  },
+  {
+    "Ad": "Ulubey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Uşak"
+  },
+  {
+    "Ad": "Uşak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Uşak"
+  },
+  {
+    "Ad": "Akdamar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Başkale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Çaldıran Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Edremit Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Erciş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Gevaş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Gürpınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Muradiye Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Özalp Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Van Vergi Dairesi Müdürlüğü",
+    "Sehir": "Van"
+  },
+  {
+    "Ad": "Altınova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yalova"
+  },
+  {
+    "Ad": "Armutlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yalova"
+  },
+  {
+    "Ad": "Çınarcık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yalova"
+  },
+  {
+    "Ad": "Yalova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yalova"
+  },
+  {
+    "Ad": "Akdağmadeni Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Aydıncık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Boğazlıyan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Çamlık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Çayıralan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Çekerek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Saraykent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Sarıkaya Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Sorgun Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Şefaatli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Yerköy Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Yozgat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Yozgat"
+  },
+  {
+    "Ad": "Alaplı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Çaycuma Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Devrek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Gökçebey Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Karadeniz Ereğli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Karaelmas Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Uzunmehmet Vergi Dairesi Müdürlüğü",
+    "Sehir": "Zonguldak"
+  },
+  {
+    "Ad": "Ayvacık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Bayramiç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Biga Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Bozcaada Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Çanakkale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Çan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Eceabat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Ezine Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Gelibolu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Gökçeada Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Lapseki Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Yenice Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çanakkale"
+  },
+  {
+    "Ad": "Çankırı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çankırı"
+  },
+  {
+    "Ad": "Çerkeş Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çankırı"
+  },
+  {
+    "Ad": "Ilgaz Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çankırı"
+  },
+  {
+    "Ad": "Karatekin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çankırı"
+  },
+  {
+    "Ad": "Orta Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çankırı"
+  },
+  {
+    "Ad": "Şabanözü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çankırı"
+  },
+  {
+    "Ad": "Akşemseddin Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Alaca Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Bayat Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Çorum Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Hasanpaşa Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "İskilip Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Kargı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Mecitözü Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Osmancık Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Sungurlu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Çorum"
+  },
+  {
+    "Ad": "Akçakale Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Birecik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Bozova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Ceylanpınar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Göbeklitepe Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Halfeti Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Harran Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Hilvan Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Siverek Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Suruç Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Şehitlik Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Topçumeydanı Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Viranşehir Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şanlıurfa"
+  },
+  {
+    "Ad": "Cizre Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şırnak"
+  },
+  {
+    "Ad": "İdil Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şırnak"
+  },
+  {
+    "Ad": "Silopi Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şırnak"
+  },
+  {
+    "Ad": "Şırnak Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şırnak"
+  },
+  {
+    "Ad": "Uludere Vergi Dairesi Müdürlüğü",
+    "Sehir": "Şırnak"
+  },
+  {
+    "Ad": "Demirkent Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karabük"
+  },
+  {
+    "Ad": "Eskipazar Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karabük"
+  },
+  {
+    "Ad": "Karabük Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karabük"
+  },
+  {
+    "Ad": "Safranbolu Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karabük"
+  },
+  {
+    "Ad": "Yenice Vergi Dairesi Müdürlüğü",
+    "Sehir": "Karabük"
+  },
+  {
+    "Ad": "Kilis Vergi Dairesi Müdürlüğü",
+    "Sehir": "Kilis"
+  },
+  {
+    "Ad": "Hakkari Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hakkari"
+  },
+  {
+    "Ad": "Şemdinli Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hakkari"
+  },
+  {
+    "Ad": "Yüksekova Vergi Dairesi Müdürlüğü",
+    "Sehir": "Hakkari"
+  }
+]
