@@ -3,6 +3,8 @@
     ViewData["Title"] = "Komisyon İşlemleri";
     var satisGunleri = (List<DateTime>)ViewBag.SatisGunleri;
     var varsayilanKomisyon = (KomisyonAyari?)ViewBag.VarsayilanKomisyon;
+    var birinciSayilari = (Dictionary<DateTime, int>)ViewBag.BirinciSatisSayilari;
+    var ikinciSayilari = (Dictionary<DateTime, int>)ViewBag.IkinciSatisSayilari;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
 }
 <h3>Komisyon İşlemleri</h3>
@@ -28,11 +30,13 @@
                 <option value="">-- Seçiniz --</option>
                 @foreach (var gun in satisGunleri)
                 {
-                    <option value="@gun.ToString("yyyy-MM-dd")">@gun.ToString("dd.MM.yyyy (dddd)", trTR)</option>
+                    var birinciSayi = birinciSayilari.GetValueOrDefault(gun.Date);
+                    var ikinciSayi = ikinciSayilari.GetValueOrDefault(gun.Date);
+                    <option value="@gun.ToString("yyyy-MM-dd")" data-birinci="@birinciSayi" data-ikinci="@ikinciSayi" data-etiket="@gun.ToString("dd.MM.yyyy (dddd)", trTR)">@gun.ToString("dd.MM.yyyy (dddd)", trTR)</option>
                 }
             </select>
             <input class="form-control" type="date" name="SatisTarihi" id="satisTarihiSerbest" style="display:none;" disabled />
-            <div class="form-text" id="tarihAciklama">Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir.</div>
+            <div class="form-text" id="tarihAciklama">Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir; her tarihin yanında o tarihte 1./2. Satış'ı bekleyen dosya sayısı gösterilir.</div>
         </div>
         <div class="col-md-2">
             <label class="form-label">Satış Saati</label>
@@ -146,8 +150,24 @@
             satisTarihiSerbest.required = takvimDisi;
             tarihAciklama.textContent = takvimDisi
                 ? "Pazarlık/6183-86 Tek Satış'ın Satış Takvimi'nde sabit bir tarihi olmadığından, bu oturumun yapılacağı tarihi doğrudan seçin."
-                : "Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir.";
+                : "Liste, Satış Takvimi'ndeki resmi ihale günlerinden gelir; her tarihin yanında o tarihte bekleyen dosya sayısı gösterilir.";
         }
+
+        // Her takvim tarihi seçeneğinin yanına, seçilen Satış Türü'ne göre (1. veya 2.
+        // Satış) o tarihte GERÇEKTEN bekleyen dosya sayısını ekler - tarih seçimi böylece
+        // rastgele bir takvim günü değil, gerçek bekleyen dosyalarla bağlantılı olur.
+        // Hiç dosya yoksa bu açıkça "0 dosya bekliyor" olarak belirtilir (sessizce
+        // seçilebilir bir tarih gibi bırakılmaz).
+        function tarihSecenekleriniGuncelle() {
+            const sayiAlani = satisTuruSecim.value === '2' ? 'ikinci' : 'birinci';
+            Array.from(satisTarihiTakvimden.options).forEach(secenek => {
+                if (!secenek.dataset.etiket) return; // "-- Seçiniz --" seçeneği
+                const sayi = Number(secenek.dataset[sayiAlani] || 0);
+                secenek.textContent = `${secenek.dataset.etiket} — ${sayi} dosya bekliyor`;
+            });
+        }
+        satisTuruSecim.addEventListener('change', tarihSecenekleriniGuncelle);
+        tarihSecenekleriniGuncelle();
         satisTuruSecim.addEventListener('change', tarihModunuAyarla);
         tarihModunuAyarla();
     </script>
