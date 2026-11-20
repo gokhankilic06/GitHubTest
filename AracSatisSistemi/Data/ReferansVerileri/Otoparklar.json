@@ -1,5 +1,128 @@
 [
-  "Ostim Yediemin Otoparkı", "Sincan Yediemin Otoparkı",
-  "Mamak Yediemin Otoparkı", "Çubuk Yediemin Otoparkı",
-  "Polatlı Yediemin Otoparkı"
+  {
+    "Ad": "Ankaratrafik Vakfı Otoparkı",
+    "Adres": "Öveçler Mah. 1309. Cadde No: 2/1-2 Dikmen/Ankara",
+    "YetkiliCalisani": "Zübeyir Duran",
+    "Telefon": "0505 251 32 79"
+  },
+  {
+    "Ad": "Ankara Otoparkı (Elmadağ)",
+    "Adres": "Bahçelievler Mah. Küme Evleri No: 48 Elmadağ/Ankara",
+    "YetkiliCalisani": "Kemal Fırat",
+    "Telefon": "0507 202 46 02"
+  },
+  {
+    "Ad": "Artikod Balgat Otoparkı",
+    "Adres": "Karakusunlar Mah. 377. Sokak Çankaya/Ankara",
+    "YetkiliCalisani": "Recep",
+    "Telefon": "0541 865 66 06"
+  },
+  {
+    "Ad": "Artikod Başkent Otoparkı",
+    "Adres": "Emniyet Mah. Hipodrom Cad. No: 1 Yenimahalle/Ankara",
+    "YetkiliCalisani": "Emrah Arslan",
+    "Telefon": "0533 684 62 22"
+  },
+  {
+    "Ad": "Artikod İstanbul Yolu Otoparkı",
+    "Adres": "Fatih Sultan Mehmet Cad. No: 287/1 Etimesgut/Ankara",
+    "YetkiliCalisani": "Murat Öcek",
+    "Telefon": "0540 802 59 98"
+  },
+  {
+    "Ad": "Akyurt Otoparkı",
+    "Adres": "Beyazıt Mah. Kırgız Cad. No: 40 Akyurt/Ankara",
+    "YetkiliCalisani": "Emre",
+    "Telefon": "0506 873 46 79"
+  },
+  {
+    "Ad": "Başkentpark Otopark Sincan",
+    "Adres": "İstasyon Mah. Efsane Sokak No: 11 Sincan/Ankara",
+    "YetkiliCalisani": "Bedirhan Bedir",
+    "Telefon": "0554 649 27 99"
+  },
+  {
+    "Ad": "Bayrak Otoparkı",
+    "Adres": "Bahçekapı Mah. 2460. Sokak No: 11 Etimesgut/Ankara",
+    "YetkiliCalisani": "Süleyman - Erol",
+    "Telefon": "0553 641 08 54"
+  },
+  {
+    "Ad": "Çubuk Kural Otoparkı",
+    "Adres": "Sünlü Mah. Ahi Evran Cad. No: 12 Çubuk/Ankara",
+    "YetkiliCalisani": null,
+    "Telefon": "0543 201 66 39"
+  },
+  {
+    "Ad": "Fatih Sümer Otoparkı",
+    "Adres": "Saray Mah. Sezai Karakoç Cad. No: 1/E Kahramankazan/Ankara",
+    "YetkiliCalisani": "Fatih Sümer",
+    "Telefon": "0532 179 14 62"
+  },
+  {
+    "Ad": "Gölbaşı Otoparkı",
+    "Adres": "B.Evler Mah. 3. Cadde No: 1 Gölbaşı/Ankara",
+    "YetkiliCalisani": "Hazım Kıymaz",
+    "Telefon": "0532 400 59 30"
+  },
+  {
+    "Ad": "Güçlüler Otoparkı",
+    "Adres": "Peçenek Yolu Üzeri 1601. Cadde No: 137/A Sincan/Ankara",
+    "YetkiliCalisani": null,
+    "Telefon": "0530 704 28 10"
+  },
+  {
+    "Ad": "Hasan Sümer Otoparkı",
+    "Adres": "Yazıbeyli Köyü Yolu Üzeri Kahramankazan/Ankara",
+    "YetkiliCalisani": "Hasan Sümer",
+    "Telefon": "0532 237 94 60"
+  },
+  {
+    "Ad": "İletim Otoparkı",
+    "Adres": "Kayı Mah. Saruhan Sokak No: 3 Kahramankazan/Ankara",
+    "YetkiliCalisani": "Savaş Kaya",
+    "Telefon": "0532 436 56 53"
+  },
+  {
+    "Ad": "Kaplan Otoparkı",
+    "Adres": "Sanayi Çarşısı 3. Cad. 14. Sokak No: 2 Sincan/Ankara",
+    "YetkiliCalisani": "Mehmet - Anıl - Asım",
+    "Telefon": "0505 256 18 37"
+  },
+  {
+    "Ad": "Meyas Otoparkı",
+    "Adres": "Buğdüz Mah. Büyük Anadolu Oteli Karşısı Akyurt/Ankara",
+    "YetkiliCalisani": "Mesut Yasatekin",
+    "Telefon": "0532 407 14 77"
+  },
+  {
+    "Ad": "Pursaklar Otoparkı",
+    "Adres": "Fatih Mah. Büyükdere Caddesi No: 1/A Pursaklar/Ankara",
+    "YetkiliCalisani": "Volkan - Aslan",
+    "Telefon": "0539 436 77 06"
+  },
+  {
+    "Ad": "Onur Sümer Otoparkı",
+    "Adres": "Yazıbeyli Köyü Yolu Üzeri Kahramankazan/Ankara",
+    "YetkiliCalisani": "Onur Sümer",
+    "Telefon": "0533 926 22 34"
+  },
+  {
+    "Ad": "Ozan Otoparkı",
+    "Adres": "Ergazi Mah. 1. Cadde No: 185/1 Batıkent/Ankara",
+    "YetkiliCalisani": "Mustafa Maşalı",
+    "Telefon": "0542 358 00 57"
+  },
+  {
+    "Ad": "Y.Abdal Bayrak Otoparkı",
+    "Adres": "Y.Abdal Mah. Küme Evleri No: 2002 Çankaya/Ankara",
+    "YetkiliCalisani": "Abdullah Özbahar",
+    "Telefon": "0542 413 56 27"
+  },
+  {
+    "Ad": "R.C. Y.Abdal Bayrak Otoparkı",
+    "Adres": "Y.Abdal Mah. Küme Evleri No: 1877 Çankaya/Ankara",
+    "YetkiliCalisani": "Celal",
+    "Telefon": "0542 491 81 24"
+  }
 ]

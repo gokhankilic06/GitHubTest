@@ -42,10 +42,15 @@ namespace AracSatisSistemi.Models
         [Required] public string Sehir { get; set; } = string.Empty;
     }
 
+    // Yediemin otoparkı. Kendi sayfasından (bkz. OtoparkController) eklenir/düzenlenir/silinir;
+    // "Ad" alanı Kayıt İşlemleri ekranındaki "Bulunduğu Otopark" listesinde kullanılır.
     public class OtoparkKaydi
     {
         public int Id { get; set; }
-        [Required] public string Ad { get; set; } = string.Empty;
+        [Required, Display(Name = "Otopark Adı")] public string Ad { get; set; } = string.Empty;
+        [Display(Name = "Adresi")] public string? Adres { get; set; }
+        [Display(Name = "Yetkili/Çalışanı")] public string? YetkiliCalisani { get; set; }
+        [Display(Name = "Telefon")] public string? Telefon { get; set; }
     }
 
     public class AracRengi

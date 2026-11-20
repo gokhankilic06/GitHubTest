@@ -1,0 +1,135 @@
+@model List<OtoparkKaydi>
+@{
+    ViewData["Title"] = "Otopark Listesi";
+}
+<h3>Otopark Listesi</h3>
+<p class="text-muted">Yediemin otoparklarının adı, adresi, yetkili/çalışanı ve telefonu burada eklenir, düzenlenir ve silinir. "Otopark Adı", Kayıt İşlemleri ekranındaki "Bulunduğu Otopark" listesinde kullanılır.</p>
+
+@if (TempData["Basari"] != null)
+{
+    <div class="alert alert-success">@TempData["Basari"]</div>
+}
+@if (TempData["Hata"] != null)
+{
+    <div class="alert alert-danger">@TempData["Hata"]</div>
+}
+
+<div class="card p-3 mb-4">
+    <div class="form-section-title">Yeni Otopark Ekle</div>
+    <form asp-action="Ekle" method="post" class="row g-2 align-items-end">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3">
+            <label class="form-label">Otopark Adı</label>
+            <input class="form-control" name="Ad" required />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Adresi</label>
+            <input class="form-control" name="Adres" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Yetkili/Çalışanı</label>
+            <input class="form-control" name="YetkiliCalisani" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Telefon</label>
+            <input class="form-control" name="Telefon" />
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-success w-100">Ekle</button>
+        </div>
+    </form>
+</div>
+
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Otopark Adı</th>
+                    <th>Adresi</th>
+                    <th>Yetkili/Çalışanı</th>
+                    <th>Telefon</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var o in Model)
+                {
+                    <tr>
+                        <td>@o.Ad</td>
+                        <td>@o.Adres</td>
+                        <td>@o.YetkiliCalisani</td>
+                        <td>@o.Telefon</td>
+                        <td class="text-nowrap">
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                    data-bs-toggle="modal" data-bs-target="#duzenleModal"
+                                    data-id="@o.Id" data-ad="@o.Ad" data-adres="@o.Adres"
+                                    data-yetkili="@o.YetkiliCalisani" data-telefon="@o.Telefon">
+                                Düzenle
+                            </button>
+                            <form asp-action="Sil" method="post" class="d-inline" onsubmit="return confirm('Bu otopark silinsin mi?');">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@o.Id" />
+                                <button class="btn btn-sm btn-outline-danger">Sil</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="5" class="text-center text-muted">Henüz kayıtlı otopark yok.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="duzenleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Duzenle" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" id="duzenleId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Otoparkı Düzenle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-2">
+                        <label class="form-label">Otopark Adı</label>
+                        <input class="form-control" name="Ad" id="duzenleAd" required />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Adresi</label>
+                        <input class="form-control" name="Adres" id="duzenleAdres" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Yetkili/Çalışanı</label>
+                        <input class="form-control" name="YetkiliCalisani" id="duzenleYetkili" />
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Telefon</label>
+                        <input class="form-control" name="Telefon" id="duzenleTelefon" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" class="btn btn-primary">Kaydet</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('duzenleModal').addEventListener('show.bs.modal', function (olay) {
+            const buton = olay.relatedTarget;
+            document.getElementById('duzenleId').value = buton.dataset.id;
+            document.getElementById('duzenleAd').value = buton.dataset.ad || '';
+            document.getElementById('duzenleAdres').value = buton.dataset.adres || '';
+            document.getElementById('duzenleYetkili').value = buton.dataset.yetkili || '';
+            document.getElementById('duzenleTelefon').value = buton.dataset.telefon || '';
+        });
+    </script>
+}
