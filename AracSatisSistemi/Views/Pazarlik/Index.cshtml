@@ -1,0 +1,64 @@
+@{
+    ViewData["Title"] = "Pazarlık ve 6183/86 Tek Satış";
+    var varsayilanKomisyon = (KomisyonAyari?)ViewBag.VarsayilanKomisyon;
+}
+<h3>Pazarlık ve 6183/86 Tek Satış</h3>
+<p class="text-muted">
+    Pazarlık ve 6183/86 Tek Satış'ın, 1./2. Satış'ın aksine Satış Takvimi'nde sabit bir tarihi
+    yoktur; bu yüzden burada herhangi bir tarih ve saat girilerek komisyon oturumu açılabilir.
+</p>
+
+<div class="card p-3 mb-4">
+    <div class="form-section-title">Yeni Oturum</div>
+    <form asp-controller="Komisyon" asp-action="Create" method="post" class="row g-3">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3">
+            <label class="form-label">Satış Türü</label>
+            <select class="form-select" name="SatisTuru" required>
+                <option value="">-- Seçiniz --</option>
+                <option value="3">Pazarlık</option>
+                <option value="4">6183/86 Mad.</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Satış Tarihi</label>
+            <input class="form-control" type="date" name="SatisTarihi" required />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Satış Saati</label>
+            <input class="form-control" name="SatisSaati" type="time" required />
+            <div class="form-text">Aynı gün birden fazla oturumu ayırt etmek için.</div>
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Komisyon Başkanı</label>
+            <input class="form-control" name="Baskan" value="@varsayilanKomisyon?.Baskan" required />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">1 Nolu Üye</label>
+            <input class="form-control" name="Uye1" value="@varsayilanKomisyon?.Uye1" required />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">2 Nolu Üye</label>
+            <input class="form-control" name="Uye2" value="@varsayilanKomisyon?.Uye2" required />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">3 Nolu Üye <span class="text-muted small">(opsiyonel)</span></label>
+            <input class="form-control" name="Uye3" value="@varsayilanKomisyon?.Uye3" />
+        </div>
+        <div class="col-12">
+            <button class="btn btn-primary" type="submit"><i class="bi bi-check-circle"></i> Komisyonu Kaydet</button>
+        </div>
+    </form>
+</div>
+
+<div class="card p-3">
+    <div class="form-section-title">Komisyon Bilgileri</div>
+    <p class="text-muted small mb-2">
+        Yukarıdaki başkan/üye bilgileri varsayılan komisyondan geldi. Varsayılanı değiştirmek,
+        tüm kayıtlı komisyon oturumlarını (1./2. Satış dahil) görmek veya silmek için
+        Komisyon sayfasına gidin.
+    </p>
+    <a asp-controller="Komisyon" asp-action="Index" class="btn btn-primary">
+        <i class="bi bi-people-fill"></i> Komisyon Sayfasına Git
+    </a>
+</div>
