@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
 using AracSatisSistemi.Models;
+using AracSatisSistemi.Services;
 
 namespace AracSatisSistemi.Controllers
 {
@@ -22,6 +23,13 @@ namespace AracSatisSistemi.Controllers
                 .OrderBy(t => t.Tarih)
                 .Select(t => t.Tarih)
                 .ToListAsync();
+
+            // Her takvim tarihinde o tarihte 1./2. Satış'ını BEKLEYEN dosya sayısı - tarih
+            // seçimi, Satış Takvimi'ndeki gibi gerçek bekleyen dosyalara bağlansın diye
+            // (bkz. SatisTakvimiYardimcisi, Satış Takvimi ekranında da aynı sayılar kullanılır).
+            var (birinciSayilari, ikinciSayilari) = await SatisTakvimiYardimcisi.PlanliDosyaSayilariGetir(_db);
+            ViewBag.BirinciSatisSayilari = birinciSayilari;
+            ViewBag.IkinciSatisSayilari = ikinciSayilari;
 
             // Yeni oturum formunda, aynı kişiler genelde her oturumda görev aldığı için
             // "Güncellemeler" ekranındaki varsayılan Komisyon Bilgileri öneri olarak doldurulur.
