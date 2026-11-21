@@ -222,8 +222,13 @@ namespace AracSatisSistemi.Models
             }
         }
 
-        // "Alıcıya Terk" aşamasındayken, 6183 sayılı Kanun Md. 85/86 uyarınca aracın resen
-        // terk edileceği kişi: en son "kazanıp işlem yapmadığı" tespit edilen satış kaydı.
+        // "Alıcıya Terk" aşamasındayken, 6183 sayılı Kanun Md. 85/86 uyarınca formun dayandığı
+        // son satış denemesi. İki farklı senaryodan gelinebilir: (1) bir aşamayı KAZANIP işlemini
+        // tamamlamayan alıcı yüzünden ("Alıcı İşlem Yapmadı") - formda o alıcının bilgileri
+        // otomatik dolar; (2) o aşamada HİÇ alıcı çıkmaması ("Alıcı Çıkmadı") yüzünden - bu
+        // durumda "kazanan" bir alıcı yoktur, form yine de hangi satış türünün son deneme
+        // olduğunu göstermek için en son (öncelik sırasına göre) girilmiş kaydı döner, alıcı
+        // alanları boş kalır ve memur gerekirse elle doldurur.
         [NotMapped]
         public Satis? TerkEdilecekSatis
         {
@@ -235,7 +240,8 @@ namespace AracSatisSistemi.Models
                 foreach (var tur in siralama)
                 {
                     var kayit = Satislar.FirstOrDefault(s => s.SatisTuru == tur);
-                    if (kayit?.SatisSonucu == SatisSonucu.AliciIslemYapmadi) return kayit;
+                    if (kayit != null && (kayit.SatisSonucu == SatisSonucu.AliciIslemYapmadi || kayit.SatisSonucu == SatisSonucu.AliciCikmadi))
+                        return kayit;
                 }
                 return null;
             }
