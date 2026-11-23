@@ -4,10 +4,90 @@
     var kullanici = (Kullanici)ViewBag.Kullanici;
     var girisler = (List<GirisKaydi>)ViewBag.Girisler;
     var toplamSure = (TimeSpan)ViewBag.ToplamSure;
+    var ortalamaSure = (TimeSpan)ViewBag.OrtalamaSure;
+    var ilkGiris = (DateTime?)ViewBag.IlkGiris;
+    var sonGiris = (DateTime?)ViewBag.SonGiris;
+    var sonIslem = (DateTime?)ViewBag.SonIslem;
+    var suAnOnlineMi = (bool)ViewBag.SuAnOnlineMi;
+    var toplamGiris = (int)ViewBag.ToplamGiris;
+    var toplamIslem = (int)ViewBag.ToplamIslem;
     string SureGoster(TimeSpan s) => s.TotalMinutes < 1 ? "< 1 dk" : $"{(int)s.TotalHours} sa {s.Minutes} dk";
 }
-<h3>@kullanici.KullaniciAdi @(string.IsNullOrWhiteSpace(kullanici.AdSoyad) ? "" : $"({kullanici.AdSoyad})")</h3>
-<p class="text-muted">Toplam @girisler.Count giriş, toplam @SureGoster(toplamSure) oturum süresi.</p>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+    <div>
+        <h3 class="mb-0">
+            @kullanici.KullaniciAdi @(string.IsNullOrWhiteSpace(kullanici.AdSoyad) ? "" : $"({kullanici.AdSoyad})")
+            @if (kullanici.Admin)
+            {
+                <span class="badge bg-dark ms-1">Admin</span>
+            }
+            @if (suAnOnlineMi)
+            {
+                <span class="badge bg-success ms-1">Çevrimiçi</span>
+            }
+            else if (!kullanici.Aktif)
+            {
+                <span class="badge bg-secondary ms-1">Pasif</span>
+            }
+        </h3>
+    </div>
+    <a class="btn btn-outline-secondary" asp-action="Index"><i class="bi bi-arrow-left"></i> Listeye Dön</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-2 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Giriş</div>
+            <div class="fs-4 fw-bold">@toplamGiris</div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Süre</div>
+            <div class="fs-5 fw-bold">@SureGoster(toplamSure)</div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Ortalama Oturum</div>
+            <div class="fs-5 fw-bold">@SureGoster(ortalamaSure)</div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam İşlem</div>
+            <div class="fs-4 fw-bold">@toplamIslem</div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">İlk Giriş</div>
+            <div class="fs-6 fw-bold">@(ilkGiris?.ToString("dd.MM.yyyy") ?? "-")</div>
+        </div>
+    </div>
+    <div class="col-md-2 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Son Giriş / Son İşlem</div>
+            <div class="small fw-bold">@(sonGiris?.ToString("dd.MM.yyyy HH:mm") ?? "-")</div>
+            <div class="small text-muted">@(sonIslem?.ToString("dd.MM.yyyy HH:mm") ?? "-")</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">Son 14 Günde Giriş Sayısı</div>
+            <canvas id="girisGrafik" height="200"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-3 h-100">
+            <div class="form-section-title">En Çok Yapılan İşlemler</div>
+            <canvas id="islemGrafik" height="200"></canvas>
+        </div>
+    </div>
+</div>
 
 <div class="row g-3">
     <div class="col-md-6">
@@ -70,4 +150,44 @@
     </div>
 </div>
 
-<a class="btn btn-outline-secondary mt-3" asp-action="Index">&larr; Listeye Dön</a>
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        const renkler = ['#4e79a7', '#f28e2b', '#e15759', '#76b7b2', '#59a14f', '#edc948', '#b07aa1', '#ff9da7'];
+
+        new Chart(document.getElementById('girisGrafik'), {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.GunlukGirisEtiketleri)),
+                datasets: [{
+                    label: 'Giriş Sayısı',
+                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.GunlukGirisSayilari)),
+                    backgroundColor: '#4e79a7'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+
+        const islemEtiketleri = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(((IEnumerable<dynamic>)ViewBag.IslemTuruDagilimi).Select(x => (string)x.Etiket)));
+        const islemAdetleri = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(((IEnumerable<dynamic>)ViewBag.IslemTuruDagilimi).Select(x => (int)x.Adet)));
+
+        if (islemEtiketleri.length > 0) {
+            new Chart(document.getElementById('islemGrafik'), {
+                type: 'doughnut',
+                data: {
+                    labels: islemEtiketleri,
+                    datasets: [{ data: islemAdetleri, backgroundColor: renkler }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } } }
+            });
+        } else {
+            document.getElementById('islemGrafik').replaceWith(
+                Object.assign(document.createElement('p'), { className: 'text-muted text-center mt-4', textContent: 'Henüz işlem yok.' })
+            );
+        }
+    </script>
+}

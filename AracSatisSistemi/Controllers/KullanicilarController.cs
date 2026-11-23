@@ -54,7 +54,17 @@ namespace AracSatisSistemi.Controllers
                     ToplamSure = girisleri.Aggregate(TimeSpan.Zero, (toplam, g) => toplam + g.Sure),
                     IslemSayisi = islemSayilari.GetValueOrDefault(k.KullaniciAdi)
                 };
-            }).ToList();
+            })
+            .OrderByDescending(o => o.SuAnOnlineMi)
+            .ThenByDescending(o => o.SonGiris)
+            .ToList();
+
+            // Genel özet (tüm kullanıcılar) - sayfanın en üstündeki kutular için.
+            var bugun = DateTime.Today;
+            ViewBag.ToplamKullanici = ozetler.Count;
+            ViewBag.SuAnOnline = ozetler.Count(o => o.SuAnOnlineMi);
+            ViewBag.BugunGirisYapan = tumGirisler.Where(g => g.GirisZamani.Date == bugun).Select(g => g.KullaniciId).Distinct().Count();
+            ViewBag.ToplamIslem = islemSayilari.Values.Sum();
 
             return View(ozetler);
         }
@@ -64,21 +74,48 @@ namespace AracSatisSistemi.Controllers
             var kullanici = await _db.Kullanicilar.FindAsync(id);
             if (kullanici == null) return NotFound();
 
-            ViewBag.Kullanici = kullanici;
-            var girisleri = await _db.GirisKayitlari
+            // İstatistikler (toplam giriş sayısı, ortalama süre, günlük dağılım vb.) kullanıcının
+            // TÜM geçmişinden hesaplanır; aşağıdaki tablolar ise görüntüleme amacıyla son 200
+            // kayıtla sınırlıdır - ikisi birbirinden bağımsızdır.
+            var tumGirisler = await _db.GirisKayitlari
                 .Where(g => g.KullaniciId == id)
                 .OrderByDescending(g => g.GirisZamani)
-                .Take(200)
                 .ToListAsync();
-            var islemleri = await _db.IslemKayitlari
+            var tumIslemler = await _db.IslemKayitlari
                 .Where(i => i.KullaniciAdi == kullanici.KullaniciAdi)
                 .OrderByDescending(i => i.Zaman)
-                .Take(200)
                 .ToListAsync();
 
-            ViewBag.Girisler = girisleri;
-            ViewBag.ToplamSure = girisleri.Aggregate(TimeSpan.Zero, (toplam, g) => toplam + g.Sure);
-            return View(islemleri);
+            ViewBag.Kullanici = kullanici;
+            ViewBag.Girisler = tumGirisler.Take(200).ToList();
+
+            var toplamSure = tumGirisler.Aggregate(TimeSpan.Zero, (toplam, g) => toplam + g.Sure);
+            ViewBag.ToplamSure = toplamSure;
+            ViewBag.OrtalamaSure = tumGirisler.Count > 0 ? toplamSure / tumGirisler.Count : TimeSpan.Zero;
+            ViewBag.IlkGiris = tumGirisler.Count > 0 ? tumGirisler.Min(g => g.GirisZamani) : (DateTime?)null;
+            ViewBag.SonGiris = tumGirisler.Count > 0 ? tumGirisler.Max(g => g.GirisZamani) : (DateTime?)null;
+            ViewBag.SonIslem = tumIslemler.Count > 0 ? tumIslemler.Max(i => i.Zaman) : (DateTime?)null;
+            ViewBag.SuAnOnlineMi = tumGirisler.Any(g => g.CikisZamani == null && (DateTime.Now - g.SonAktiviteZamani) < TimeSpan.FromMinutes(15));
+
+            // Son 14 gün - her gün kaç kez giriş yapıldığı (çubuk grafik için).
+            var sonGunler = Enumerable.Range(0, 14).Select(i => DateTime.Today.AddDays(-13 + i)).ToList();
+            ViewBag.GunlukGirisEtiketleri = sonGunler.Select(g => g.ToString("dd.MM")).ToList();
+            ViewBag.GunlukGirisSayilari = sonGunler
+                .Select(g => tumGirisler.Count(giris => giris.GirisZamani.Date == g))
+                .ToList();
+
+            // İşlem türü dağılımı - en çok yapılan ilk 8 işlem (pasta grafik + tablo için).
+            ViewBag.IslemTuruDagilimi = tumIslemler
+                .GroupBy(i => i.Detay ?? $"{i.Controller}/{i.Action}")
+                .Select(g => new { Etiket = g.Key, Adet = g.Count() })
+                .OrderByDescending(x => x.Adet)
+                .Take(8)
+                .ToList();
+
+            ViewBag.ToplamGiris = tumGirisler.Count;
+            ViewBag.ToplamIslem = tumIslemler.Count;
+
+            return View(tumIslemler.Take(200).ToList());
         }
     }
 }
