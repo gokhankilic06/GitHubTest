@@ -77,8 +77,10 @@ namespace AracSatisSistemi.Controllers
             };
             if (kullanici.Admin) claims.Add(new Claim(ClaimTypes.Role, "Admin"));
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            // IsPersistent = false: oturum çerezi tarayıcı tamamen kapatılınca sona erer,
+            // böylece siteye tekrar girildiğinde eski kullanıcıyla otomatik oturum açılmaz.
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                new AuthenticationProperties { IsPersistent = true });
+                new AuthenticationProperties { IsPersistent = false });
         }
 
         // Yeni kullanıcıların admin onayı almadan, sadece Güncellemeler'de belirlenen davet
