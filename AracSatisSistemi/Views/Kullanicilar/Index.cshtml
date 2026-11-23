@@ -5,7 +5,34 @@
     string SureGoster(TimeSpan s) => s.TotalMinutes < 1 ? "< 1 dk" : $"{(int)s.TotalHours} sa {s.Minutes} dk";
 }
 <h3>Kullanıcılar</h3>
-<p class="text-muted">Kullanıcıların giriş/çıkış geçmişi ve yaptıkları işlemler. Detay için bir kullanıcıya tıklayın.</p>
+<p class="text-muted">Kullanıcıların giriş/çıkış geçmişi ve yaptıkları işlemler. Detaylı istatistikler için bir kullanıcıya tıklayın.</p>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam Kullanıcı</div>
+            <div class="fs-4 fw-bold">@ViewBag.ToplamKullanici</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Şu An Çevrimiçi</div>
+            <div class="fs-4 fw-bold text-success">@ViewBag.SuAnOnline</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Bugün Giriş Yapan</div>
+            <div class="fs-4 fw-bold">@ViewBag.BugunGirisYapan</div>
+        </div>
+    </div>
+    <div class="col-md-3 col-6">
+        <div class="card p-3 text-center h-100">
+            <div class="text-muted small">Toplam İşlem</div>
+            <div class="fs-4 fw-bold">@ViewBag.ToplamIslem</div>
+        </div>
+    </div>
+</div>
 
 <div class="card p-3">
     <div class="table-responsive">
@@ -52,7 +79,7 @@
                         <td>@(k.SonGiris?.ToString("dd.MM.yyyy HH:mm") ?? "-")</td>
                         <td>@SureGoster(k.ToplamSure)</td>
                         <td>@k.IslemSayisi</td>
-                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Detay" asp-route-id="@k.Id">Detay</a></td>
+                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Detay" asp-route-id="@k.Id">Detay <i class="bi bi-arrow-right"></i></a></td>
                     </tr>
                 }
                 @if (!Model.Any())
