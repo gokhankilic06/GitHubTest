@@ -22,6 +22,14 @@
                 </div>
                 <div class="card p-4 shadow">
                     <h5 class="mb-3">Giriş Yap</h5>
+                    @if (TempData["Basari"] != null)
+                    {
+                        <div class="alert alert-success py-2 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill"></i> @TempData["Basari"]</div>
+                    }
+                    @if (TempData["Hata"] != null)
+                    {
+                        <div class="alert alert-danger py-2 d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle-fill"></i> @TempData["Hata"]</div>
+                    }
                     @if (!ViewData.ModelState.IsValid)
                     {
                         <div class="alert alert-danger py-2">@Html.ValidationSummary(true, null, new { @class = "mb-0" })</div>
