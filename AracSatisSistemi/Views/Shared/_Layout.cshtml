@@ -63,6 +63,10 @@
                 <li class="nav-item"><a class="nav-link" asp-controller="Istatistik" asp-action="Index"><i class="bi bi-bar-chart-line"></i> İstatistik</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Ayarlar" asp-action="Index"><i class="bi bi-gear"></i> Güncellemeler</a></li>
                 <li class="nav-item"><a class="nav-link" asp-controller="Yedekleme" asp-action="Index"><i class="bi bi-hdd-stack"></i> Yedekleme</a></li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item"><a class="nav-link" asp-controller="Kullanicilar" asp-action="Index"><i class="bi bi-people"></i> Kullanıcılar</a></li>
+                }
             </ul>
         </div>
     </div>

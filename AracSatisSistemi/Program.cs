@@ -20,6 +20,9 @@ builder.Services.AddControllersWithViews(options =>
     // bkz. InvariantDecimalModelBinder: tr-TR kültüründe formdan gelen "99.99" gibi
     // noktalı decimal değerlerin yanlış (9999 gibi) ayrıştırılmasını önler.
     options.ModelBinderProviders.Insert(0, new InvariantDecimalModelBinderProvider());
+    // Her POST işlemini (kayıt ekleme/düzenleme/silme vb.) IslemKayitlari'na yazar -
+    // bkz. Kullanıcılar (istatistik) sayfası.
+    options.Filters.Add<AracSatisSistemi.Data.IslemKaydiFiltresi>();
 });
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
@@ -167,11 +170,19 @@ using (var scope = app.Services.CreateScope())
     if (!db.Kullanicilar.Any())
     {
         var hasher = new PasswordHasher<Kullanici>();
-        var admin = new Kullanici { KullaniciAdi = "admin", AdSoyad = "Yönetici", Aktif = true };
+        var admin = new Kullanici { KullaniciAdi = "admin", AdSoyad = "Yönetici", Aktif = true, Admin = true };
         admin.SifreHash = hasher.HashPassword(admin, "Admin123!");
         db.Kullanicilar.Add(admin);
         db.SaveChanges();
     }
+
+    // Kullanıcılara Admin yetkisi sonradan eklendi; eski veritabanlarında sütun yoksa
+    // eklenir. Sistemin kurulu olduğu "admin" hesabı her zaman Admin kalır - aksi halde
+    // bu güncellemeden sonra ilk açılışta hiç admin kalmayabilir.
+    try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""Kullanicilar"" ADD COLUMN ""Admin"" INTEGER NOT NULL DEFAULT 0;"); }
+    catch { /* sütun zaten varsa göz ardı edilir */ }
+    try { db.Database.ExecuteSqlRaw(@"UPDATE ""Kullanicilar"" SET ""Admin"" = 1 WHERE ""KullaniciAdi"" = 'admin';"); }
+    catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
 }
 
 if (!app.Environment.IsDevelopment())
@@ -191,6 +202,22 @@ app.Use(async (context, next) =>
 {
     var db = context.RequestServices.GetRequiredService<AppDbContext>();
     await OtomatikSurecIsleyici.AliciGelmeyenSatislariGuncelleAsync(db);
+    await next();
+});
+
+// Giriş yapmış kullanıcının oturumuna ait GirisKaydi'nın "son aktivite" zamanını
+// günceller - bkz. Kullanıcılar (istatistik) sayfası, Data/KullaniciAktiviteIzleyici.
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity?.IsAuthenticated == true)
+    {
+        var girisKaydiIdClaim = context.User.FindFirst("GirisKaydiId")?.Value;
+        if (int.TryParse(girisKaydiIdClaim, out var girisKaydiId))
+        {
+            var db = context.RequestServices.GetRequiredService<AppDbContext>();
+            await KullaniciAktiviteIzleyici.GuncelleAsync(db, girisKaydiId);
+        }
+    }
     await next();
 });
 

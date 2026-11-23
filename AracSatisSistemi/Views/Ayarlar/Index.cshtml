@@ -12,57 +12,80 @@
 }
 <h3>Güncellemeler</h3>
 
-<div class="card p-3">
-    <div class="form-section-title">Kullanıcılar (Giriş Yetkisi)</div>
-    <p class="text-muted small mb-2">Programa giriş yapabilecek kullanıcı adı/şifreler burada yönetilir. Şifreler güvenli şekilde (hash'lenerek) saklanır; unutulan bir şifre, buradan yeniden belirlenebilir.</p>
-    <form asp-action="KullaniciEkle" method="post" class="row g-2 align-items-end mb-3">
-        @Html.AntiForgeryToken()
-        <div class="col-auto"><label class="form-label">Kullanıcı Adı</label><input class="form-control" name="kullaniciAdi" required /></div>
-        <div class="col-auto"><label class="form-label">Ad Soyad</label><input class="form-control" name="adSoyad" /></div>
-        <div class="col-auto"><label class="form-label">Şifre</label><input class="form-control" type="password" name="sifre" minlength="6" required /></div>
-        <div class="col-auto"><button class="btn btn-success">Kullanıcı Ekle</button></div>
-    </form>
-    <ul class="list-group">
-        @foreach (var k in kullanicilar)
-        {
-            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <span><strong>@k.KullaniciAdi</strong>@(string.IsNullOrWhiteSpace(k.AdSoyad) ? "" : $" ({k.AdSoyad})")</span>
-                <div class="d-flex gap-2 align-items-center">
-                    <form asp-action="KullaniciSifreSifirla" method="post" class="d-flex gap-1">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@k.Id" />
-                        <input class="form-control form-control-sm" type="password" name="yeniSifre" placeholder="Yeni şifre" minlength="6" style="width:10rem;" required />
-                        <button class="btn btn-sm btn-outline-secondary">Şifreyi Değiştir</button>
-                    </form>
-                    <form asp-action="KullaniciSil" method="post" onsubmit="return confirm('Silinsin mi?');">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@k.Id" />
-                        <button class="btn btn-sm btn-outline-danger">Sil</button>
-                    </form>
-                </div>
-            </li>
-        }
-        @if (!kullanicilar.Any())
-        {
-            <li class="list-group-item text-muted text-center">Henüz kullanıcı eklenmedi.</li>
-        }
-    </ul>
+@if (User.IsInRole("Admin"))
+{
+    <div class="card p-3">
+        <div class="form-section-title">Kullanıcılar (Giriş Yetkisi)</div>
+        <p class="text-muted small mb-2">
+            Programa giriş yapabilecek kullanıcı adı/şifreler burada yönetilir. Şifreler güvenli
+            şekilde (hash'lenerek) saklanır; unutulan bir şifre, buradan yeniden belirlenebilir.
+            Kullanıcıların giriş/çıkış ve işlem geçmişi için <a asp-controller="Kullanicilar" asp-action="Index">Kullanıcılar</a> sayfasına bakın.
+        </p>
+        <form asp-action="KullaniciEkle" method="post" class="row g-2 align-items-end mb-3">
+            @Html.AntiForgeryToken()
+            <div class="col-auto"><label class="form-label">Kullanıcı Adı</label><input class="form-control" name="kullaniciAdi" required /></div>
+            <div class="col-auto"><label class="form-label">Ad Soyad</label><input class="form-control" name="adSoyad" /></div>
+            <div class="col-auto"><label class="form-label">Şifre</label><input class="form-control" type="password" name="sifre" minlength="6" required /></div>
+            <div class="col-auto form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="admin" value="true" id="yeniKullaniciAdmin" />
+                <label class="form-check-label" for="yeniKullaniciAdmin">Admin</label>
+            </div>
+            <div class="col-auto"><button class="btn btn-success">Kullanıcı Ekle</button></div>
+        </form>
+        <ul class="list-group">
+            @foreach (var k in kullanicilar)
+            {
+                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <span>
+                        <strong>@k.KullaniciAdi</strong>@(string.IsNullOrWhiteSpace(k.AdSoyad) ? "" : $" ({k.AdSoyad})")
+                        @if (k.Admin)
+                        {
+                            <span class="badge bg-dark ms-1">Admin</span>
+                        }
+                    </span>
+                    <div class="d-flex gap-2 align-items-center">
+                        <form asp-action="KullaniciAdminDegistir" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@k.Id" />
+                            <input type="hidden" name="admin" value="@((!k.Admin).ToString())" />
+                            <button class="btn btn-sm btn-outline-dark">@(k.Admin ? "Admin Yetkisini Kaldır" : "Admin Yap")</button>
+                        </form>
+                        <form asp-action="KullaniciSifreSifirla" method="post" class="d-flex gap-1">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@k.Id" />
+                            <input class="form-control form-control-sm" type="password" name="yeniSifre" placeholder="Yeni şifre" minlength="6" style="width:10rem;" required />
+                            <button class="btn btn-sm btn-outline-secondary">Şifreyi Değiştir</button>
+                        </form>
+                        <form asp-action="KullaniciSil" method="post" onsubmit="return confirm('Silinsin mi?');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@k.Id" />
+                            <button class="btn btn-sm btn-outline-danger">Sil</button>
+                        </form>
+                    </div>
+                </li>
+            }
+            @if (!kullanicilar.Any())
+            {
+                <li class="list-group-item text-muted text-center">Henüz kullanıcı eklenmedi.</li>
+            }
+        </ul>
 
-    <hr />
-    <p class="text-muted small mb-2">
-        Kullanıcıların kendi hesaplarını <a asp-controller="Hesap" asp-action="KayitOl">Kayıt Ol</a> ekranından
-        kendileri oluşturabilmesi için burada bir davet kodu belirleyin; bu kodu bilmeyen kayıt olamaz.
-        Alan boş bırakılırsa "Kayıt Ol" ekranı tamamen kapalı olur.
-    </p>
-    <form asp-action="DavetKoduGuncelle" method="post" class="row g-2 align-items-end">
-        @Html.AntiForgeryToken()
-        <div class="col-auto">
-            <label class="form-label">Davet Kodu</label>
-            <input class="form-control" name="davetKodu" value="@genelAyar?.DavetKodu" placeholder="ör. ANKARA2027" />
-        </div>
-        <div class="col-auto"><button class="btn btn-outline-primary">Kaydet</button></div>
-    </form>
-</div>
+        <hr />
+        <p class="text-muted small mb-2">
+            Kullanıcıların kendi hesaplarını <a asp-controller="Hesap" asp-action="KayitOl">Kayıt Ol</a> ekranından
+            kendileri oluşturabilmesi için burada bir davet kodu belirleyin; bu kodu bilmeyen kayıt olamaz.
+            Alan boş bırakılırsa "Kayıt Ol" ekranı tamamen kapalı olur.
+        </p>
+        <form asp-action="DavetKoduGuncelle" method="post" class="row g-2 align-items-end">
+            @Html.AntiForgeryToken()
+            <div class="col-auto">
+                <label class="form-label">Davet Kodu</label>
+                <input class="form-control" name="davetKodu" value="@genelAyar?.DavetKodu" placeholder="ör. ANKARA2027" />
+            </div>
+            <div class="col-auto"><button class="btn btn-outline-primary">Kaydet</button></div>
+        </form>
+    </div>
+}
 
 <div class="card p-3 mt-3">
     <div class="form-section-title">Satış Takvimi</div>

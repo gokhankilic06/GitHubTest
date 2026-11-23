@@ -47,17 +47,38 @@ namespace AracSatisSistemi.Controllers
                 return View();
             }
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, kullanici!.KullaniciAdi),
-                new Claim("AdSoyad", kullanici.AdSoyad ?? kullanici.KullaniciAdi),
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                new AuthenticationProperties { IsPersistent = true });
+            await GirisYapAsync(kullanici!);
 
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
             return RedirectToAction("Index", "Home");
+        }
+
+        // Oturum açma (cookie + Admin/GirisKaydiId claim'leri) ve GirisKaydi oluşturma -
+        // hem normal Giriş hem Kayıt Ol sonrası ortak akış; bkz. Kullanıcılar (istatistik)
+        // sayfası, Data/KullaniciAktiviteIzleyici.
+        private async Task GirisYapAsync(Kullanici kullanici)
+        {
+            var simdi = DateTime.Now;
+            var girisKaydi = new GirisKaydi
+            {
+                KullaniciId = kullanici.Id,
+                KullaniciAdi = kullanici.KullaniciAdi,
+                GirisZamani = simdi,
+                SonAktiviteZamani = simdi
+            };
+            _db.GirisKayitlari.Add(girisKaydi);
+            await _db.SaveChangesAsync();
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, kullanici.KullaniciAdi),
+                new Claim("AdSoyad", kullanici.AdSoyad ?? kullanici.KullaniciAdi),
+                new Claim("GirisKaydiId", girisKaydi.Id.ToString()),
+            };
+            if (kullanici.Admin) claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
+                new AuthenticationProperties { IsPersistent = true });
         }
 
         // Yeni kullanıcıların admin onayı almadan, sadece Güncellemeler'de belirlenen davet
@@ -119,14 +140,7 @@ namespace AracSatisSistemi.Controllers
             _db.Kullanicilar.Add(yeniKullanici);
             await _db.SaveChangesAsync();
 
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, yeniKullanici.KullaniciAdi),
-                new Claim("AdSoyad", yeniKullanici.AdSoyad ?? yeniKullanici.KullaniciAdi),
-            };
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity),
-                new AuthenticationProperties { IsPersistent = true });
+            await GirisYapAsync(yeniKullanici);
 
             TempData["Basari"] = "Hesabınız oluşturuldu, hoş geldiniz!";
             return RedirectToAction("Index", "Home");
@@ -135,6 +149,17 @@ namespace AracSatisSistemi.Controllers
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Cikis()
         {
+            var girisKaydiIdClaim = User.FindFirst("GirisKaydiId")?.Value;
+            if (int.TryParse(girisKaydiIdClaim, out var girisKaydiId))
+            {
+                var kayit = await _db.GirisKayitlari.FindAsync(girisKaydiId);
+                if (kayit != null && kayit.CikisZamani == null)
+                {
+                    kayit.CikisZamani = DateTime.Now;
+                    await _db.SaveChangesAsync();
+                }
+            }
+
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction(nameof(Giris));
         }

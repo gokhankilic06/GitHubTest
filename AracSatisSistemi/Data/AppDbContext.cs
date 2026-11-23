@@ -25,6 +25,8 @@ namespace AracSatisSistemi.Data
         public DbSet<KomisyonOturumu> KomisyonOturumlari => Set<KomisyonOturumu>();
         public DbSet<SatisTarihi> SatisTarihleri => Set<SatisTarihi>();
         public DbSet<Kullanici> Kullanicilar => Set<Kullanici>();
+        public DbSet<GirisKaydi> GirisKayitlari => Set<GirisKaydi>();
+        public DbSet<IslemKaydi> IslemKayitlari => Set<IslemKaydi>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
