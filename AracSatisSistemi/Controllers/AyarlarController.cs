@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -78,7 +79,7 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
         public async Task<IActionResult> DavetKoduGuncelle(string? davetKodu)
         {
             var kayit = await _db.GenelAyarlar.FirstOrDefaultAsync();
@@ -288,8 +289,8 @@ namespace AracSatisSistemi.Controllers
         }
 
         // ---- KULLANICILAR (giriş güvenliği) ----
-        [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> KullaniciEkle(string kullaniciAdi, string sifre, string? adSoyad)
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
+        public async Task<IActionResult> KullaniciEkle(string kullaniciAdi, string sifre, string? adSoyad, bool admin)
         {
             kullaniciAdi = (kullaniciAdi ?? string.Empty).Trim();
             if (string.IsNullOrWhiteSpace(kullaniciAdi) || string.IsNullOrWhiteSpace(sifre))
@@ -308,7 +309,7 @@ namespace AracSatisSistemi.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var kullanici = new Kullanici { KullaniciAdi = kullaniciAdi, AdSoyad = string.IsNullOrWhiteSpace(adSoyad) ? null : adSoyad.Trim() };
+            var kullanici = new Kullanici { KullaniciAdi = kullaniciAdi, AdSoyad = string.IsNullOrWhiteSpace(adSoyad) ? null : adSoyad.Trim(), Admin = admin };
             var hasher = new PasswordHasher<Kullanici>();
             kullanici.SifreHash = hasher.HashPassword(kullanici, sifre);
             _db.Kullanicilar.Add(kullanici);
@@ -317,7 +318,27 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
+        public async Task<IActionResult> KullaniciAdminDegistir(int id, bool admin)
+        {
+            var kayit = await _db.Kullanicilar.FindAsync(id);
+            if (kayit == null) return RedirectToAction(nameof(Index));
+
+            // Admin yetkisi kaldırılan son admin olursa, Kullanıcılar bölümüne ve
+            // istatistik sayfasına bir daha kimse erişemez.
+            if (!admin && kayit.Admin && await _db.Kullanicilar.CountAsync(k => k.Admin) <= 1)
+            {
+                TempData["Hata"] = "Son admin kullanıcının yetkisi kaldırılamaz.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            kayit.Admin = admin;
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"\"{kayit.KullaniciAdi}\" kullanıcısı {(admin ? "admin yapıldı" : "admin yetkisi kaldırıldı")}.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
         public async Task<IActionResult> KullaniciSifreSifirla(int id, string yeniSifre)
         {
             var kayit = await _db.Kullanicilar.FindAsync(id);
@@ -335,7 +356,7 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Admin")]
         public async Task<IActionResult> KullaniciSil(int id)
         {
             var kayit = await _db.Kullanicilar.FindAsync(id);
@@ -351,6 +372,11 @@ namespace AracSatisSistemi.Controllers
             if (kayit.Aktif && await _db.Kullanicilar.CountAsync(k => k.Aktif) <= 1)
             {
                 TempData["Hata"] = "Son aktif kullanıcı silinemez; aksi halde sisteme kimse giriş yapamaz.";
+                return RedirectToAction(nameof(Index));
+            }
+            if (kayit.Admin && await _db.Kullanicilar.CountAsync(k => k.Admin) <= 1)
+            {
+                TempData["Hata"] = "Son admin kullanıcı silinemez.";
                 return RedirectToAction(nameof(Index));
             }
 

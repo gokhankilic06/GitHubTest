@@ -1,0 +1,65 @@
+@using AracSatisSistemi.Controllers
+@model List<KullanicilarController.KullaniciOzet>
+@{
+    ViewData["Title"] = "Kullanıcılar";
+    string SureGoster(TimeSpan s) => s.TotalMinutes < 1 ? "< 1 dk" : $"{(int)s.TotalHours} sa {s.Minutes} dk";
+}
+<h3>Kullanıcılar</h3>
+<p class="text-muted">Kullanıcıların giriş/çıkış geçmişi ve yaptıkları işlemler. Detay için bir kullanıcıya tıklayın.</p>
+
+<div class="card p-3">
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                    <th>Ad Soyad</th>
+                    <th>Durum</th>
+                    <th>Giriş Sayısı</th>
+                    <th>Son Giriş</th>
+                    <th>Toplam Süre</th>
+                    <th>İşlem Sayısı</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var k in Model)
+                {
+                    <tr>
+                        <td>
+                            @k.KullaniciAdi
+                            @if (k.Admin)
+                            {
+                                <span class="badge bg-dark ms-1">Admin</span>
+                            }
+                        </td>
+                        <td>@k.AdSoyad</td>
+                        <td>
+                            @if (!k.Aktif)
+                            {
+                                <span class="badge bg-secondary">Pasif</span>
+                            }
+                            else if (k.SuAnOnlineMi)
+                            {
+                                <span class="badge bg-success">Çevrimiçi</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-light text-dark">Çevrimdışı</span>
+                            }
+                        </td>
+                        <td>@k.GirisSayisi</td>
+                        <td>@(k.SonGiris?.ToString("dd.MM.yyyy HH:mm") ?? "-")</td>
+                        <td>@SureGoster(k.ToplamSure)</td>
+                        <td>@k.IslemSayisi</td>
+                        <td><a class="btn btn-sm btn-outline-primary" asp-action="Detay" asp-route-id="@k.Id">Detay</a></td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted">Henüz kullanıcı yok.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
