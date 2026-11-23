@@ -64,6 +64,11 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Terk Tarihi")]
         [DataType(DataType.Date)]
         public DateTime? TerkTarihi { get; set; }
+        [Display(Name = "Terk Yazı Tarihi")]
+        [DataType(DataType.Date)]
+        public DateTime? TerkYaziTarihi { get; set; }
+        [Display(Name = "Terk Yazı Sayısı")]
+        public string? TerkYaziSayisi { get; set; }
         [Display(Name = "Terk Edilen Kişi (Adı Soyadı)")]
         public string? TerkEdilenAdiSoyadi { get; set; }
         [Display(Name = "Terk Edilen Kişi T.C. Kimlik / VKN")]
