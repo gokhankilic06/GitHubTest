@@ -190,7 +190,7 @@ namespace AracSatisSistemi.Controllers
             DateTime? satisTarihi = null,
             string? vergiDairesi = null,
             SatisSonucu? satisSonucu = null,
-            string durum = "aktif")
+            string durum = "")
         {
             var veri = await FiltreliListeGetir(dosyaNo, satisTuru, plaka, satisTarihi, vergiDairesi, satisSonucu, durum);
 
@@ -225,7 +225,7 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> ExcelIndir(
             string? dosyaNo = null, SatisTuru? satisTuru = null, string? plaka = null,
             DateTime? satisTarihi = null, string? vergiDairesi = null, SatisSonucu? satisSonucu = null,
-            string durum = "aktif")
+            string durum = "")
         {
             var veri = await FiltreliListeGetir(dosyaNo, satisTuru, plaka, satisTarihi, vergiDairesi, satisSonucu, durum);
             var trTR = new System.Globalization.CultureInfo("tr-TR");
