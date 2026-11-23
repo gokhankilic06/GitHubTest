@@ -140,10 +140,8 @@ namespace AracSatisSistemi.Controllers
             _db.Kullanicilar.Add(yeniKullanici);
             await _db.SaveChangesAsync();
 
-            await GirisYapAsync(yeniKullanici);
-
-            TempData["Basari"] = "Hesabınız oluşturuldu, hoş geldiniz!";
-            return RedirectToAction("Index", "Home");
+            TempData["Basari"] = "Kaydınız başarıyla oluşturuldu. Şimdi giriş yapabilirsiniz.";
+            return RedirectToAction(nameof(Giris));
         }
 
         [HttpPost, ValidateAntiForgeryToken]
