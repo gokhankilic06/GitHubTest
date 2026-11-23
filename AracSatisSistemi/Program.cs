@@ -183,6 +183,12 @@ using (var scope = app.Services.CreateScope())
     catch { /* sütun zaten varsa göz ardı edilir */ }
     try { db.Database.ExecuteSqlRaw(@"UPDATE ""Kullanicilar"" SET ""Admin"" = 1 WHERE ""KullaniciAdi"" = 'admin';"); }
     catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
+
+    // Alıcıya Terk'e, hızlı/tekil kayıt ekranı için "Terk Yazı Tarihi/Sayısı" sonradan eklendi.
+    try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""IptalIadeler"" ADD COLUMN ""TerkYaziTarihi"" TEXT NULL;"); }
+    catch { /* sütun zaten varsa göz ardı edilir */ }
+    try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""IptalIadeler"" ADD COLUMN ""TerkYaziSayisi"" TEXT NULL;"); }
+    catch { /* sütun zaten varsa göz ardı edilir */ }
 }
 
 if (!app.Environment.IsDevelopment())

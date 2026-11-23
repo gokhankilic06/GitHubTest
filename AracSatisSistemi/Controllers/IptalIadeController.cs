@@ -137,6 +137,40 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction("Details", "Dosya", new { id = dosya.Id });
         }
 
+        // POST: /IptalIade/HizliAliciyaTerk - Dosya No girilerek, mevcut satış/aşama
+        // durumuna bakılmaksızın doğrudan "Alıcıya Terk" kaydı girilip dosyanın pasife
+        // çekilmesi için hızlı/tekil kayıt ekranı (bkz. Views/IptalIade/Index.cshtml).
+        // Yukarıdaki dosyaId bazlı AliciyaTerk akışından farkı: Dosya.Asama ==
+        // AliciyaTerkBekliyor şartı aranmaz, yalnızca dosya no ile bulunup işlenir.
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> HizliAliciyaTerk(string dosyaNo, DateTime? terkYaziTarihi, string? terkYaziSayisi)
+        {
+            dosyaNo = (dosyaNo ?? string.Empty).Trim();
+            var dosya = await _db.Dosyalar.Include(d => d.IptalIade).FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            if (dosya == null)
+            {
+                TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (dosya.IptalIade == null)
+            {
+                dosya.IptalIade = new IptalIade { DosyaId = dosya.Id };
+                _db.IptalIadeler.Add(dosya.IptalIade);
+            }
+            var kayit = dosya.IptalIade;
+            kayit.AliciyaTerkSecildi = true;
+            kayit.TerkTarihi ??= DateTime.Today;
+            kayit.TerkYaziTarihi = terkYaziTarihi;
+            kayit.TerkYaziSayisi = terkYaziSayisi;
+
+            dosya.Durum = DosyaDurumu.AliciyaTerkEdildi;
+
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = $"{dosya.DosyaNo} nolu dosya pasife çekildi.";
+            return RedirectToAction(nameof(Index));
+        }
+
         // POST: /IptalIade/Kapat - Aktif bir dosyayı doğrudan (onay sonrası) kapatır.
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Kapat(int dosyaId)
