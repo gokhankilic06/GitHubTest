@@ -25,7 +25,7 @@ namespace AracSatisSistemi.Models
         [Display(Name = "Vergi Dairesi Yazı Sayısı")]
         public string? VergiDairesiYaziSayisi { get; set; }
 
-        [Required, Display(Name = "Alacaklı Vergi Dairesi")]
+        [Display(Name = "Alacaklı Vergi Dairesi")]
         public string AlacakliVergiDairesi { get; set; } = string.Empty;
 
         // ---- BORÇLU MÜKELLEF BİLGİLERİ ----
