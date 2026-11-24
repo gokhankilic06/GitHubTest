@@ -268,6 +268,22 @@ namespace AracSatisSistemi.Controllers
             return RedirectToAction(nameof(SonucGir), new { dosyaId, tur = adim.Value.tur, tarih = adim.Value.tarih });
         }
 
+        // GET: /Satis/DosyaNoIleGit?dosyaNo=.. - Satış Sonuçlarını Gir ana ekranındaki "Dosya No ile
+        // Git" kısayolu. Memur ihalenin tam tarihini/türünü hatırlamasa bile, sadece dosya no
+        // yazarak doğrudan o dosyanın sırada bekleyen satış sonucu formuna gidebilir (bkz.
+        // DosyaIcinYonlendir - aynı mantığı dosya no üzerinden çağırır).
+        public async Task<IActionResult> DosyaNoIleGit(string dosyaNo)
+        {
+            dosyaNo = (dosyaNo ?? string.Empty).Trim();
+            var dosya = await _db.Dosyalar.FirstOrDefaultAsync(d => d.DosyaNo == dosyaNo);
+            if (dosya == null)
+            {
+                TempData["Hata"] = $"\"{dosyaNo}\" numaralı dosya bulunamadı.";
+                return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(DosyaIcinYonlendir), new { dosyaId = dosya.Id });
+        }
+
         public async Task<IActionResult> Edit(int id)
         {
             var satis = await _db.Satislar.Include(s => s.Dosya).FirstOrDefaultAsync(s => s.Id == id);
