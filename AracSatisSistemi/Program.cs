@@ -189,6 +189,18 @@ using (var scope = app.Services.CreateScope())
     catch { /* sütun zaten varsa göz ardı edilir */ }
     try { db.Database.ExecuteSqlRaw(@"ALTER TABLE ""IptalIadeler"" ADD COLUMN ""TerkYaziSayisi"" TEXT NULL;"); }
     catch { /* sütun zaten varsa göz ardı edilir */ }
+
+    // Daha önceki sürümlerde Komisyon Bilgileri (Ayarlar) ilk kurulumda "Üye 1 (güncelleyin)"
+    // gibi yer tutucu metinlerle oluşturuluyordu; bu metinler kalıcı veri olarak kaydedilmiş
+    // olabileceğinden, hâlâ tam olarak bu haliyle duran satırlar burada boşa çevrilir.
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonAyarlari"" SET ""Baskan"" = '' WHERE ""Baskan"" = 'Komisyon Başkanı (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonAyarlari"" SET ""Uye1"" = '' WHERE ""Uye1"" = 'Üye 1 (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonAyarlari"" SET ""Uye2"" = '' WHERE ""Uye2"" = 'Üye 2 (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonAyarlari"" SET ""Uye3"" = '' WHERE ""Uye3"" = 'Üye 3 (güncelleyin)';");
+    }
+    catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
 }
 
 if (!app.Environment.IsDevelopment())
