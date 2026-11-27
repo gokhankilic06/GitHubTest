@@ -42,11 +42,6 @@
         <div class="col-md-3"><label class="form-label" asp-for="AliciVKN"></label><input class="form-control" asp-for="AliciVKN" maxlength="10" /></div>
         <div class="col-md-3"><label class="form-label" asp-for="AliciAdiSoyadi"></label><input class="form-control" asp-for="AliciAdiSoyadi" /></div>
         <div class="col-md-3"><label class="form-label" asp-for="Adres"></label><input class="form-control" asp-for="Adres" /></div>
-
-        <div class="col-md-3">
-            <label class="form-label">Vade (Satış tarihinden itibaren 3 gün)</label>
-            <input class="form-control" id="vadeOnizleme" readonly />
-        </div>
     </div>
 
     <div class="mt-4">
@@ -68,16 +63,5 @@
         }
         sonucSelect.addEventListener('change', bedelAlaniniAyarla);
         bedelAlaniniAyarla();
-
-        const tarihInput = document.getElementById('satisTarihi');
-        const vadeOut = document.getElementById('vadeOnizleme');
-        function vadeHesapla() {
-            if (!tarihInput.value) { vadeOut.value = ''; return; }
-            const d = new Date(tarihInput.value);
-            d.setDate(d.getDate() + 3);
-            vadeOut.value = d.toLocaleDateString('tr-TR');
-        }
-        tarihInput.addEventListener('change', vadeHesapla);
-        vadeHesapla();
     </script>
 }
