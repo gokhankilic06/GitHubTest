@@ -23,6 +23,7 @@ namespace AracSatisSistemi.Data
         public DbSet<ResmiTatil> ResmiTatiller => Set<ResmiTatil>();
         public DbSet<AliciKaydi> AliciKayitlari => Set<AliciKaydi>();
         public DbSet<KomisyonOturumu> KomisyonOturumlari => Set<KomisyonOturumu>();
+        public DbSet<KomisyonOturumuDosya> KomisyonOturumuDosyalari => Set<KomisyonOturumuDosya>();
         public DbSet<SatisTarihi> SatisTarihleri => Set<SatisTarihi>();
         public DbSet<Kullanici> Kullanicilar => Set<Kullanici>();
         public DbSet<GirisKaydi> GirisKayitlari => Set<GirisKaydi>();

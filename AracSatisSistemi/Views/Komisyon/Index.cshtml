@@ -5,6 +5,9 @@
     var varsayilanKomisyon = (KomisyonAyari?)ViewBag.VarsayilanKomisyon;
     var birinciSayilari = (Dictionary<DateTime, int>)ViewBag.BirinciSatisSayilari;
     var ikinciSayilari = (Dictionary<DateTime, int>)ViewBag.IkinciSatisSayilari;
+    var pazarlikBekleyenDosyalar = (List<Dosya>)ViewBag.PazarlikBekleyenDosyalar;
+    var madde6183BekleyenDosyalar = (List<Dosya>)ViewBag.Madde6183BekleyenDosyalar;
+    var oturumDosyalari = (Dictionary<int, List<Dosya>>)ViewBag.OturumDosyalari;
     var trTR = new System.Globalization.CultureInfo("tr-TR");
 }
 <h3>Komisyon İşlemleri</h3>
@@ -59,6 +62,40 @@
             <label class="form-label">3 Nolu Üye <span class="text-muted small">(opsiyonel)</span></label>
             <input class="form-control" name="Uye3" value="@varsayilanKomisyon?.Uye3" />
         </div>
+        <div class="col-12" id="pazarlikDosyaAlani" style="display:none;">
+            <label class="form-label">Bu Oturumda Görüşülecek Dosya(lar) <span class="text-muted small">(opsiyonel)</span></label>
+            <div class="form-text mb-1">Seçilen dosya(lar) için "Kayıtlı Komisyon Oturumları" listesinde doğrudan "Sonuç Gir" bağlantısı görünür.</div>
+            <div class="border rounded p-2" style="max-height:160px; overflow-y:auto;">
+                @foreach (var d in pazarlikBekleyenDosyalar)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="dosyaIdleri" value="@d.Id" id="pzd_@d.Id" />
+                        <label class="form-check-label" for="pzd_@d.Id">@d.DosyaNo - @d.Plaka - @d.AdiSoyadiUnvani</label>
+                    </div>
+                }
+                @if (!pazarlikBekleyenDosyalar.Any())
+                {
+                    <span class="text-muted small">Şu an Pazarlık bekleyen dosya yok.</span>
+                }
+            </div>
+        </div>
+        <div class="col-12" id="madde6183DosyaAlani" style="display:none;">
+            <label class="form-label">Bu Oturumda Görüşülecek Dosya(lar) <span class="text-muted small">(opsiyonel)</span></label>
+            <div class="form-text mb-1">Seçilen dosya(lar) için "Kayıtlı Komisyon Oturumları" listesinde doğrudan "Sonuç Gir" bağlantısı görünür.</div>
+            <div class="border rounded p-2" style="max-height:160px; overflow-y:auto;">
+                @foreach (var d in madde6183BekleyenDosyalar)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="dosyaIdleri" value="@d.Id" id="m6183d_@d.Id" />
+                        <label class="form-check-label" for="m6183d_@d.Id">@d.DosyaNo - @d.Plaka - @d.AdiSoyadiUnvani</label>
+                    </div>
+                }
+                @if (!madde6183BekleyenDosyalar.Any())
+                {
+                    <span class="text-muted small">Şu an 6183/86 Tek Satış bekleyen dosya yok.</span>
+                }
+            </div>
+        </div>
         <div class="col-12">
             <button class="btn btn-primary" type="submit"><i class="bi bi-check-circle"></i> Komisyonu Kaydet</button>
         </div>
@@ -79,12 +116,14 @@
                     <th>1 Nolu Üye</th>
                     <th>2 Nolu Üye</th>
                     <th>3 Nolu Üye</th>
+                    <th>İlgili Dosyalar</th>
                     <th></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var k in Model)
                 {
+                    var baglidosyalar = oturumDosyalari.GetValueOrDefault(k.Id) ?? new List<Dosya>();
                     <tr>
                         <td>@k.Id</td>
                         <td>@k.SatisTuruGorunen</td>
@@ -94,6 +133,22 @@
                         <td>@k.Uye1</td>
                         <td>@k.Uye2</td>
                         <td>@k.Uye3</td>
+                        <td>
+                            @if (!baglidosyalar.Any())
+                            {
+                                <span class="text-muted small">-</span>
+                            }
+                            else
+                            {
+                                @foreach (var d in baglidosyalar)
+                                {
+                                    <a class="btn btn-sm btn-outline-dark mb-1" asp-controller="Satis" asp-action="SonucGir" asp-route-dosyaId="@d.Id" asp-route-tur="@((int)k.SatisTuru)" asp-route-tarih="@k.SatisTarihi.ToString("yyyy-MM-dd")">
+                                        @d.DosyaNo <i class="bi bi-arrow-right-circle"></i> Sonuç Gir
+                                    </a>
+                                    <br />
+                                }
+                            }
+                        </td>
                         <td>
                             <form asp-action="Sil" method="post" onsubmit="return confirm('Bu komisyon oturumu silinsin mi?');">
                                 @Html.AntiForgeryToken()
@@ -105,7 +160,7 @@
                 }
                 @if (!Model.Any())
                 {
-                    <tr><td colspan="9" class="text-center text-muted">Henüz kayıtlı komisyon oturumu yok.</td></tr>
+                    <tr><td colspan="10" class="text-center text-muted">Henüz kayıtlı komisyon oturumu yok.</td></tr>
                 }
             </tbody>
         </table>
@@ -170,5 +225,16 @@
         tarihSecenekleriniGuncelle();
         satisTuruSecim.addEventListener('change', tarihModunuAyarla);
         tarihModunuAyarla();
+
+        // Dosya seçim listesi yalnızca Pazarlık/6183-86 için anlamlıdır (1./2. Satış zaten
+        // Satış Takvimi tarihiyle otomatik eşleşir).
+        const pazarlikDosyaAlani = document.getElementById('pazarlikDosyaAlani');
+        const madde6183DosyaAlani = document.getElementById('madde6183DosyaAlani');
+        function dosyaAlaniniAyarla() {
+            pazarlikDosyaAlani.style.display = satisTuruSecim.value === '3' ? '' : 'none';
+            madde6183DosyaAlani.style.display = satisTuruSecim.value === '4' ? '' : 'none';
+        }
+        satisTuruSecim.addEventListener('change', dosyaAlaniniAyarla);
+        dosyaAlaniniAyarla();
     </script>
 }

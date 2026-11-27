@@ -317,7 +317,8 @@ namespace AracSatisSistemi.Controllers
             satis.AliciVKN = guncel.AliciVKN;
             satis.AliciAdiSoyadi = guncel.AliciAdiSoyadi;
             satis.Adres = guncel.Adres;
-            satis.OtoparkaGirisTarihi = guncel.OtoparkaGirisTarihi;
+            // OtoparkaGirisTarihi bu formda yok (Kayıt İşlemleri'nde / Alıcı Ödeme Bilgileri'nde
+            // giriliyor) - burada üzerine yazılmıyor ki mevcut değeri silinmesin.
 
             if (satis.Dosya != null)
             {

@@ -34,6 +34,11 @@ namespace AracSatisSistemi.Controllers
             // Yeni oturum formunda, aynı kişiler genelde her oturumda görev aldığı için
             // "Güncellemeler" ekranındaki varsayılan Komisyon Bilgileri öneri olarak doldurulur.
             ViewBag.VarsayilanKomisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
+
+            // Pazarlık/6183-86 oturumu oluştururken, o oturumda hangi dosya(lar)ın görüşüleceğini
+            // doğrudan seçebilmek için - bkz. Create POST, KomisyonOturumuDosya.
+            ViewBag.PazarlikBekleyenDosyalar = await PazarlikDosyaYardimcisi.BekleyenDosyalariGetir(_db, SatisTuru.Pazarlik);
+            ViewBag.Madde6183BekleyenDosyalar = await PazarlikDosyaYardimcisi.BekleyenDosyalariGetir(_db, SatisTuru.Madde6183_86);
         }
 
         // GET: /Komisyon - liste + yeni kayıt formu
@@ -46,11 +51,21 @@ namespace AracSatisSistemi.Controllers
                 .OrderByDescending(k => k.SatisTarihi)
                 .ThenByDescending(k => k.SatisSaati)
                 .ToList();
+
+            // Her oturuma bağlı dosyaları (varsa) tek seferde çekip Id'ye göre gruplayarak
+            // View'a veriyoruz - bkz. Index.cshtml "İlgili Dosyalar" sütunu.
+            var baglantilar = await _db.KomisyonOturumuDosyalari.ToListAsync();
+            var dosyaIdleri = baglantilar.Select(b => b.DosyaId).Distinct().ToList();
+            var dosyalar = await _db.Dosyalar.Where(d => dosyaIdleri.Contains(d.Id)).ToListAsync();
+            ViewBag.OturumDosyalari = baglantilar
+                .GroupBy(b => b.KomisyonOturumuId)
+                .ToDictionary(g => g.Key, g => g.Select(b => dosyalar.FirstOrDefault(d => d.Id == b.DosyaId)).Where(d => d != null).Cast<Dosya>().ToList());
+
             return View(liste);
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(KomisyonOturumu form)
+        public async Task<IActionResult> Create(KomisyonOturumu form, int[]? dosyaIdleri)
         {
             if (!ModelState.IsValid)
             {
@@ -71,6 +86,18 @@ namespace AracSatisSistemi.Controllers
 
             _db.KomisyonOturumlari.Add(form);
             await _db.SaveChangesAsync();
+
+            // Pazarlık/6183-86 için: bu oturumda görüşülecek dosya(lar) seçilmişse bağlantı
+            // kaydedilir - bkz. Index (OturumDosyalari), Index.cshtml "Sonuç Gir" bağlantıları.
+            if (dosyaIdleri != null && dosyaIdleri.Length > 0)
+            {
+                foreach (var dosyaId in dosyaIdleri)
+                {
+                    _db.KomisyonOturumuDosyalari.Add(new KomisyonOturumuDosya { KomisyonOturumuId = form.Id, DosyaId = dosyaId });
+                }
+                await _db.SaveChangesAsync();
+            }
+
             TempData["Basari"] = $"{form.Id} nolu komisyon oturumu kaydedildi.";
             return RedirectToAction(nameof(Index));
         }
@@ -81,6 +108,8 @@ namespace AracSatisSistemi.Controllers
             var kayit = await _db.KomisyonOturumlari.FindAsync(id);
             if (kayit != null)
             {
+                var baglantilar = await _db.KomisyonOturumuDosyalari.Where(b => b.KomisyonOturumuId == id).ToListAsync();
+                _db.KomisyonOturumuDosyalari.RemoveRange(baglantilar);
                 _db.KomisyonOturumlari.Remove(kayit);
                 await _db.SaveChangesAsync();
                 TempData["Basari"] = $"{id} nolu komisyon oturumu silindi.";
