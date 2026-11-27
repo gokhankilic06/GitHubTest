@@ -9,6 +9,13 @@
     var renkler = (List<AracSatisSistemi.Models.AracRengi>)ViewBag.Renkler;
     var resmiTatiller = (List<AracSatisSistemi.Models.ResmiTatil>)ViewBag.ResmiTatiller;
     var kullanicilar = (List<AracSatisSistemi.Models.Kullanici>)ViewBag.Kullanicilar;
+    // DİKKAT: tr-TR kültüründe @ondalık.ToString() virgüllü biçim üretir (ör. "41,5"), ama
+    // type="number" inputları değeri SADECE nokta ondalık ayracıyla kabul eder - uyuşmazlıkta
+    // tarayıcı değeri sessizce boşaltır (bu yüzden tarifedeki sayılar "sıfırlanmış" gibi
+    // görünüyordu). asp-for tag helper'ı bunu kendi içinde hallediyor, ama burada ViewBag'den
+    // gelen genelAyar için elle yazılan value="" ifadelerinde InvariantCulture'a zorlanması
+    // gerekiyor.
+    string Ondalik(decimal? d) => (d ?? 0m).ToString(System.Globalization.CultureInfo.InvariantCulture);
 }
 <h3>Güncellemeler</h3>
 
@@ -121,7 +128,6 @@
     </p>
     <form asp-action="TarifeGuncelle" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" name="Id" value="@genelAyar?.Id" />
         <div class="table-responsive">
             <table class="table table-bordered align-middle text-center">
                 <thead class="table-light">
@@ -136,36 +142,42 @@
                 <tbody>
                     <tr>
                         <td class="fw-semibold table-light">6 Aya Kadar (TL/gün)</td>
-                        <td><input class="form-control" name="KucukArac6AyaKadar" type="number" step="0.01" value="@genelAyar?.KucukArac6AyaKadar" /></td>
-                        <td><input class="form-control" name="MinibusKamyonet6AyaKadar" type="number" step="0.01" value="@genelAyar?.MinibusKamyonet6AyaKadar" /></td>
-                        <td><input class="form-control" name="BuyukArac6AyaKadar" type="number" step="0.01" value="@genelAyar?.BuyukArac6AyaKadar" /></td>
-                        <td><input class="form-control" name="Motor6AyaKadar" type="number" step="0.01" value="@genelAyar?.Motor6AyaKadar" /></td>
+                        <td><input class="form-control" name="KucukArac6AyaKadar" type="number" step="0.01" value="@Ondalik(genelAyar?.KucukArac6AyaKadar)" /></td>
+                        <td><input class="form-control" name="MinibusKamyonet6AyaKadar" type="number" step="0.01" value="@Ondalik(genelAyar?.MinibusKamyonet6AyaKadar)" /></td>
+                        <td><input class="form-control" name="BuyukArac6AyaKadar" type="number" step="0.01" value="@Ondalik(genelAyar?.BuyukArac6AyaKadar)" /></td>
+                        <td><input class="form-control" name="Motor6AyaKadar" type="number" step="0.01" value="@Ondalik(genelAyar?.Motor6AyaKadar)" /></td>
                     </tr>
                     <tr>
                         <td class="fw-semibold table-light">6 Aydan Sonra (TL/gün)</td>
-                        <td><input class="form-control" name="KucukArac6AydanSonra" type="number" step="0.01" value="@genelAyar?.KucukArac6AydanSonra" /></td>
-                        <td><input class="form-control" name="MinibusKamyonet6AydanSonra" type="number" step="0.01" value="@genelAyar?.MinibusKamyonet6AydanSonra" /></td>
-                        <td><input class="form-control" name="BuyukArac6AydanSonra" type="number" step="0.01" value="@genelAyar?.BuyukArac6AydanSonra" /></td>
-                        <td><input class="form-control" name="Motor6AydanSonra" type="number" step="0.01" value="@genelAyar?.Motor6AydanSonra" /></td>
+                        <td><input class="form-control" name="KucukArac6AydanSonra" type="number" step="0.01" value="@Ondalik(genelAyar?.KucukArac6AydanSonra)" /></td>
+                        <td><input class="form-control" name="MinibusKamyonet6AydanSonra" type="number" step="0.01" value="@Ondalik(genelAyar?.MinibusKamyonet6AydanSonra)" /></td>
+                        <td><input class="form-control" name="BuyukArac6AydanSonra" type="number" step="0.01" value="@Ondalik(genelAyar?.BuyukArac6AydanSonra)" /></td>
+                        <td><input class="form-control" name="Motor6AydanSonra" type="number" step="0.01" value="@Ondalik(genelAyar?.Motor6AydanSonra)" /></td>
                     </tr>
                     <tr>
                         <td class="fw-semibold table-light">Çekici Ücreti (TL, sabit)</td>
-                        <td><input class="form-control" name="KucukAracCekiciUcreti" type="number" step="0.01" value="@genelAyar?.KucukAracCekiciUcreti" /></td>
-                        <td><input class="form-control" name="MinibusKamyonetCekiciUcreti" type="number" step="0.01" value="@genelAyar?.MinibusKamyonetCekiciUcreti" /></td>
-                        <td><input class="form-control" name="BuyukAracCekiciUcreti" type="number" step="0.01" value="@genelAyar?.BuyukAracCekiciUcreti" /></td>
-                        <td><input class="form-control" name="MotorCekiciUcreti" type="number" step="0.01" value="@genelAyar?.MotorCekiciUcreti" /></td>
+                        <td><input class="form-control" name="KucukAracCekiciUcreti" type="number" step="0.01" value="@Ondalik(genelAyar?.KucukAracCekiciUcreti)" /></td>
+                        <td><input class="form-control" name="MinibusKamyonetCekiciUcreti" type="number" step="0.01" value="@Ondalik(genelAyar?.MinibusKamyonetCekiciUcreti)" /></td>
+                        <td><input class="form-control" name="BuyukAracCekiciUcreti" type="number" step="0.01" value="@Ondalik(genelAyar?.BuyukAracCekiciUcreti)" /></td>
+                        <td><input class="form-control" name="MotorCekiciUcreti" type="number" step="0.01" value="@Ondalik(genelAyar?.MotorCekiciUcreti)" /></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-        <div class="row g-3 mt-1">
-            <div class="col-md-3">
-                <label class="form-label">Model Yılı Üst Sınırı</label>
-                <input class="form-control" name="MaksimumModelYili" type="number" value="@genelAyar?.MaksimumModelYili" />
-                <div class="form-text">Kayıt İşlemleri/Dosya Düzenle ekranındaki "Model Yılı" listesinin en yüksek değeri; yıl ilerledikçe buradan artırabilirsiniz.</div>
-            </div>
+        <div class="mt-3"><button class="btn btn-primary">Otopark Bilgilerini Kaydet</button></div>
+    </form>
+
+    <hr class="my-4" />
+
+    <div class="form-section-title">Model Yılı Üst Sınırı</div>
+    <form asp-action="ModelYiliGuncelle" method="post" class="row g-3 align-items-end">
+        @Html.AntiForgeryToken()
+        <div class="col-md-3">
+            <label class="form-label">Model Yılı Üst Sınırı</label>
+            <input class="form-control" name="maksimumModelYili" type="number" value="@genelAyar?.MaksimumModelYili" required />
+            <div class="form-text">Kayıt İşlemleri/Dosya Düzenle ekranındaki "Model Yılı" listesinin en yüksek değeri; yıl ilerledikçe buradan artırabilirsiniz.</div>
         </div>
-        <div class="mt-3"><button class="btn btn-primary">Tarifeyi Güncelle</button></div>
+        <div class="col-md-3"><button class="btn btn-primary">Yılı Kaydet</button></div>
     </form>
 </div>
 
