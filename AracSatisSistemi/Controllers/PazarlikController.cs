@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AracSatisSistemi.Data;
+using AracSatisSistemi.Models;
+using AracSatisSistemi.Services;
 
 namespace AracSatisSistemi.Controllers
 {
@@ -16,6 +18,8 @@ namespace AracSatisSistemi.Controllers
         public async Task<IActionResult> Index()
         {
             ViewBag.VarsayilanKomisyon = await _db.KomisyonAyarlari.FirstOrDefaultAsync();
+            ViewBag.PazarlikBekleyenDosyalar = await PazarlikDosyaYardimcisi.BekleyenDosyalariGetir(_db, SatisTuru.Pazarlik);
+            ViewBag.Madde6183BekleyenDosyalar = await PazarlikDosyaYardimcisi.BekleyenDosyalariGetir(_db, SatisTuru.Madde6183_86);
             return View();
         }
     }

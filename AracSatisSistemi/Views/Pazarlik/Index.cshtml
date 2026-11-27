@@ -1,6 +1,8 @@
 @{
     ViewData["Title"] = "Pazarlık ve 6183/86 Tek Satış";
     var varsayilanKomisyon = (KomisyonAyari?)ViewBag.VarsayilanKomisyon;
+    var pazarlikBekleyenDosyalar = (List<Dosya>)ViewBag.PazarlikBekleyenDosyalar;
+    var madde6183BekleyenDosyalar = (List<Dosya>)ViewBag.Madde6183BekleyenDosyalar;
 }
 <h3>Pazarlık ve 6183/86 Tek Satış</h3>
 <p class="text-muted">
@@ -14,7 +16,7 @@
         @Html.AntiForgeryToken()
         <div class="col-md-3">
             <label class="form-label">Satış Türü</label>
-            <select class="form-select" name="SatisTuru" required>
+            <select class="form-select" name="SatisTuru" id="satisTuruSecim" required>
                 <option value="">-- Seçiniz --</option>
                 <option value="3">Pazarlık</option>
                 <option value="4">6183/86 Mad.</option>
@@ -45,6 +47,40 @@
             <label class="form-label">3 Nolu Üye <span class="text-muted small">(opsiyonel)</span></label>
             <input class="form-control" name="Uye3" value="@varsayilanKomisyon?.Uye3" />
         </div>
+        <div class="col-12" id="pazarlikDosyaAlani" style="display:none;">
+            <label class="form-label">Bu Oturumda Görüşülecek Dosya(lar) <span class="text-muted small">(opsiyonel)</span></label>
+            <div class="form-text mb-1">Seçilen dosya(lar) için Komisyon sayfasındaki listede doğrudan "Sonuç Gir" bağlantısı görünür.</div>
+            <div class="border rounded p-2" style="max-height:160px; overflow-y:auto;">
+                @foreach (var d in pazarlikBekleyenDosyalar)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="dosyaIdleri" value="@d.Id" id="pzd_@d.Id" />
+                        <label class="form-check-label" for="pzd_@d.Id">@d.DosyaNo - @d.Plaka - @d.AdiSoyadiUnvani</label>
+                    </div>
+                }
+                @if (!pazarlikBekleyenDosyalar.Any())
+                {
+                    <span class="text-muted small">Şu an Pazarlık bekleyen dosya yok.</span>
+                }
+            </div>
+        </div>
+        <div class="col-12" id="madde6183DosyaAlani" style="display:none;">
+            <label class="form-label">Bu Oturumda Görüşülecek Dosya(lar) <span class="text-muted small">(opsiyonel)</span></label>
+            <div class="form-text mb-1">Seçilen dosya(lar) için Komisyon sayfasındaki listede doğrudan "Sonuç Gir" bağlantısı görünür.</div>
+            <div class="border rounded p-2" style="max-height:160px; overflow-y:auto;">
+                @foreach (var d in madde6183BekleyenDosyalar)
+                {
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="dosyaIdleri" value="@d.Id" id="m6183d_@d.Id" />
+                        <label class="form-check-label" for="m6183d_@d.Id">@d.DosyaNo - @d.Plaka - @d.AdiSoyadiUnvani</label>
+                    </div>
+                }
+                @if (!madde6183BekleyenDosyalar.Any())
+                {
+                    <span class="text-muted small">Şu an 6183/86 Tek Satış bekleyen dosya yok.</span>
+                }
+            </div>
+        </div>
         <div class="col-12">
             <button class="btn btn-primary" type="submit"><i class="bi bi-check-circle"></i> Komisyonu Kaydet</button>
         </div>
@@ -62,3 +98,17 @@
         <i class="bi bi-people-fill"></i> Komisyon Sayfasına Git
     </a>
 </div>
+
+@section Scripts {
+    <script>
+        const satisTuruSecim = document.getElementById('satisTuruSecim');
+        const pazarlikDosyaAlani = document.getElementById('pazarlikDosyaAlani');
+        const madde6183DosyaAlani = document.getElementById('madde6183DosyaAlani');
+        function dosyaAlaniniAyarla() {
+            pazarlikDosyaAlani.style.display = satisTuruSecim.value === '3' ? '' : 'none';
+            madde6183DosyaAlani.style.display = satisTuruSecim.value === '4' ? '' : 'none';
+        }
+        satisTuruSecim.addEventListener('change', dosyaAlaniniAyarla);
+        dosyaAlaniniAyarla();
+    </script>
+}
