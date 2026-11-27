@@ -214,9 +214,11 @@ else
     }
     else
     {
-        @* Henüz sonuçlanmamış ("Bekliyor") satırlar için resmi İhale Tutanağı belgesi
-           üretilmez - bu belge yalnızca gerçekleşmiş bir ihale/satış sonucunu kayıt altına alır. *@
-        @foreach (var s in Model.Where(s => !s.HenuzSonucGirilmedi))
+        @* Henüz sonuçlanmamış ("Bekliyor") satırlar ile hiçbir satış türüne ait olmayan
+           (ör. hiç satışa çıkmadan doğrudan Alıcıya Terk ile kapatılmış bir dosyanın "-"
+           bilgi satırı) için resmi İhale Tutanağı belgesi üretilmez - bu belge yalnızca
+           gerçekleşmiş bir ihale/satış sonucunu kayıt altına alır. *@
+        @foreach (var s in Model.Where(s => !s.HenuzSonucGirilmedi && s.SatisTuru.HasValue))
         {
             <div class="tutanak-blok">
                 <div class="text-center mb-2">
