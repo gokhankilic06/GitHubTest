@@ -92,13 +92,7 @@ namespace AracSatisSistemi.Data
 
             if (!context.KomisyonAyarlari.Any())
             {
-                context.KomisyonAyarlari.Add(new KomisyonAyari
-                {
-                    Baskan = "Komisyon Başkanı (güncelleyin)",
-                    Uye1 = "Üye 1 (güncelleyin)",
-                    Uye2 = "Üye 2 (güncelleyin)",
-                    Uye3 = "Üye 3 (güncelleyin)"
-                });
+                context.KomisyonAyarlari.Add(new KomisyonAyari());
             }
 
             if (!context.GenelAyarlar.Any())
