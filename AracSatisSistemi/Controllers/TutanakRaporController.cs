@@ -49,66 +49,134 @@ namespace AracSatisSistemi.Controllers
                 AracSatisSistemi.Models.SatisTuru.Madde6183_86 => "6183/86 Mad.",
                 _ => "-"
             };
+            // Bu dosya için henüz hiç satış sonucu girilmemişse (hâlâ 1. Satış'ı bekliyorsa),
+            // Satış Türü/Tarihi/SONUÇ sütunları "-" yerine planlanan 1. Satış bilgisiyle
+            // dolu gösterilsin diye; bkz. FiltreliListeGetir.
+            public bool HenuzSonucGirilmedi { get; set; }
+
             public string SonucGorunen => SatisSonucu switch
             {
                 AracSatisSistemi.Models.SatisSonucu.Satildi => "Satıldı",
                 AracSatisSistemi.Models.SatisSonucu.AliciCikmadi => "Alıcı Çıkmadı",
                 AracSatisSistemi.Models.SatisSonucu.AliciIslemYapmadi => "Alıcı İşlem Yapmadı",
-                _ => "-"
+                _ => HenuzSonucGirilmedi ? "Bekliyor" : "-"
             };
         }
+
+        // Dosya.Asama'nın (henüz sonuçlanmamış) işaret ettiği satış türü - bu türün "Bekliyor"
+        // satırını listeye eklemek için kullanılır; eşleşmeyen aşamalar (Alıcıya Terk Bekliyor,
+        // Süreç Tamamlandı) için bekleyen bir satış türü yoktur.
+        private static readonly Dictionary<Dosya.SurecAsamasi, SatisTuru> AsamaBekleyenTur = new()
+        {
+            [Dosya.SurecAsamasi.BirinciSatisBekliyor] = SatisTuru.BirinciSatis,
+            [Dosya.SurecAsamasi.IkinciSatisBekliyor] = SatisTuru.IkinciSatis,
+            [Dosya.SurecAsamasi.PazarlikBekliyor] = SatisTuru.Pazarlik,
+            [Dosya.SurecAsamasi.Madde6183_86Bekliyor] = SatisTuru.Madde6183_86
+        };
 
         private async Task<List<SatirSonuc>> FiltreliListeGetir(
             string? dosyaNo, SatisTuru? satisTuru, string? plaka, DateTime? satisTarihi,
             string? vergiDairesi, SatisSonucu? satisSonucu, string durum)
         {
-            var sorgu =
-                from d in _db.Dosyalar
-                join s in _db.Satislar on d.Id equals s.DosyaId into satislar
-                from s in satislar.DefaultIfEmpty()
-                select new { d, s };
-
-            if (!string.IsNullOrWhiteSpace(dosyaNo)) sorgu = sorgu.Where(x => x.d.DosyaNo == dosyaNo);
-            if (!string.IsNullOrWhiteSpace(plaka)) sorgu = sorgu.Where(x => x.d.Plaka == plaka);
-            if (!string.IsNullOrWhiteSpace(vergiDairesi)) sorgu = sorgu.Where(x => x.d.VergiDairesiAdi == vergiDairesi);
-            if (satisTuru.HasValue) sorgu = sorgu.Where(x => x.s != null && x.s.SatisTuru == satisTuru.Value);
-            if (satisTarihi.HasValue) sorgu = sorgu.Where(x => x.s != null && x.s.SatisTarihi.Date == satisTarihi.Value.Date);
-            if (satisSonucu.HasValue) sorgu = sorgu.Where(x => x.s != null && x.s.SatisSonucu == satisSonucu.Value);
-
+            // Dallanma mantığı (Dosya.Asama) SQL'e çevrilemediğinden, eşleşen dosyalar belleğe
+            // alınıp orada süzülür (bkz. IhaleGorunumleriGetir'deki aynı yaklaşım) - bu sayede
+            // henüz hiç sonuç girilmemiş (ör. 1. Satış'ı bekleyen) dosyalar da "Bekliyor" satırı
+            // olarak gösterilebilir, sadece geçmiş sonuçlar değil.
+            var sorgu = _db.Dosyalar.Include(d => d.Satislar).AsQueryable();
+            if (!string.IsNullOrWhiteSpace(dosyaNo)) sorgu = sorgu.Where(d => d.DosyaNo == dosyaNo);
+            if (!string.IsNullOrWhiteSpace(plaka)) sorgu = sorgu.Where(d => d.Plaka == plaka);
+            if (!string.IsNullOrWhiteSpace(vergiDairesi)) sorgu = sorgu.Where(d => d.VergiDairesiAdi == vergiDairesi);
             if (durum == "aktif")
-                sorgu = sorgu.Where(x => x.d.Durum == DosyaDurumu.Kayitli || x.d.Durum == DosyaDurumu.SatisaCikti);
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti);
             else if (durum == "pasif")
-                sorgu = sorgu.Where(x => x.d.Durum == DosyaDurumu.Satildi || x.d.Durum == DosyaDurumu.IptalEdildi
-                    || x.d.Durum == DosyaDurumu.IadeEdildi || x.d.Durum == DosyaDurumu.Kapandi
-                    || x.d.Durum == DosyaDurumu.AliciyaTerkEdildi);
+                sorgu = sorgu.Where(d => d.Durum == DosyaDurumu.Satildi || d.Durum == DosyaDurumu.IptalEdildi
+                    || d.Durum == DosyaDurumu.IadeEdildi || d.Durum == DosyaDurumu.Kapandi
+                    || d.Durum == DosyaDurumu.AliciyaTerkEdildi);
 
-            var liste = await sorgu
-                .OrderByDescending(x => x.d.DosyaNo)
-                .ThenByDescending(x => x.s != null ? x.s.SatisTarihi : (DateTime?)null)
-                .Select(x => new SatirSonuc
+            var dosyalar = await sorgu.ToListAsync();
+
+            SatirSonuc DosyaAlanlariniKopyala(Dosya d) => new()
+            {
+                DosyaId = d.Id,
+                DosyaNo = d.DosyaNo,
+                Plaka = d.Plaka,
+                AracCinsi = d.AracCinsi,
+                AracTipi = d.AracTipi,
+                AracMarkasi = d.AracMarkasi,
+                ModelYili = d.ModelYili,
+                MuhammenBedel = d.MuhammenBedel,
+                AdiSoyadiUnvani = d.AdiSoyadiUnvani,
+                VergiKimlikNumarasi = d.VergiKimlikNumarasi,
+                TCKimlikNumarasi = d.TCKimlikNumarasi,
+                VergiDairesiAdi = d.VergiDairesiAdi,
+                AlacakliVergiDairesi = d.AlacakliVergiDairesi,
+                KomisyonBaskani = d.KomisyonBaskani,
+                KomisyonUye1 = d.KomisyonUye1,
+                KomisyonUye2 = d.KomisyonUye2,
+                KomisyonUye3 = d.KomisyonUye3
+            };
+
+            var liste = new List<SatirSonuc>();
+            foreach (var d in dosyalar)
+            {
+                var eklendi = false;
+                foreach (var s in d.Satislar)
                 {
-                    DosyaId = x.d.Id,
-                    DosyaNo = x.d.DosyaNo,
-                    Plaka = x.d.Plaka,
-                    AracCinsi = x.d.AracCinsi,
-                    AracTipi = x.d.AracTipi,
-                    AracMarkasi = x.d.AracMarkasi,
-                    ModelYili = x.d.ModelYili,
-                    MuhammenBedel = x.d.MuhammenBedel,
-                    SatisTuru = x.s != null ? x.s.SatisTuru : (SatisTuru?)null,
-                    SatisTarihi = x.s != null ? x.s.SatisTarihi : (DateTime?)null,
-                    SatisSonucu = x.s != null ? x.s.SatisSonucu : (SatisSonucu?)null,
-                    AdiSoyadiUnvani = x.d.AdiSoyadiUnvani,
-                    VergiKimlikNumarasi = x.d.VergiKimlikNumarasi,
-                    TCKimlikNumarasi = x.d.TCKimlikNumarasi,
-                    VergiDairesiAdi = x.d.VergiDairesiAdi,
-                    AlacakliVergiDairesi = x.d.AlacakliVergiDairesi,
-                    KomisyonBaskani = x.d.KomisyonBaskani,
-                    KomisyonUye1 = x.d.KomisyonUye1,
-                    KomisyonUye2 = x.d.KomisyonUye2,
-                    KomisyonUye3 = x.d.KomisyonUye3
-                })
-                .ToListAsync();
+                    if (satisTuru.HasValue && s.SatisTuru != satisTuru.Value) continue;
+                    if (satisTarihi.HasValue && s.SatisTarihi.Date != satisTarihi.Value.Date) continue;
+                    if (satisSonucu.HasValue && s.SatisSonucu != satisSonucu.Value) continue;
+
+                    var satir = DosyaAlanlariniKopyala(d);
+                    satir.SatisTuru = s.SatisTuru;
+                    satir.SatisTarihi = s.SatisTarihi;
+                    satir.SatisSonucu = s.SatisSonucu;
+                    liste.Add(satir);
+                    eklendi = true;
+                }
+
+                // Henüz sonuçlanmamış bir "Bekliyor" satırı: bir sonuç filtresi (satisSonucu)
+                // seçiliyse hiçbir zaman eklenmez (bekleyen bir satırın sonucu yoktur). Ayrıca
+                // yalnızca gerçekten aktif (süreci devam eden) dosyalarda eklenir - Dosya.Asama,
+                // "2. Satış kaydı hiç yoksa 2. Satışı Bekliyor" kısayolunu 1. Satış zaten
+                // "Satıldı" sonuçlanıp dosya pasife düşmüş olsa bile döndürür (o özelliğin asıl
+                // kullanıldığı yerlerde zaten hep aktif dosyalarla çağrıldığı için sorun
+                // çıkarmıyor); burada Satıldı/İade/Kapandı/Terk gibi tamamlanmış bir dosya için
+                // yanlışlıkla "sonraki tur bekliyor" satırı eklenmesin diye durum kontrolü eklendi.
+                var dosyaAktif = d.Durum == DosyaDurumu.Kayitli || d.Durum == DosyaDurumu.SatisaCikti;
+                if (dosyaAktif && !satisSonucu.HasValue && AsamaBekleyenTur.TryGetValue(d.Asama, out var bekleyenTur))
+                {
+                    if (!satisTuru.HasValue || satisTuru.Value == bekleyenTur)
+                    {
+                        var planlanmisTarih = bekleyenTur switch
+                        {
+                            SatisTuru.BirinciSatis => d.Satis1Tarihi,
+                            SatisTuru.IkinciSatis => d.Satis2Tarihi,
+                            _ => DateTime.Today
+                        };
+                        if (!satisTarihi.HasValue || satisTarihi.Value.Date == planlanmisTarih.Date)
+                        {
+                            var satir = DosyaAlanlariniKopyala(d);
+                            satir.SatisTuru = bekleyenTur;
+                            satir.SatisTarihi = planlanmisTarih;
+                            satir.HenuzSonucGirilmedi = true;
+                            liste.Add(satir);
+                            eklendi = true;
+                        }
+                    }
+                }
+
+                // Hiçbir satış türü/tarihi/sonucu filtresi verilmemişse, her dosya en az bir
+                // satırla (bilgisi "-" olsa dahi) listede yer almaya devam eder.
+                if (!eklendi && !satisTuru.HasValue && !satisTarihi.HasValue && !satisSonucu.HasValue)
+                {
+                    liste.Add(DosyaAlanlariniKopyala(d));
+                }
+            }
+
+            liste = liste
+                .OrderByDescending(x => x.DosyaNo)
+                .ThenByDescending(x => x.SatisTarihi)
+                .ToList();
 
             // İhale saatini, aynı satış türü/tarihi için kaydedilmiş bir Komisyon İşlemleri
             // oturumundan (varsa) eşleştirerek doldur.
