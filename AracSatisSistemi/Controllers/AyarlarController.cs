@@ -54,28 +54,56 @@ namespace AracSatisSistemi.Controllers
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> TarifeGuncelle(GenelAyar form)
+        public async Task<IActionResult> TarifeGuncelle(
+            decimal KucukArac6AyaKadar, decimal KucukArac6AydanSonra,
+            decimal MinibusKamyonet6AyaKadar, decimal MinibusKamyonet6AydanSonra,
+            decimal BuyukArac6AyaKadar, decimal BuyukArac6AydanSonra,
+            decimal Motor6AyaKadar, decimal Motor6AydanSonra,
+            decimal KucukAracCekiciUcreti, decimal MinibusKamyonetCekiciUcreti,
+            decimal BuyukAracCekiciUcreti, decimal MotorCekiciUcreti)
+        {
+            // Bu action artık yalnızca bu 12 tutarı parametre olarak alıyor (tüm GenelAyar
+            // modelini DEĞİL) - aksi halde, bu formda artık bulunmayan MaksimumModelYili gibi
+            // (ayrı bir forma taşındı, bkz. ModelYiliGuncelle) zorunlu value-type alanlar
+            // eksik geldiği için ModelState her zaman geçersiz sayılıp hiçbir şey
+            // kaydedilemiyordu. Herhangi bir alan (ör. elle silinmiş/hatalı yazılmış bir tutar)
+            // ayrıştırılamazsa ModelState geçersiz olur; bu durumda kayıt YAPILMAZ ki o alan
+            // sessizce 0 (sıfır) olarak kaydedilmesin - kullanıcıya hangi alanın hatalı olduğu
+            // bildirilir.
+            if (!ModelState.IsValid)
+            {
+                var hatali = string.Join(", ", ModelState.Where(m => m.Value?.Errors.Count > 0).Select(m => m.Key));
+                TempData["Hata"] = $"Şu alan(lar)da geçersiz değer var, hiçbir şey kaydedilmedi: {hatali}";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var kayit = await _db.GenelAyarlar.FirstOrDefaultAsync();
+            if (kayit == null) { kayit = new GenelAyar(); _db.GenelAyarlar.Add(kayit); }
+            kayit.KucukArac6AyaKadar = KucukArac6AyaKadar;
+            kayit.KucukArac6AydanSonra = KucukArac6AydanSonra;
+            kayit.MinibusKamyonet6AyaKadar = MinibusKamyonet6AyaKadar;
+            kayit.MinibusKamyonet6AydanSonra = MinibusKamyonet6AydanSonra;
+            kayit.BuyukArac6AyaKadar = BuyukArac6AyaKadar;
+            kayit.BuyukArac6AydanSonra = BuyukArac6AydanSonra;
+            kayit.Motor6AyaKadar = Motor6AyaKadar;
+            kayit.Motor6AydanSonra = Motor6AydanSonra;
+            kayit.KucukAracCekiciUcreti = KucukAracCekiciUcreti;
+            kayit.MinibusKamyonetCekiciUcreti = MinibusKamyonetCekiciUcreti;
+            kayit.BuyukAracCekiciUcreti = BuyukAracCekiciUcreti;
+            kayit.MotorCekiciUcreti = MotorCekiciUcreti;
+            await _db.SaveChangesAsync();
+            TempData["Basari"] = "Otopark ve çekici ücret tarifesi güncellendi.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> ModelYiliGuncelle(int maksimumModelYili)
         {
             var kayit = await _db.GenelAyarlar.FirstOrDefaultAsync();
-            if (kayit == null) { kayit = form; _db.GenelAyarlar.Add(kayit); }
-            else
-            {
-                kayit.KucukArac6AyaKadar = form.KucukArac6AyaKadar;
-                kayit.KucukArac6AydanSonra = form.KucukArac6AydanSonra;
-                kayit.MinibusKamyonet6AyaKadar = form.MinibusKamyonet6AyaKadar;
-                kayit.MinibusKamyonet6AydanSonra = form.MinibusKamyonet6AydanSonra;
-                kayit.BuyukArac6AyaKadar = form.BuyukArac6AyaKadar;
-                kayit.BuyukArac6AydanSonra = form.BuyukArac6AydanSonra;
-                kayit.Motor6AyaKadar = form.Motor6AyaKadar;
-                kayit.Motor6AydanSonra = form.Motor6AydanSonra;
-                kayit.KucukAracCekiciUcreti = form.KucukAracCekiciUcreti;
-                kayit.MinibusKamyonetCekiciUcreti = form.MinibusKamyonetCekiciUcreti;
-                kayit.BuyukAracCekiciUcreti = form.BuyukAracCekiciUcreti;
-                kayit.MotorCekiciUcreti = form.MotorCekiciUcreti;
-                kayit.MaksimumModelYili = form.MaksimumModelYili;
-            }
+            if (kayit == null) { kayit = new GenelAyar(); _db.GenelAyarlar.Add(kayit); }
+            kayit.MaksimumModelYili = maksimumModelYili;
             await _db.SaveChangesAsync();
-            TempData["Basari"] = "Otopark ücret tarifesi güncellendi.";
+            TempData["Basari"] = "Model Yılı Üst Sınırı güncellendi.";
             return RedirectToAction(nameof(Index));
         }
 
