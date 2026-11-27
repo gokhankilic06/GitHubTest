@@ -201,6 +201,32 @@ using (var scope = app.Services.CreateScope())
         db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonAyarlari"" SET ""Uye3"" = '' WHERE ""Uye3"" = 'Üye 3 (güncelleyin)';");
     }
     catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
+
+    // Komisyon Oturumu formu, Başkan/Üye alanlarını yukarıdaki varsayılan Komisyon
+    // Bilgileri'yle önceden dolduruyor; bu yüzden bir kullanıcı değiştirmeden kaydettiyse
+    // aynı yer tutucu metin gerçek bir oturum kaydına (ör. İhale Tutanağı'nda görünen) da
+    // işlemiş olabilir - o satırlar da burada boşa çevrilir.
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonOturumlari"" SET ""Baskan"" = '' WHERE ""Baskan"" = 'Komisyon Başkanı (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonOturumlari"" SET ""Uye1"" = '' WHERE ""Uye1"" = 'Üye 1 (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonOturumlari"" SET ""Uye2"" = '' WHERE ""Uye2"" = 'Üye 2 (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""KomisyonOturumlari"" SET ""Uye3"" = '' WHERE ""Uye3"" = 'Üye 3 (güncelleyin)';");
+    }
+    catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
+
+    // Kayıt İşlemleri (Dosya oluşturma) de aynı varsayılan Komisyon Bilgileri'ni dosyanın
+    // kendi Komisyon alanlarına kopyalıyor (bkz. DosyaController.Create GET, İhale Tutanağı
+    // belgesinde dosya.KomisyonBaskani/Uye1/Uye2/Uye3 geri düşüş olarak kullanılıyor) - bu
+    // yüzden aynı yer tutucu metin dosyalara da işlemiş olabilir, burada temizlenir.
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"UPDATE ""Dosyalar"" SET ""KomisyonBaskani"" = NULL WHERE ""KomisyonBaskani"" = 'Komisyon Başkanı (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""Dosyalar"" SET ""KomisyonUye1"" = NULL WHERE ""KomisyonUye1"" = 'Üye 1 (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""Dosyalar"" SET ""KomisyonUye2"" = NULL WHERE ""KomisyonUye2"" = 'Üye 2 (güncelleyin)';");
+        db.Database.ExecuteSqlRaw(@"UPDATE ""Dosyalar"" SET ""KomisyonUye3"" = NULL WHERE ""KomisyonUye3"" = 'Üye 3 (güncelleyin)';");
+    }
+    catch { /* tablo/sütun bir şekilde yoksa sessizce geçilir */ }
 }
 
 if (!app.Environment.IsDevelopment())
