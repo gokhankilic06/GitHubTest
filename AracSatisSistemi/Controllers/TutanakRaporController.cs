@@ -386,6 +386,7 @@ namespace AracSatisSistemi.Controllers
             Yaz("Alıcı TC Kimlik No", satis.AliciTCKN);
             Yaz("Vade Tarihi", satis.VerilenSure?.ToString("dd.MM.yyyy"));
             Yaz("Faturayı Kesecek Otopark", satis.FaturayiKesenOtopark);
+            Yaz("Otopark Ücreti (TL)", veri.OtoparkTutari);
             Yaz("Çekici Bedeli (TL)", satis.CekiciBedeli);
             ws.Columns().AdjustToContents();
 

@@ -85,10 +85,10 @@
 
     <table class="tutanak-tablo mt-2">
         <tr><td class="baslik" colspan="3">ARAÇ OTOPARK BİLGİLERİ</td></tr>
-        <tr><td class="etiket">Faturayı Kesecek Otopark Adı</td><td class="etiket">Alıcı Adresi</td><td class="etiket">Çekici Bedeli</td></tr>
+        <tr><td class="etiket">Faturayı Kesecek Otopark Adı</td><td class="etiket">Otopark Ücreti (Bedeli)</td><td class="etiket">Çekici Bedeli</td></tr>
         <tr>
             <td>@satis.FaturayiKesenOtopark</td>
-            <td>@satis.Adres</td>
+            <td>@Model.OtoparkTutari.ToString("N2", trTR) TL</td>
             <td>@(satis.CekiciBedeli.HasValue ? satis.CekiciBedeli.Value.ToString("N2", trTR) + " TL" : "-")</td>
         </tr>
     </table>
@@ -101,7 +101,7 @@
     </p>
     <p class="tutanak-paragraf text-end">@satis.SatisTarihi.ToString("dd.MM.yyyy")</p>
 
-    <div class="text-center mt-4 mb-1 fw-bold">SATIŞ EKİBİ</div>
+    <div class="text-center mt-3 mb-1 fw-bold">SATIŞ EKİBİ</div>
     <div class="row text-center">
         <div class="col"><div class="imza-cizgi">@satis.AliciAdiSoyadi</div><span class="small text-muted">ALICI</span></div>
         <div class="col"><div class="imza-cizgi">@ViewBag.KomisyonUye1</div><span class="small text-muted">ÜYE</span></div>
@@ -115,12 +115,15 @@
 </div>
 
 <style>
+    /* Sayfa yazdırıldığında tek sayfaya sığması için üst/alt boşluk daraltıldı (yalnızca
+       bu belgeye özel - paylaşılan ".a4-sayfa" sınıfının diğer kullanımlarına dokunmaz). */
+    #kararAlani { padding: 15px 40px !important; }
     .tutanak-tablo { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
     .tutanak-tablo td { border: 1px solid #333; padding: 5px 8px; vertical-align: middle; }
-    .tutanak-tablo td.etiket { font-weight: 600; background: #f8f9fa; }
-    .tutanak-tablo td.baslik { font-weight: 700; background: #eaeaea; }
+    .tutanak-tablo td.etiket { font-weight: 600; background: #fff; }
+    .tutanak-tablo td.baslik { font-weight: 700; background: #fff; }
     .tutanak-paragraf { font-size: 0.85rem; }
-    .imza-cizgi { border-top: 1px solid #333; margin-top: 3rem; padding-top: .25rem; min-height: 1.2rem; }
+    .imza-cizgi { border-top: 1px solid #333; margin-top: 1.5rem; padding-top: .25rem; min-height: 1.2rem; }
 </style>
 
 @section Scripts {
